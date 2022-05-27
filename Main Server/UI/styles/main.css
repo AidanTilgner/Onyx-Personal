@@ -1,0 +1,32 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Quicksand", sans-serif;
+}
+
+.input {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+.input__prompt {
+  font-size: 24px;
+  font-weight: 500;
+}
+.input__text {
+  border: none;
+  width: 25vw;
+}
+.input__input {
+  font-family: "Quicksand", sans-serif;
+  border: none;
+  border-bottom: 1px solid black;
+  width: 100%;
+  font-size: 18px;
+}
+.input__input:focus {
+  outline: none;
+  border-bottom: 2px solid #2256f2;
+}/*# sourceMappingURL=main.css.map */
