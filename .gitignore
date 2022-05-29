@@ -3,3 +3,5 @@ node_modules/
 models/
 .rasa/
 venv/
+
+.env

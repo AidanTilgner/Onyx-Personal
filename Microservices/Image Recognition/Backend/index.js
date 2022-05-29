@@ -1,12 +1,14 @@
+// * TensorFlow Stuff
 import * as tf from "@tensorflow/tfjs-node";
 import coco_ssd from "@tensorflow-models/coco-ssd";
+
+// * Server Stuff
 import express from "express";
-import { config } from "dotenv";
-// busboy import
 import busboy from "busboy";
+import { config } from "dotenv";
 config();
 
-// * INIT MODEL
+// * Init Model
 let model = undefined;
 (async () => {
   model = await coco_ssd.load({
@@ -14,35 +16,26 @@ let model = undefined;
   });
 })();
 
+// * Init Express
 const app = express();
 const PORT = process.env.PORT || 5000;
 app.use(express.json());
 
-const wrapAsync = (fn) => {
-  return (req, res, next) => {
-    Promise.resolve(fn(req, res, next)).catch(next);
-  };
-};
-
 app.post("/predict", (req, res) => {
   if (!model) {
     res.status(500).send("Model is not loaded yet!");
-    return;
   }
-
-  console.log("Hit /predict endpoint");
+  // * Create a BusBoy Instance
   const bb = busboy({ headers: req.headers });
-  console.log("busboy created");
   bb.on("file", (fieldname, file, filename, encoding, mimetype) => {
-    console.log("Type: ", mimetype);
     const buffer = [];
     file.on("data", (data) => {
       buffer.push(data);
     });
     file.on("end", async () => {
+      // * Run Object Detection
       const image = tf.node.decodeImage(Buffer.concat(buffer));
       const predictions = await model.detect(image, 3, 0.25);
-      console.log("Predictions: ", predictions);
       res.json(predictions);
     });
   });
