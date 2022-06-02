@@ -8,7 +8,7 @@ from omegaconf import OmegaConf
 
 language = "en"
 _, decoder, utils = torch.hub._load_local(
-    hubconf_dir="silero/", model="silero_stt", language=language
+    hubconf_dir="utils/", model="silero_stt", language=language
 )
 (read_batch, split_into_batches, read_audio, prepare_model_input) = utils
 
