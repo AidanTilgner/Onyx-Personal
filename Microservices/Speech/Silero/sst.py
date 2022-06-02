@@ -17,7 +17,7 @@ onnx.checker.check_model(onnx_model)
 ort_session = onnxruntime.InferenceSession("models/model.onnx")
 
 # download a single file, any format compatible with TorchAudio
-test_files = ["speech_orig.wav"]
+test_files = ["audio/speech_orig.wav"]
 batches = split_into_batches(test_files, batch_size=10)
 input = prepare_model_input(read_batch(batches[0]))
 
