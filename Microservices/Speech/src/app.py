@@ -11,6 +11,11 @@ def index():
     return "Hello World!"
 
 
+@app.route("/ui", methods=["GET"])
+def ui():
+    return render_template("index.html")
+
+
 # The stt post request will take an audio file and return predicted text
 @app.route("/stt", methods=["POST"])
 def sst():
