@@ -1,1 +1,4 @@
 utils/
+__pycache__/
+models/
+tmp/
