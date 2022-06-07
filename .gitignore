@@ -1,7 +1,10 @@
 
 node_modules/
 models/
+model.*
+model/
 .rasa/
 venv/
-
+.onnx
+.jit
 .env
