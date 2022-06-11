@@ -4,6 +4,8 @@
 
 The Applications server exists in order to host applications that utilize the Onyx system's functionality. This could be the dashboard that nearly directly controls the Onyx system, or a text editor that allows the user to create and edit text files used by the system. Because this will be communicating with different microservices in the Onyx system, and rendering UI elements sent by each microservice, the Applications server will be capable of handling lots of requests, and routing efficiently.
 
+The Applications Server will also be responsible for taking UI and other elements of different services and condensing them into a single system.
+
 ## Design and Architecture
 
 We're talking about combining multiple clients into one server, while also keeping each one reasonably independent to avoid coupling. In order to do this we will need to maintain a careful balance of orchestration by a central gateway server, and choreography between the various clients to create a seemless user experience. This will be done by creating a single gateway server that will be responsible for routing requests between the clients and different services.

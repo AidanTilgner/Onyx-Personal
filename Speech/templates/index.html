@@ -10,16 +10,36 @@
       type="text/css"
       href="{{ url_for('static', filename='styles/style.css') }}"
     />
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
   </head>
   <body>
     <div id="controls">
-      <button id="recordButton">Record</button>
+      <!-- <button id="recordButton">Record</button>
       <button id="pauseButton" disabled>Pause</button>
-      <button id="stopButton" disabled>Stop</button>
+      <button id="stopButton" disabled>Stop</button> -->
     </div>
-    <div id="formats">Format: start recording to see sample rate</div>
+    <div class="interface">
+      <p>Voice Input</p>
+      <button id="interfaceButton" class="button">
+        <i class="material-symbols-outlined">mic</i>
+      </button>
+    </div>
+    <!-- <div id="formats">Format: start recording to see sample rate</div> -->
     <p><strong>Translations:</strong></p>
-    <ol id="recordingsList"></ol>
+    <ul id="recordingsList"></ul>
     <!-- inserting these scripts at the end to be able to use all the elements in the DOM -->
     <script src="{{ url_for('static', filename='js/recorder.js') }}"></script>
     <script src="{{ url_for('static', filename='js/index.js') }}"></script>
