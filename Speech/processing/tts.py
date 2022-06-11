@@ -26,7 +26,7 @@ def generateRandomString(length):
 model = torch.package.PackageImporter(local_file).load_pickle("tts_models", "model")
 model.to(device)
 
-example_text = "Hello there this is a test"
+example_text = "These leggings are too small for me"
 sample_rate = 24000
 speaker = "en_0"
 put_accent = True
@@ -48,7 +48,7 @@ audio_path = model.save_wav(
     sample_rate=sample_rate,
     put_accent=put_accent,
     put_yo=put_yo,
-    audio_path="test.wav",
+    audio_path=f"audio_output/{generateRandomString(10)}.wav",
 )
 print("Audio Path: ", audio_path)
 object_methods = [
