@@ -51,11 +51,18 @@ async function createDownloadLink(blob) {
 
   const formData = new FormData();
   formData.append("file", blob);
-  const res = await fetch("/stt", {
-    method: "POST",
-    body: formData,
-  }).then((res) => res.json());
-  li.innerText = res.text;
+  axios
+    .post("http://localhost:5000/stt", {
+      body: formData,
+    })
+    .then((res) => res.json())
+    .then((data) => {
+      li.innerText = data.text;
 
-  recordingsList.appendChild(li);
+      recordingsList.appendChild(li);
+    });
+  // const res = await fetch("http://localhost:5000/stt", {
+  //   method: "POST",
+  //   body: formData,
+  // }).then((res) => res.json());
 }

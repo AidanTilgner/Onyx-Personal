@@ -5,11 +5,7 @@
     <title>Audio Interface</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <link
-      rel="stylesheet"
-      type="text/css"
-      href="{{ url_for('static', filename='styles/style.css') }}"
-    />
+    <link rel="stylesheet" type="text/css" href="./styles/style.css" />
     <link
       href="https://fonts.googleapis.com/icon?family=Material+Icons"
       rel="stylesheet"
@@ -41,7 +37,8 @@
     <p><strong>Translations:</strong></p>
     <ul id="recordingsList"></ul>
     <!-- inserting these scripts at the end to be able to use all the elements in the DOM -->
-    <script src="{{ url_for('static', filename='js/recorder.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/index.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="./js/recorder.js"></script>
+    <script src="./js/index.js"></script>
   </body>
 </html>

@@ -8,14 +8,14 @@ from flask import (
     make_response,
     session,
 )
-from sst import *
+from processing.sst import *
 import os
 from flask_cors import CORS
 
 # Initialize the Flask application
 app = Flask(__name__)
 app.secret_key = "A0Zr98j/3yX R~XHH!jmNlLWX/,?cT"
-CORS(app, resources={"/*": {"origins": "*"}})
+CORS(app, resources={"/*": {"origins": "localhost:5500"}})
 
 
 @app.route("/")
@@ -63,5 +63,5 @@ def translations():
 
 # start server on port 5000
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+    app.run(host="0.0.0.0", port=5000, debug=True)
 
