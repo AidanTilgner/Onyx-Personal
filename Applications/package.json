@@ -1,23 +1,16 @@
 {
-  "name": "onyx-applications-server",
-  "version": "1.0.0",
-  "description": "The Applications server exists in order to host applications that utilize the Onyx system's functionality. This could be the dashboard that nearly directly controls the Onyx system, or a text editor that allows the user to create and edit text files used by the system. Because this will be communicating with different microservices in the Onyx system, and rendering UI elements sent by each microservice, the Applications server will be capable of handling lots of requests, and routing efficiently.",
-  "main": "public/index.js",
+  "name": "applications",
+  "version": "0.0.0",
+  "private": true,
   "scripts": {
-    "dev": "ts-node-dev src/index.ts"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "devDependencies": {
-    "nodemon": "^2.0.16",
-    "ts-node": "^10.8.1",
-    "ts-node-dev": "^2.0.0",
-    "typescript": "^4.7.3"
+    "start": "node ./bin/www"
   },
   "dependencies": {
-    "@types/express": "^4.17.13",
-    "@types/node": "^17.0.42",
-    "express": "^4.18.1"
+    "cookie-parser": "~1.4.4",
+    "debug": "~2.6.9",
+    "ejs": "~2.6.1",
+    "express": "~4.16.1",
+    "http-errors": "~1.6.3",
+    "morgan": "~1.9.1"
   }
 }
