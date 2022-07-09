@@ -104,15 +104,11 @@ var audioContext;
 var interfaceButton = document.getElementById("interfaceButton");
 
 interfaceButton.addEventListener("mousedown", (e) => {
-  console.log("interfaceButton clicked");
   startRecording();
 });
 interfaceButton.addEventListener("mouseup", (e) => {
-  console.log("interfaceButton clicked");
   stopRecording();
 });
-
-console.log("App started");
 
 function startRecording() {
   var constraints = { audio: true, video: false };
@@ -126,8 +122,6 @@ function startRecording() {
       rec = new Recorder(input, { numChannels: 1 });
 
       rec.record();
-
-      console.log("Recording started");
     })
     .catch(function (err) {
       console.log(err);
