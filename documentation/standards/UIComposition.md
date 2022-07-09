@@ -1,8 +1,8 @@
-# Onyx Systems Standards
+# UI Composition
 
 ## Summary
 
-This document will contain common standards that all ONyx Systems will follow.
+This document will contain common standards for Onyx Systems composite UI's to follow.
 
 ## Frontend UI Composition
 
@@ -20,6 +20,8 @@ An example implementation of the Context API hook will look like as follows:
 ```js
 const { getStores, actions, events, elements } = useContext();
 ```
+
+As you can see, the `useContext()` method will be globally available within the host page, and therefore will be globally accessible to any javascript bundle that wants to use it.
 
 `getStores` will be a method that returns an object of all of the stores available to the widget. If the widget wants to access a specific store withing that object, they can pass a string to the method, and the method will return the store. By default however, the method will return the entire object. We will need to figure out how to secure this by validating bundles that are being sent to the frontend. Each store object will contain `subcribe`, `set`, and `update` methods. That way we can add reactivity by alerting widgets to changes in the store. In order to decrease coupling however, what actions happen as a result of store updates will be handled by the widget itself.
 
