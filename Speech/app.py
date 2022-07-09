@@ -1,20 +1,14 @@
 from time import time
-from flask import (
-    Flask,
-    request,
-    render_template,
-    redirect,
-    url_for,
-)
+from flask import Flask, request, render_template, redirect, url_for, jsonify
 from processing.sst import *
 import os
-from flask_cors import CORS
+from flask_cors import CORS, cross_origin
 from handlers.widgets import widgets as widgetsHandler
 
 # Initialize the Flask application
 app = Flask(__name__)
 app.secret_key = "A0Zr98j/3yX R~XHH!jmNlLWX/,?cT"
-CORS(app, resources={"/*": {"origins": "localhost:5500"}})
+CORS(app)
 
 
 @app.route("/")
@@ -38,7 +32,9 @@ def sst():
         text = predictAudio(os.path.join(os.path.dirname(__file__), "tmp/" + filename))
         os.remove(os.path.join(os.path.dirname(__file__), "tmp/" + filename))
         # Add text translation to session array\
-        return {"text": text}
+
+        res = jsonify({"text": text})
+        return res
 
 
 @app.route("/widgets/<widget_id>", methods=["GET"])

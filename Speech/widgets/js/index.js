@@ -61,8 +61,4 @@ async function createDownloadLink(blob) {
 
       recordingsList.appendChild(li);
     });
-  // const res = await fetch("http://localhost:5000/stt", {
-  //   method: "POST",
-  //   body: formData,
-  // }).then((res) => res.json());
 }
