@@ -1,6 +1,11 @@
 version: "3.0"
 
 rules:
+  - rule: Say Hello
+    steps:
+      - intent: greet
+      - action: utter_greet
+
   - rule: Say goodbye anytime the user says goodbye
     steps:
       - intent: goodbye
@@ -26,3 +31,8 @@ rules:
       - active_loop: null
       - action: utter_submit
       - action: utter_slots_values
+
+  - rule: Get weather information
+    steps:
+      - intent: inquire_weather
+      - action: get_weather

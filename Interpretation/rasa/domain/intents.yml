@@ -8,6 +8,6 @@ intents:
   - mood_great
   - mood_unhappy
   - bot_challenge
-  # * Restaurant Form Intents
   - request_restaurant
   - inform
+  - inquire_weather
