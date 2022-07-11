@@ -3,6 +3,8 @@ import torch
 import onnxruntime
 from omegaconf import OmegaConf
 import os
+from processing.te import apply_te
+from processing.spellcheck import auto_correct_sentence
 
 # import everything from utils in ./utils/utils.py
 # from utils.utils import *
@@ -22,12 +24,11 @@ ort_session = onnxruntime.InferenceSession(
 )
 
 
-def predictAudio(audio_path):
+def predict_audio(audio_path):
     """
     audio_path: path to audio file
     """
     # download a single file, any format compatible with TorchAudio
-    print("Reading audio", audio_path)
     test_files = [audio_path]
     batches = split_into_batches(test_files, batch_size=10)
     input = prepare_model_input(read_batch(batches[0]))
@@ -37,4 +38,16 @@ def predictAudio(audio_path):
     ort_inputs = {"input": onnx_input}
     ort_outs = ort_session.run(None, ort_inputs)
     decoded = decoder(torch.Tensor(ort_outs[0])[0])
+    return decoded
+
+
+def predict_audio_with_te(audio_path):
+    decoded = predict_audio(audio_path)
+    decoded = apply_te(decoded)
+    return decoded
+
+
+def predict_audio_with_autocorrect(audio_path):
+    decoded = predict_audio(audio_path)
+    decoded = auto_correct_sentence(decoded)
     return decoded

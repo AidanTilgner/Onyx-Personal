@@ -137,11 +137,20 @@ function stopRecording() {
 async function createDownloadLink(blob) {
   const formData = new FormData();
   formData.append("file", blob);
-  axios
-    .post("http://localhost:5000/stt", formData)
-    .then((res) => res.data)
-    .then((data) => {
-      console.log("Text: ", data);
+  axios("http://localhost:5000/stt", {
+    method: "POST",
+    data: formData,
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  })
+    .then((res) => {
+      console.log(res);
+      console.log(res.data);
+      console.log(res.data.text);
+    })
+    .catch((err) => {
+      console.log(err);
     });
 }
 

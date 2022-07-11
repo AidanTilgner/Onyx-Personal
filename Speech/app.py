@@ -1,8 +1,9 @@
 from time import time
 from flask import Flask, request, render_template, redirect, url_for, jsonify
-from processing.sst import *
+from processing.sst import predict_audio, predict_audio_with_autocorrect
+from processing.spellcheck import auto_correct_sentence
 import os
-from flask_cors import CORS, cross_origin
+from flask_cors import CORS
 from handlers.widgets import widgets as widgetsHandler
 
 # Initialize the Flask application
@@ -29,11 +30,11 @@ def sst():
         ext = file.filename.split(".")[-1]
         filename = "temp." + ext
         file.save(os.path.join(os.path.dirname(__file__), "tmp/" + filename))
-        text = predictAudio(os.path.join(os.path.dirname(__file__), "tmp/" + filename))
+        text = predict_audio(os.path.join(os.path.dirname(__file__), "tmp/" + filename))
+        corrected = auto_correct_sentence(text)
         os.remove(os.path.join(os.path.dirname(__file__), "tmp/" + filename))
-        # Add text translation to session array\
 
-        res = jsonify({"text": text})
+        res = jsonify({"text": text, "corrected": corrected})
         return res
 
 
@@ -44,5 +45,5 @@ def widgets(widget_id):
 
 # start server on port 5000
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=False)
+    app.run(host="0.0.0.0", port=5000, debug=True)
 
