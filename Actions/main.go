@@ -1,8 +1,7 @@
 package main
 
 import (
-	"github.com/kataras/iris/v12",
-	"fmt"
+	"github.com/kataras/iris/v12"
 )
 
 func main() {
@@ -14,7 +13,8 @@ func main() {
 	})
 
 	app.Handle("POST", "/webook", func(ctx iris.Context) {
-		fmt.Println("Response: ", ctx.ReadJSON())
+		// parse request body as json
+
 		ctx.JSON("Thanks")
 	})
 
