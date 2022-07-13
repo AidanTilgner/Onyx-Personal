@@ -2,6 +2,7 @@ import { calculateScore } from "../helpers";
 import { CommandSubtypes, Types } from "../index.d";
 import { commandSubtypeMatch } from "./types";
 import typesJSON from "./type.json";
+import { getMaxElementIndex } from "../helpers";
 
 const types: Types = typesJSON;
 
@@ -16,11 +17,12 @@ export const findCommandType = (
     scores.push(score);
   });
 
-  const type = types[getMaxElementIndex(scores)];
+  const type = typesArr[getMaxElementIndex(scores)];
 
   return {
     name: type.name,
-    functionName: getCommandSubtype(input, commandSubtypeMatch[type.name]).name,
+    functionName: getCommandSubtype(input, commandSubtypeMatch[type.name]).func
+      .name,
   };
 };
 
@@ -36,13 +38,7 @@ const getCommandSubtype = (
     scores.push(score);
   });
 
-  const type = types[getMaxElementIndex(scores)];
+  const type = typesArr[getMaxElementIndex(scores)];
 
   return { name: type.name, func: type.func };
-};
-
-const getMaxElementIndex = (nums: number[]): number => {
-  const min = Math.max();
-  const index = nums.indexOf(min);
-  return index;
 };

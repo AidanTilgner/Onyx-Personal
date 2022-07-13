@@ -1,5 +1,5 @@
 import typesJSON from "./intitial.json";
-import { calculateScore } from "./helpers";
+import { calculateScore, getMaxElementIndex } from "./helpers";
 import { WordTokenizer } from "natural";
 import { findQueryType } from "./queries/index";
 import { findCommandType } from "./commands/index";
@@ -13,7 +13,23 @@ const checkMappings: { [key: string]: Function } = {
 export const getInputMapping = (input: string): Result => {
   const tokenized = new WordTokenizer().tokenize(input);
   const type = findType(tokenized);
-  const subType = checkMappings[type](input);
+  if (!type) {
+    console.error("No type");
+    return {
+      type: "not found",
+      subType: "not found",
+      functionName: "not found",
+    };
+  }
+  const subType = checkMappings[type](tokenized);
+  if (!subType) {
+    console.error("No subType");
+    return {
+      type: type,
+      subType: "not found",
+      functionName: "not found",
+    };
+  }
 
   const result = {
     type: type,
@@ -24,9 +40,9 @@ export const getInputMapping = (input: string): Result => {
   return result;
 };
 
-const types: Types = typesJSON;
-
 const findType = (input: string[]): string => {
+  const types: Types = typesJSON;
+
   const typesArr = Object.keys(types).map((t) => types[t]);
   const scores: number[] = [];
 
@@ -35,15 +51,21 @@ const findType = (input: string[]): string => {
     scores.push(score);
   });
 
-  const type = types[getMaxElementIndex(scores)];
-
-  return type.name;
+  const type = typesArr[getMaxElementIndex(scores)];
+  return type ? type.name : "";
 };
 
-const getMaxElementIndex = (nums: number[]): number => {
-  const min = Math.max();
-  const index = nums.indexOf(min);
-  return index;
-};
-
-console.log("Test: ", getInputMapping("What is the weather today?"));
+// ! Tests
+console.assert(
+  getInputMapping("What is the weather today?").type === "query",
+  "Checking Mapping Type"
+);
+console.assert(
+  getInputMapping("What is the weather today?").subType === "weather",
+  "Checking Mapping SubType"
+);
+console.assert(
+  getInputMapping("What is the weather today?").functionName ===
+    "get_weather_by_time_of_day",
+  "Checking Mapping Function Name"
+);

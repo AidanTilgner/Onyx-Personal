@@ -11,3 +11,9 @@ export const calculateScore = (input: string[], mappings: Mappings): number => {
 
   return score;
 };
+
+export const getMaxElementIndex = (nums: number[]): number => {
+  const max = Math.max(...nums);
+  const index = nums.indexOf(max);
+  return index;
+};
