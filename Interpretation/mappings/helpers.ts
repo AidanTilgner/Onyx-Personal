@@ -6,11 +6,8 @@ export const calculateScore = (input: string[], mappings: Mappings): number => {
   input.forEach((token) => {
     if (mappings[token]) {
       score += mappings[token].value;
-      console.log("matched with word", token);
     }
   });
-
-  console.log("Score: ", score);
 
   return score;
 };

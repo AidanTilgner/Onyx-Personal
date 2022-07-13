@@ -50,11 +50,8 @@ const findType = (input: string[]): string => {
     const score = calculateScore(input, t.words);
     scores.push(score);
   });
-  console.log("Types array", typesArr);
-  console.log("Types Scores: ", scores);
 
   const type = typesArr[getMaxElementIndex(scores)];
-  console.log("Type Score: ", type, getMaxElementIndex(scores));
   return type ? type.name : "";
 };
 
