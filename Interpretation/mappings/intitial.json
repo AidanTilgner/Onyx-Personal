@@ -1,5 +1,6 @@
 {
   "query": {
+    "name": "query",
     "words": {
       "?": {
         "value": 150
@@ -34,6 +35,7 @@
     }
   },
   "command": {
+    "name": "query",
     "words": {
       "?": {
         "value": -150

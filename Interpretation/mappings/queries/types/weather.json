@@ -1,5 +1,6 @@
 {
   "time": {
+    "name": "time",
     "words": {
       "today": {
         "value": 100
@@ -20,8 +21,8 @@
         "value": 100
       }
     },
-    "function": {
-      "value": "get_weather_by_time_of_day",
+    "func": {
+      "name": "get_weather_by_time_of_day",
       "entities": {
         "today": "today",
         "yesterday": "yesterday",
@@ -31,12 +32,19 @@
     }
   },
   "place": {
+    "name": "place",
     "words": {
       "here": {
         "value": 100
       },
       "there": {
         "value": 100
+      }
+    },
+    "func": {
+      "name": "get_weather_by_location",
+      "entities": {
+        "place": ""
       }
     }
   }

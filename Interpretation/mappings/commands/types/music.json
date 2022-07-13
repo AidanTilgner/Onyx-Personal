@@ -1,0 +1,16 @@
+{
+  "song_name": {
+    "name": "play",
+    "words": {
+      "name": {
+        "value": 100
+      }
+    },
+    "func": {
+      "name": "play_music_from_song_name",
+      "entities": {
+        "song_name": ""
+      }
+    }
+  }
+}

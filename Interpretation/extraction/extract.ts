@@ -1,14 +1,6 @@
-import "./index";
-import { WordTokenizer } from "natural";
+import { Extraction } from "./index.d";
+import { getInputMapping } from "../mappings/index";
 
-export const calculateScore = (input: string[], mappings: Mappings): number => {
-  let score = 0;
-
-  input.forEach((token) => {
-    if (mappings[token]) {
-      score += mappings[token];
-    }
-  });
-
-  return score;
+export const runNLU = (input: string) => {
+  return getInputMapping(input);
 };

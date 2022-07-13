@@ -1,11 +1,11 @@
 import { calculateScore } from "../helpers";
-import { Types, QuerySubtypes } from "../index.d";
-import { querySubtypeMatch } from "./types";
+import { CommandSubtypes, Types } from "../index.d";
+import { commandSubtypeMatch } from "./types";
 import typesJSON from "./type.json";
 
 const types: Types = typesJSON;
 
-export const findQueryType = (
+export const findCommandType = (
   input: string[]
 ): { name: string; functionName: string } => {
   const typesArr = Object.keys(types).map((t) => types[t]);
@@ -20,14 +20,14 @@ export const findQueryType = (
 
   return {
     name: type.name,
-    functionName: getQuerySubtype(input, querySubtypeMatch[type.name]).name,
+    functionName: getCommandSubtype(input, commandSubtypeMatch[type.name]).name,
   };
 };
 
-const getQuerySubtype = (
+const getCommandSubtype = (
   input: string[],
-  types: QuerySubtypes
-): { name: string } => {
+  types: CommandSubtypes
+): { name: string; func: { name: string } } => {
   const typesArr = Object.keys(types).map((t) => types[t]);
   const scores: number[] = [];
 
@@ -38,7 +38,7 @@ const getQuerySubtype = (
 
   const type = types[getMaxElementIndex(scores)];
 
-  return { name: type.name };
+  return { name: type.name, func: type.func };
 };
 
 const getMaxElementIndex = (nums: number[]): number => {

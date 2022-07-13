@@ -1,0 +1,10 @@
+{
+  "music": {
+    "name": "music",
+    "words": {
+      "play": {
+        "value": 100
+      }
+    }
+  }
+}

@@ -1,4 +1,4 @@
-type Extraction = {
+export type Extraction = {
   original_input: string;
   function: {
     type: string;
@@ -6,8 +6,4 @@ type Extraction = {
     arguments: { [key: string]: any };
   };
   confidence: number;
-};
-
-type Mappings = {
-  [key: string]: number;
 };

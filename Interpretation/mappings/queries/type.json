@@ -1,5 +1,6 @@
 {
   "weather": {
+    "name": "weather",
     "words": {
       "weather": {
         "value": 150
