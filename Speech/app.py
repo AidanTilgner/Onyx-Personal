@@ -1,21 +1,15 @@
 from time import time
-from flask import (
-    Flask,
-    request,
-    render_template,
-    redirect,
-    url_for,
-    make_response,
-    session,
-)
-from processing.sst import *
+from flask import Flask, request, render_template, redirect, url_for, jsonify
+from processing.sst import predict_audio, predict_audio_with_autocorrect
+from processing.spellcheck import auto_correct_sentence
 import os
 from flask_cors import CORS
+from handlers.widgets import widgets as widgetsHandler
 
 # Initialize the Flask application
 app = Flask(__name__)
 app.secret_key = "A0Zr98j/3yX R~XHH!jmNlLWX/,?cT"
-CORS(app, resources={"/*": {"origins": "localhost:5500"}})
+CORS(app)
 
 
 @app.route("/")
@@ -36,29 +30,17 @@ def sst():
         ext = file.filename.split(".")[-1]
         filename = "temp." + ext
         file.save(os.path.join(os.path.dirname(__file__), "tmp/" + filename))
-        text = predictAudio(os.path.join(os.path.dirname(__file__), "tmp/" + filename))
+        text = predict_audio(os.path.join(os.path.dirname(__file__), "tmp/" + filename))
+        corrected = auto_correct_sentence(text)
         os.remove(os.path.join(os.path.dirname(__file__), "tmp/" + filename))
-        # Add text translation to session array\
-        print("Text: ", text)
-        if "translations" in session and session["translations"] is not None:
-            print("Appending")
-            session["translations"].append({"text": text})
-            session["translations"] = session["translations"][-10:]
-        else:
-            print("Defining")
-            session["translations"] = [{"text": text}]
-        print("Translations in stt: ", session["translations"])
-        return {"text": text}
+
+        res = jsonify({"text": text, "corrected": corrected})
+        return res
 
 
-@app.route("/translations", methods=["GET"])
-def translations():
-    # get all translations from session
-    if request.method == "GET":
-        if "translations" in session:
-            return {"translations": session["translations"]}
-        else:
-            return {"translations": []}
+@app.route("/widgets/<widget_id>", methods=["GET"])
+def widgets(widget_id):
+    return widgetsHandler(request, widget_id)
 
 
 # start server on port 5000

@@ -1,0 +1,51 @@
+{
+  "time": {
+    "name": "time",
+    "words": {
+      "today": {
+        "value": 100
+      },
+      "yesterday": {
+        "value": 100
+      },
+      "tomorrow": {
+        "value": 100
+      },
+      "week": {
+        "value": 100
+      },
+      "last": {
+        "value": 100
+      },
+      "next": {
+        "value": 100
+      }
+    },
+    "func": {
+      "name": "get_weather_by_time_of_day",
+      "entities": {
+        "today": "today",
+        "yesterday": "yesterday",
+        "tomorrow": "tomorrow",
+        "week": "next_week"
+      }
+    }
+  },
+  "place": {
+    "name": "place",
+    "words": {
+      "here": {
+        "value": 100
+      },
+      "there": {
+        "value": 100
+      }
+    },
+    "func": {
+      "name": "get_weather_by_location",
+      "entities": {
+        "place": ""
+      }
+    }
+  }
+}
