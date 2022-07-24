@@ -13,7 +13,7 @@ The package protocal will allow use to identify a chain of endpoints, and then n
         0: {
             query: "query_definition",
             command: "command_definition",
-            deposit: 1,
+            deposit: step_to_deposit,
             data: {
                 deposited: any,
                 gathered: any,
