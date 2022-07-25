@@ -1,0 +1,9 @@
+flask
+flask_cors
+CyHunspell
+torch
+onnx
+onnxruntime
+omegaconf
+torchaudio
+PySoundFile

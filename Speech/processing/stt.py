@@ -52,10 +52,17 @@ def predict_audio_with_autocorrect(audio_path):
     corrected = auto_correct_sentence(decoded)
     return {"text": decoded, "corrected": corrected}
 
+
+def save_to_file(content, filename):
+    with open(filename, "w") as file:
+        file.write(content)
+
+
 def predict_audio_from_file(file):
     ext = file.filename.split(".")[-1]
     filename = "temp." + ext
-    file.save(os.path.join(os.path.dirname(__file__), "tmp/" + filename))
-    text = predict_audio_with_autocorrect(os.path.join(os.path.dirname(__file__), "tmp/" + filename))
-    os.remove(os.path.join(os.path.dirname(__file__), "tmp/" + filename))
+    ROOT = os.path.abspath(os.curdir)
+    file.save(os.path.join(ROOT, "tmp/" + filename))
+    text = predict_audio_with_autocorrect(os.path.join(ROOT, "tmp/" + filename))
+    os.remove(os.path.join(ROOT, "tmp/" + filename))
     return text
