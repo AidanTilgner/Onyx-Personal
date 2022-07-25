@@ -1,10 +1,12 @@
+from struct import pack
 from time import time
 from flask import Flask, request, render_template, redirect, url_for, jsonify
-from processing.sst import predict_audio, predict_audio_with_autocorrect
+from processing.stt import predict_audio, predict_audio_with_autocorrect
 from processing.spellcheck import auto_correct_sentence
 import os
 from flask_cors import CORS
 from handlers.widgets import widgets as widgetsHandler
+from handlers.packages import packagesHandler
 
 # Initialize the Flask application
 app = Flask(__name__)
@@ -26,7 +28,7 @@ def ui(status=302):
 @app.route("/stt", methods=["POST", "GET"])
 def sst():
     if request.method == "POST":
-        file = request.files["file"]
+        file = request.files["audio"]
         ext = file.filename.split(".")[-1]
         filename = "temp." + ext
         file.save(os.path.join(os.path.dirname(__file__), "tmp/" + filename))
@@ -43,7 +45,11 @@ def widgets(widget_id):
     return widgetsHandler(request, widget_id)
 
 
+@app.route("/package-hook", methods=["POST", "GET"])
+def packages():
+    return packagesHandler(request)
+
+
 # start server on port 5000
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
-

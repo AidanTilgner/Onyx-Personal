@@ -1,6 +1,7 @@
 import Express, { json, urlencoded } from "express";
 import { config } from "dotenv";
 import nluRouter from "./routes/nlu";
+import packagesRouter from "./routes/packages";
 
 config();
 
@@ -12,6 +13,7 @@ app.use(json());
 app.use(urlencoded({ extended: true }));
 
 app.use("/nlu", nluRouter);
+app.use("/package-hook", packagesRouter);
 
 app.listen(PORT, () => {
   console.log("Server is running on port " + PORT);

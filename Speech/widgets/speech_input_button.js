@@ -131,13 +131,34 @@ function startRecording() {
 function stopRecording() {
   rec.stop();
   gumStream.getAudioTracks()[0].stop();
-  rec.exportWAV(createDownloadLink);
+  rec.exportWAV(sendAudio);
 }
 
-async function createDownloadLink(blob) {
+async function sendAudio(blob) {
   const formData = new FormData();
-  formData.append("file", blob);
-  axios("http://localhost:5000/stt", {
+  formData.append("audio", blob);
+
+  const pkg = {
+    current_step: 0,
+    steps: {
+      0: {
+        query: "stt",
+        deposit: 1,
+        data: {
+          deposited: null,
+          gathered: null,
+        },
+        next: "http://localhost:3000",
+        completed: false,
+        errors: [],
+        use_file: "audio",
+        use_files: [],
+      },
+    },
+  };
+  formData.append("pkg", JSON.stringify(pkg));
+
+  axios("http://localhost:5000/package-hook", {
     method: "POST",
     data: formData,
     headers: {
