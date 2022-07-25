@@ -131,10 +131,10 @@ function startRecording() {
 function stopRecording() {
   rec.stop();
   gumStream.getAudioTracks()[0].stop();
-  rec.exportWAV(createDownloadLink);
+  rec.exportWAV(sendAudio);
 }
 
-async function createDownloadLink(blob) {
+async function sendAudio(blob) {
   const formData = new FormData();
   formData.append("file", blob);
   axios("http://localhost:5000/stt", {

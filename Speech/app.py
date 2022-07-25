@@ -1,3 +1,4 @@
+from struct import pack
 from time import time
 from flask import Flask, request, render_template, redirect, url_for, jsonify
 from processing.sst import predict_audio, predict_audio_with_autocorrect
@@ -5,6 +6,7 @@ from processing.spellcheck import auto_correct_sentence
 import os
 from flask_cors import CORS
 from handlers.widgets import widgets as widgetsHandler
+from handlers.packages import packagesHandler
 
 # Initialize the Flask application
 app = Flask(__name__)
@@ -41,6 +43,10 @@ def sst():
 @app.route("/widgets/<widget_id>", methods=["GET"])
 def widgets(widget_id):
     return widgetsHandler(request, widget_id)
+
+@app.route("/package-hook", methods=["GET"])
+def widgets():
+    return packagesHandler(request)
 
 
 # start server on port 5000

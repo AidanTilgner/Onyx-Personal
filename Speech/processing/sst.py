@@ -49,5 +49,13 @@ def predict_audio_with_te(audio_path):
 
 def predict_audio_with_autocorrect(audio_path):
     decoded = predict_audio(audio_path)
-    decoded = auto_correct_sentence(decoded)
-    return decoded
+    corrected = auto_correct_sentence(decoded)
+    return {"text": decoded, "corrected": corrected}
+
+def predict_audio_from_file(file):
+    ext = file.filename.split(".")[-1]
+    filename = "temp." + ext
+    file.save(os.path.join(os.path.dirname(__file__), "tmp/" + filename))
+    text = predict_audio_with_autocorrect(os.path.join(os.path.dirname(__file__), "tmp/" + filename))
+    os.remove(os.path.join(os.path.dirname(__file__), "tmp/" + filename))
+    return text

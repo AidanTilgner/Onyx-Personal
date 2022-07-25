@@ -8,22 +8,30 @@ The package protocal will allow use to identify a chain of endpoints, and then n
 
 ```
 {
-    current_step: number,
-    steps: {
-        0: {
-            query: "query_definition",
-            command: "command_definition",
-            deposit: step_to_deposit,
-            data: {
-                deposited: any,
-                gathered: any,
+    pkg: {
+        current_step: number,
+        steps: {
+            0: {
+                query: "query_definition",
+                command: "command_definition",
+                deposit: step_to_deposit,
+                data: {
+                    deposited: any,
+                    gathered: any,
+                },
+                next: "http://<host>/<endpoint>",
+                completed: bool,
+                errors: [],
+                use_file: string,
+                use_files: number[]
             },
-            next: "http://<host>/<endpoint>",
-            completed: bool,
-            errors: [],
-            use_files: number[]
-        }
-    },
+        },
+    }
     files: files_list
 }
 ```
+
+The body will consist of multipart/form-data, with the following keys:
+
+- `pkg`: The package protocal.
+- `files`: The files to be deposited.

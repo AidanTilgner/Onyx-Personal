@@ -10,6 +10,7 @@ const queries: { [key: string]: Function } = {
 
 const handlePackage = async (pkg: NLUPackage) => {
   try {
+    pkg = JSON.parse(pkg);
     const { current_step, steps, files } = pkg;
     const {
       query,
@@ -38,7 +39,7 @@ const handlePackage = async (pkg: NLUPackage) => {
 
 router.post("/", async (req, res) => {
   try {
-    const pkg = req.body;
+    const { pkg } = req.body;
     const result = await handlePackage(pkg);
     res.send(result.data);
   } catch (err) {
