@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { runNLU } from "../extraction/extract";
-import { NLUPackage } from "../../documentation/types/packages";
+import { NLUPackage } from "../definitions/packages";
 import axios from "axios";
 const router = Router();
 
@@ -8,53 +8,39 @@ const queries: { [key: string]: Function } = {
   get_nlu: runNLU,
 };
 
-router.post("/", async (req, res) => {
+const handlePackage = async (pkg: NLUPackage) => {
   try {
-    // Example body:
-    /**
-    current_step: number,
-    steps: {
-        0: {
-            query: "query_definition",
-            command: "command_definition",
-            deposit: 1,
-            data: {
-                deposited: any,
-                gathered: any,
-            },
-            next: "http://<host>/<endpoint>",
-            completed: bool,
-            errors: [],
-            use_files: number[]
-        }
-    },
-    files: files_list
-     */
-    const { current_step, steps, files } = req.body as NLUPackage;
+    const { current_step, steps, files } = pkg;
     const {
       query,
-      command,
       deposit,
-      data: { deposited, gathered },
+      data: { deposited },
       next,
-      completed,
-      errors,
-      use_files,
     } = steps[current_step];
 
-    const next_step = steps[current_step + 1];
-
     const query_result = await queries[query](deposited);
+    steps[current_step].data.gathered = query_result;
 
     if (deposit >= 0) {
       steps[deposit].data.deposited = query_result;
     }
 
-    axios.post(next + "/package-hook", {
+    return axios.post(next + "/package-hook", {
       current_step: current_step + 1,
       steps: steps,
       files: files,
     });
+  } catch (err: any) {
+    pkg.steps[pkg.current_step].errors.push(err);
+    return axios.post(pkg.steps[pkg.current_step] + "/package-hook", pkg);
+  }
+};
+
+router.post("/", async (req, res) => {
+  try {
+    const pkg = req.body;
+    const result = await handlePackage(pkg);
+    res.send(result.data);
   } catch (err) {
     console.log(err);
     // TODO: This should just add an error to the body
