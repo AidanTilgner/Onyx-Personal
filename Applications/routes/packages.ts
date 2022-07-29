@@ -1,6 +1,9 @@
-import { Router } from "express";
+import { query, Router } from "express";
 import { AppsPackage, AppsPackageBody } from "../definitions/packages";
 import axios from "axios";
+import multer from "multer";
+import { SignatureHelpRetriggerCharacter } from "typescript";
+
 const router = Router();
 
 const queries: { [key: string]: Function } = {};
@@ -22,8 +25,14 @@ const handlePackage = async (pkg: AppsPackage) => {
       next,
     } = steps[current_step];
 
+    let result: { command: string | null; query: string | null } = {
+      command: null,
+      query: null,
+    };
+
     if (command) {
       const command_result = await commands[command](deposited);
+      result.command = command_result;
       steps[current_step].data.gathered = command_result;
 
       if (deposit >= 0) {
@@ -33,6 +42,7 @@ const handlePackage = async (pkg: AppsPackage) => {
 
     if (query) {
       const query_result = await queries[query](deposited);
+      result.query = query_result;
       steps[current_step].data.gathered = query_result;
 
       if (deposit >= 0) {
@@ -40,24 +50,39 @@ const handlePackage = async (pkg: AppsPackage) => {
       }
     }
 
-    return axios.post(next + "/package-hook", {
-      current_step: current_step + 1,
-      steps: steps,
-      files: files,
-    });
+    if (next) {
+      axios.post(next + "/package-hook", {
+        current_step: current_step + 1,
+        steps: steps,
+        files: files,
+      });
+
+      return { result: result };
+    }
   } catch (err: any) {
     pkg.steps[pkg.current_step].errors.push(err);
-    return axios.post(pkg.steps[pkg.current_step] + "/package-hook", pkg);
+    if (pkg.steps[pkg.current_step].next) {
+      return axios.post(
+        pkg.steps[pkg.current_step].next + "/package-hook",
+        pkg
+      );
+    }
+    return { error: `There was an error handling the package: ${err}` };
   }
 };
 
-router.post("/", async (req, res) => {
+const upload = multer({ dest: "tmp/" });
+
+router.post("/", upload.any(), async (req, res) => {
   try {
     const { pkg } = req.body as AppsPackageBody;
     const result = await handlePackage(JSON.parse(pkg));
-    res.send(result.data);
+    res.send({
+      message: "Successfully handled package",
+      result: result,
+    });
   } catch (err) {
-    console.log(err);
+    console.log("Error in package hook: ", err);
     // TODO: This should just add an error to the body
     return {
       error: "There was an error processing the package",

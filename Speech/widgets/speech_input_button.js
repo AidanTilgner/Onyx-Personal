@@ -154,6 +154,12 @@ async function sendAudio(blob) {
         use_file: "audio",
         use_files: [],
       },
+      1: {
+        command: "display_action_output",
+        data: {
+          deposited: null,
+        },
+      },
     },
   };
   formData.append("pkg", JSON.stringify(pkg));
@@ -166,9 +172,7 @@ async function sendAudio(blob) {
     },
   })
     .then((res) => {
-      console.log(res);
       console.log(res.data);
-      console.log(res.data.text);
     })
     .catch((err) => {
       console.log(err);
