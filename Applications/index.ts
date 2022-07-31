@@ -4,7 +4,10 @@ import { Request, Response } from "./index.d";
 import proxyRouter from "./routes/proxy";
 import packagesRouter from "./routes/packages";
 import cors from "cors";
+import { config } from "dotenv";
 const app = express();
+
+config();
 
 app.use(
   cors({
