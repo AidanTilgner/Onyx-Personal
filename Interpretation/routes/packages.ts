@@ -82,7 +82,8 @@ const handlePackage = async (pkg: NLUPackage) => {
   }
 };
 
-const upload = multer({ dest: "tmp/" });
+const storage = multer.memoryStorage();
+const upload = multer({ dest: "uploads/", storage: storage });
 
 router.post("/", upload.any(), async (req, res) => {
   try {
