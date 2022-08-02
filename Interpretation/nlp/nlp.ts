@@ -1,5 +1,6 @@
 import { NlpManager } from "node-nlp";
-import { Text_To_Intent } from ".";
+import { Text_To_Intent } from "./index.d";
+import text_to_intent_json from "./documents/text_to_intent.json";
 
 const manager = new NlpManager({
   languages: ["en"],
@@ -7,12 +8,9 @@ const manager = new NlpManager({
   nlp: { useNoneFeature: false },
 });
 
-const trainModel = async () => {
-  // * Train Intents
-  const text_to_intent: Text_To_Intent = await import(
-    "./documents/text_to_intent.json"
-  );
-
+export const trainModel = async () => {
+  const text_to_intent: Text_To_Intent = text_to_intent_json;
+  console.log("Training model...");
   text_to_intent.forEach((item) => {
     const { name, examples } = item;
     examples.forEach((example) => {
@@ -22,7 +20,15 @@ const trainModel = async () => {
   });
 
   (async () => {
-    await manager.train();
-    console.log("Trained");
+    try {
+      await manager.train();
+      // Current timestamp
+      const timestamp = new Date().getTime();
+      const filename = `models/model-${timestamp}.json`;
+      manager.save(filename);
+      console.log("Trained");
+    } catch (err) {
+      console.error(err);
+    }
   })();
 };
