@@ -6,6 +6,11 @@
         "text": "Hello there",
         "intent": "greeting.hello",
         "language": "en"
+      },
+      {
+        "text": "Hi there",
+        "intent": "greeting.hello",
+        "language": "en"
       }
     ]
   },

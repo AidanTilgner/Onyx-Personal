@@ -4,6 +4,7 @@
   "description": "The Interpretation Server is responsible for converting text to actions. This means using NLU frameworks like Rasa to interpret user text input. This will also be capable of handling direct user commands by detecting keywords in the user's input. This interpreted text will then be sent to the Action Server to be executed.",
   "main": "index.js",
   "dependencies": {
+    "@nlpjs/basic": "^4.23.5",
     "@types/axios": "^0.14.0",
     "@types/multer": "^1.4.7",
     "@types/natural": "^5.1.1",

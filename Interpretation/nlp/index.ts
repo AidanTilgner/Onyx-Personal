@@ -1,5 +1,7 @@
-import { trainModel } from "./nlp";
+import { testModel, trainModel } from "./nlp";
 
 export const startNLP = async () => {
-  trainModel();
+  console.log("Starting NLP...");
+  await trainModel();
+  await testModel();
 };
