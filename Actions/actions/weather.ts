@@ -5,12 +5,14 @@ const getWeather = async (city: string) => {
     if (!city) {
       city = "Salem,OR,US";
     }
+    console.log("Getting weather for", city);
     const { data } = await thirdPartyApi.get(`/weather?location=${city}`);
     if (data.error) {
       return {
         error: data.error,
       };
     }
+    console.log("Got Weather:", data);
     return data;
   } catch (err) {
     console.log("Error: ", err);
@@ -21,5 +23,5 @@ const getWeather = async (city: string) => {
 };
 
 export default {
-  get_weather_by_location: getWeather,
+  get_weather_by_time_of_day: getWeather,
 };

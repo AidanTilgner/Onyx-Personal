@@ -30,11 +30,20 @@ def packagesHandler(request):
 
         current_step["completed"] = True
 
-        if not pkg["current_step"] + 1 < len(pkg["steps"]):
-            return jsonify({"result": query_result})
+        pkg["current_step"] += 1
+
+        if not pkg["current_step"] < len(pkg["steps"]):
+            return jsonify(
+                {"result": query_result, "message": "Successfully handled query"}
+            )
 
         send_next = requests.Request(
-            "POST", f"{current_step['next']}/package-hook", files=request.files
+            "POST",
+            f"{current_step['next']}/package-hook",
+            data={"pkg": json.dumps(pkg)},
+            files=request.files,
         ).prepare()
 
-        return requests.Session().send(send_next)
+        requests.Session().send(send_next)
+
+        return jsonify({"result": query_result, "message": "Next step sent"})

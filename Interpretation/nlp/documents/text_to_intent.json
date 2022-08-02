@@ -1,0 +1,32 @@
+[
+  {
+    "name": "greeting",
+    "examples": [
+      {
+        "text": "Hello there",
+        "intent": "greeting.hello",
+        "language": "en"
+      }
+    ]
+  },
+  {
+    "name": "inquiries",
+    "examples": [
+      {
+        "text": "How are you?",
+        "intent": "inquiry.how_are_you",
+        "language": "en"
+      },
+      {
+        "text": "How are you doing?",
+        "intent": "inquiry.how_are_you",
+        "language": "en"
+      },
+      {
+        "text": "How are you doing today?",
+        "intent": "inquiry.how_are_you",
+        "language": "en"
+      }
+    ]
+  }
+]

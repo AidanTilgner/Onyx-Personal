@@ -1,7 +1,7 @@
 import express from "express";
-import { Request, Response } from "./index.d";
 import { config } from "dotenv";
 import queryRouter from "./routes/queries";
+import packagesRouter from "./routes/packages";
 config();
 
 const app = express();
@@ -11,6 +11,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use("/query", queryRouter);
+app.use("/package-hook", packagesRouter);
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

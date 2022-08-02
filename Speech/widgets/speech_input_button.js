@@ -148,15 +148,46 @@ async function sendAudio(blob) {
           deposited: null,
           gathered: null,
         },
-        next: "http://localhost:3000",
+        next: "http://localhost:5001",
         completed: false,
         errors: [],
         use_file: "audio",
         use_files: [],
       },
+      1: {
+        query: "get_nlu_for_speech_server",
+        deposit: 2,
+        data: {
+          deposited: null,
+        },
+        completed: false,
+        errors: [],
+        next: "http://localhost:5002",
+      },
+      2: {
+        query: "parse_and_use_nlu",
+        command: "parse_and_use_nlu",
+        deposit: 3,
+        data: {
+          deposited: null,
+        },
+        completed: false,
+        errors: [],
+        next: "http://localhost:3000",
+      },
+      3: {
+        command: "display_action_output",
+        data: {
+          deposited: null,
+        },
+        completed: false,
+        errors: [],
+      },
     },
   };
   formData.append("pkg", JSON.stringify(pkg));
+
+  console.log("Sending audio...");
 
   axios("http://localhost:5000/package-hook", {
     method: "POST",
@@ -166,9 +197,7 @@ async function sendAudio(blob) {
     },
   })
     .then((res) => {
-      console.log(res);
       console.log(res.data);
-      console.log(res.data.text);
     })
     .catch((err) => {
       console.log(err);

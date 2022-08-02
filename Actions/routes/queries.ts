@@ -3,9 +3,13 @@ import mappings from "../mappings/queries";
 
 const router = Router();
 
+type ExpectedBody = {
+  function_name: string;
+};
+
 router.get("/from-nlu", async (req, res) => {
   try {
-    const { function_name } = req.body;
+    const { function_name } = req.body as ExpectedBody;
     if (!mappings[function_name]) {
       return res.send({
         error: "Function not found",

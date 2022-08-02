@@ -1,7 +1,7 @@
 import weatherMappings from "../actions/weather";
 
-const mappings = {
-  get_weather_by_location: weatherMappings["get_weather_by_location"],
+const mappings: { [key: string]: Function } = {
+  get_weather_by_time_of_day: weatherMappings["get_weather_by_time_of_day"],
 };
 
 export default mappings;

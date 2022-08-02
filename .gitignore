@@ -8,3 +8,4 @@ venv/
 .onnx
 .jit
 .env
+tmp/
