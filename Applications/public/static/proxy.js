@@ -36,7 +36,6 @@ const useFetchProxy = async (url, config) => {
 
 const useAxiosProxy = async (url, config) => {
   // Same thing as above but for axios
-  console.log("Config", config);
   const {
     method,
     headers,

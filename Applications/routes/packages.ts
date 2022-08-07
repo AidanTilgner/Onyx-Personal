@@ -14,7 +14,6 @@ const mappings: { [key: string]: Function } = {
 
 const handlePackage = async (pkg: AppsPackage) => {
   try {
-    console.log("Handling package", pkg);
     const { current_step, steps } = pkg;
     const {
       action,
@@ -25,8 +24,6 @@ const handlePackage = async (pkg: AppsPackage) => {
 
     let result: any;
 
-    console.log("Data:", deposited);
-
     const res = await mappings[action](deposited);
     result = res;
     steps[current_step].data.gathered = res;
@@ -34,9 +31,6 @@ const handlePackage = async (pkg: AppsPackage) => {
     if (deposit >= 0) {
       steps[deposit].data.deposited = result;
     }
-
-    console.log("Result:", result);
-
     if (next) {
       return [
         {
@@ -72,7 +66,6 @@ const upload = multer({ dest: "tmp/" });
 
 router.post("/", upload.any(), async (req, res) => {
   try {
-    console.log("Receiving package", req.body);
     const { pkg } = req.body as AppsPackageBody;
     const [newPkg, next] = await handlePackage(JSON.parse(pkg));
     const newBody = { pkg: JSON.stringify(newPkg), files: req.files };
