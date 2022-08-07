@@ -1,6 +1,7 @@
 import { NlpManager } from "node-nlp";
-import { Text_To_Intent } from "./index.d";
+import { TextToIntent } from "./index.d";
 import text_to_intent_json from "./documents/text_to_intent.json";
+import intent_to_action_json from "./documents/intent_to_action.json";
 
 const manager = new NlpManager({
   languages: ["en"],
@@ -11,7 +12,7 @@ const manager = new NlpManager({
 export const trainModel = async () => {
   try {
     console.log("Training model...");
-    const text_to_intent: Text_To_Intent = text_to_intent_json;
+    const text_to_intent: TextToIntent = text_to_intent_json;
     text_to_intent.forEach((item) => {
       const { name, examples } = item;
       examples.forEach((example) => {
@@ -25,8 +26,10 @@ export const trainModel = async () => {
     const filename = `models/model-${timestamp}.json`;
     manager.save(filename);
     console.log("Trained");
+    return manager;
   } catch (err) {
     console.log(err);
+    return null;
   }
 };
 
@@ -46,6 +49,10 @@ export const testModel = async () => {
       {
         try: "How are you?",
         expected: "inquiry.how_are_you",
+      },
+      {
+        try: "What is the weather like?",
+        expected: "faq.weather",
       },
     ];
     tests.forEach(async (test) => {
@@ -83,5 +90,34 @@ export const testModel = async () => {
     });
   } catch (err) {
     console.error(err);
+  }
+};
+
+export const getIntent = async (lang: string, input: string) => {
+  try {
+    const intent = await manager.process(lang, input);
+    return intent;
+  } catch (err) {
+    console.error(err);
+    return null;
+  }
+};
+
+export const getAction = (int: string) => {
+  const [intent, subintent] = int.split(".");
+  const action = intent_to_action_json[intent][subintent].action;
+  if (!action) {
+    return "i_dont_understand";
+  }
+  return action;
+};
+
+export const getIntentAndAction = async (lang: string, input: string) => {
+  try {
+    const { intent, ...rest } = await manager.process(lang, input);
+    return { intent, action: getAction(intent), metaData: rest };
+  } catch (err) {
+    console.error(err);
+    return null;
   }
 };

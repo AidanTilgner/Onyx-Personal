@@ -1,0 +1,17 @@
+{
+  "greeting": {
+    "hello": {
+      "action": "say_hello"
+    }
+  },
+  "inquiry": {
+    "how_are_you": {
+      "action": "describe_current_state"
+    }
+  },
+  "faq": {
+    "weather": {
+      "action": "get_weather"
+    }
+  }
+}

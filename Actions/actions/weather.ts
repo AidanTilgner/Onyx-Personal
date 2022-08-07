@@ -23,5 +23,5 @@ const getWeather = async (city: string) => {
 };
 
 export default {
-  get_weather_by_time_of_day: getWeather,
+  get_weather: getWeather,
 };

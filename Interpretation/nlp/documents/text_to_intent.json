@@ -15,7 +15,7 @@
     ]
   },
   {
-    "name": "inquiries",
+    "name": "inquiry",
     "examples": [
       {
         "text": "How are you?",
@@ -30,6 +30,31 @@
       {
         "text": "How are you doing today?",
         "intent": "inquiry.how_are_you",
+        "language": "en"
+      }
+    ]
+  },
+  {
+    "name": "faq",
+    "examples": [
+      {
+        "text": "What is the weather like?",
+        "intent": "faq.weather",
+        "language": "en"
+      },
+      {
+        "text": "What is the weather like today?",
+        "intent": "faq.weather",
+        "language": "en"
+      },
+      {
+        "text": "What is the weather like this morning?",
+        "intent": "faq.weather",
+        "language": "en"
+      },
+      {
+        "text": "What is the weather like in Salem?",
+        "intent": "faq.weather",
         "language": "en"
       }
     ]
