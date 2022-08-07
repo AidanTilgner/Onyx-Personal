@@ -1,26 +1,24 @@
 import { Router } from "express";
 import { ActionsPackage, ActionsPackageBody } from "../definitions/packages";
-import FormData from "form-data";
-import queries from "../mappings/queries";
-import commands from "../mappings/commands";
+import mappings from "../actions/index";
 import axios from "axios";
 import multer from "multer";
 
 const router = Router();
 
 const parseAndUseNLU = async (nlu: {
-  type: string;
-  subtype: string;
-  functionName: string;
+  intent: string;
+  action: string;
+  metaData: any;
 }) => {
-  console.log("Using NLU:", nlu);
-  switch (nlu.type) {
-    case "command":
-      return await commands[nlu.functionName]();
-    case "query":
-      return await queries[nlu.functionName]();
-    default:
-      return null;
+  try {
+    const { action, metaData } = nlu;
+    return await mappings[action](metaData);
+  } catch (err) {
+    console.log("Error parsing NLU:", err);
+    return {
+      error: "There was an error parsing the NLU.",
+    };
   }
 };
 
@@ -29,52 +27,35 @@ const handlePackage = async (pkg: ActionsPackage) => {
     console.log("Handling package", pkg);
     const { current_step, steps } = pkg;
     const {
-      query,
-      command,
+      action,
       deposit,
       data: { deposited },
       next,
     } = steps[current_step];
 
-    let result: { command: any | null; query: any | null } = {
-      command: null,
-      query: null,
-    };
+    let result: any;
 
-    console.log("Data:", deposited, command);
+    console.log("Data:", deposited);
 
-    const parsingNLU =
-      command === "parse_and_use_nlu" || query === "parse_and_use_nlu";
+    const parsingNLU = "parse_and_use_nlu";
 
     if (parsingNLU) {
       const nlu = await parseAndUseNLU(deposited);
-      result.command = nlu;
-      result.query = nlu;
+      result = nlu;
       steps[current_step].data.gathered = nlu;
-
-      if (deposit >= 0) {
-        steps[deposit].data.deposited = nlu;
-      }
     }
 
-    if (command && commands.hasOwnProperty(command) && !parsingNLU) {
-      const command_result = await commands[command](deposited);
-      result.command = command_result;
-      steps[current_step].data.gathered = command_result;
+    if (!parsingNLU) {
+      const res = await mappings[action](deposited);
+      result = res;
+      steps[current_step].data.gathered = res;
     }
 
-    if (query && queries.hasOwnProperty(query) && !parsingNLU) {
-      console.log("Deposited Data:", deposited);
-      const query_result = await queries[query](deposited);
-      result.query = query_result;
-      steps[current_step].data.gathered = query_result;
+    if (deposit >= 0) {
+      steps[deposit].data.deposited = result;
     }
 
     console.log("Result:", result);
-
-    if (deposit >= 0 && !parsingNLU) {
-      steps[deposit].data.deposited = result;
-    }
 
     if (next) {
       return [

@@ -7,8 +7,7 @@ export type ActionsPackage = {
   current_step: number;
   steps: {
     [key: number]: {
-      query: string;
-      command: string;
+      action: string;
       deposit: number;
       data: {
         deposited: any;

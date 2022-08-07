@@ -1,4 +1,4 @@
-import weatherMappings from "../actions/weather";
+import weatherMappings from "./types/weather";
 
 const mappings: { [key: string]: Function } = {
   get_weather: weatherMappings["get_weather"],

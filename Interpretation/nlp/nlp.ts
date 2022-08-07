@@ -2,6 +2,7 @@ import { NlpManager } from "node-nlp";
 import { TextToIntent } from "./index.d";
 import text_to_intent_json from "./documents/text_to_intent.json";
 import intent_to_action_json from "./documents/intent_to_action.json";
+import { spellCheckText } from "./similarity/spellcheck";
 
 const manager = new NlpManager({
   languages: ["en"],
@@ -115,6 +116,20 @@ export const getAction = (int: string) => {
 export const getIntentAndAction = async (lang: string, input: string) => {
   try {
     const { intent, ...rest } = await manager.process(lang, input);
+    return { intent, action: getAction(intent), metaData: rest };
+  } catch (err) {
+    console.error(err);
+    return null;
+  }
+};
+
+export const getIntentAndActionForSpeechServer = async (
+  lang: string,
+  input: { text: string }
+) => {
+  try {
+    const newText = spellCheckText(input.text.toLocaleLowerCase());
+    const { intent, ...rest } = await manager.process(lang, newText);
     return { intent, action: getAction(intent), metaData: rest };
   } catch (err) {
     console.error(err);

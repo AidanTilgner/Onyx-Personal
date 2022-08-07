@@ -1,4 +1,4 @@
-import { thirdPartyApi } from "../config/axios";
+import { thirdPartyApi } from "../../config/axios";
 
 const getWeather = async (city: string) => {
   try {

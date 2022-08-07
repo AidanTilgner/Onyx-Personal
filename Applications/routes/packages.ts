@@ -6,9 +6,7 @@ import multer from "multer";
 
 const router = Router();
 
-const queries: { [key: string]: Function } = {};
-
-const commands: { [key: string]: Function } = {
+const mappings: { [key: string]: Function } = {
   display_action_output: (out: any) => {
     console.log("Output:", out);
   },
@@ -19,38 +17,25 @@ const handlePackage = async (pkg: AppsPackage) => {
     console.log("Handling package", pkg);
     const { current_step, steps } = pkg;
     const {
-      query,
-      command,
+      action,
       deposit,
       data: { deposited },
       next,
     } = steps[current_step];
 
-    let result: { command: string | null; query: string | null } = {
-      command: null,
-      query: null,
-    };
-    console.log("Deposited Data:", deposited);
+    let result: any;
 
-    if (command && commands.hasOwnProperty(command)) {
-      const command_result = await commands[command](deposited);
-      result.command = command_result;
-      steps[current_step].data.gathered = command_result;
+    console.log("Data:", deposited);
 
-      if (deposit >= 0) {
-        steps[deposit].data.deposited = command;
-      }
+    const res = await mappings[action](deposited);
+    result = res;
+    steps[current_step].data.gathered = res;
+
+    if (deposit >= 0) {
+      steps[deposit].data.deposited = result;
     }
 
-    if (query && queries.hasOwnProperty(query)) {
-      const query_result = await queries[query](deposited);
-      result.query = query_result;
-      steps[current_step].data.gathered = query_result;
-
-      if (deposit >= 0) {
-        steps[deposit].data.deposited = query_result;
-      }
-    }
+    console.log("Result:", result);
 
     if (next) {
       return [

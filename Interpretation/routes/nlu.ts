@@ -1,5 +1,4 @@
 import { Router } from "express";
-import { runNLU } from "../extraction/extract";
 import { startNLP } from "../nlp/index";
 import { getIntentAndAction } from "../nlp/nlp";
 

@@ -17,25 +17,21 @@ def packagesHandler(request):
         file_name = current_step["use_file"] or current_step["use_files"][0]
 
         use_data = current_step["data"]["deposited"] or request.files[file_name]
-        query_result = queries[current_step["query"]](use_data)
-        current_step["data"]["gathered"] = query_result
+        result = queries[current_step["action"]](use_data)
+        current_step["data"]["gathered"] = result
 
         if (
             current_step["deposit"] >= 0
             and str(current_step["deposit"]) in pkg["steps"]
         ):
-            pkg["steps"][str(current_step["deposit"])]["data"][
-                "deposited"
-            ] = query_result
+            pkg["steps"][str(current_step["deposit"])]["data"]["deposited"] = result
 
         current_step["completed"] = True
 
         pkg["current_step"] += 1
 
         if not pkg["current_step"] < len(pkg["steps"]):
-            return jsonify(
-                {"result": query_result, "message": "Successfully handled query"}
-            )
+            return jsonify({"result": result, "message": "Successfully handled query"})
 
         send_next = requests.Request(
             "POST",
@@ -46,4 +42,4 @@ def packagesHandler(request):
 
         requests.Session().send(send_next)
 
-        return jsonify({"result": query_result, "message": "Next step sent"})
+        return jsonify({"result": result, "message": "Next step sent"})

@@ -1,55 +1,43 @@
 import { Router } from "express";
-import { runNLU, runNLU_for_speech_server } from "../extraction/extract";
+import {
+  getIntentAndAction,
+  getIntentAndActionForSpeechServer,
+} from "../nlp/nlp";
 import { NLUPackage, NLUPackageBody } from "../definitions/packages";
 import FormData from "form-data";
 import multer from "multer";
 import axios from "axios";
 const router = Router();
 
-const queries: { [key: string]: Function } = {
-  get_nlu: runNLU,
-  get_nlu_for_speech_server: runNLU_for_speech_server,
+const mappings: { [key: string]: Function } = {
+  get_nlu: getIntentAndAction,
+  get_nlu_for_speech_server: getIntentAndActionForSpeechServer,
 };
-
-const commands: { [key: string]: Function } = {};
 
 const handlePackage = async (pkg: NLUPackage) => {
   try {
     console.log("Handling package", pkg);
     const { current_step, steps } = pkg;
     const {
-      query,
-      command,
+      action,
       deposit,
       data: { deposited },
       next,
     } = steps[current_step];
 
-    let result: { command: string | null; query: string | null } = {
-      command: null,
-      query: null,
-    };
+    let result: any;
 
-    if (command && commands.hasOwnProperty(command)) {
-      const command_result = await commands[command](deposited);
-      result.command = command_result;
-      steps[current_step].data.gathered = command_result;
+    console.log("Data:", deposited);
 
-      if (deposit >= 0) {
-        steps[deposit].data.deposited = command;
-      }
+    const res = await mappings[action](deposited);
+    result = res;
+    steps[current_step].data.gathered = res;
+
+    if (deposit >= 0) {
+      steps[deposit].data.deposited = result;
     }
 
-    if (query && queries.hasOwnProperty(query)) {
-      console.log("Deposited Data:", deposited);
-      const query_result = await queries[query](deposited);
-      result.query = query_result;
-      steps[current_step].data.gathered = query_result;
-
-      if (deposit >= 0) {
-        steps[deposit].data.deposited = query_result;
-      }
-    }
+    console.log("Result:", result);
 
     if (next) {
       return [
