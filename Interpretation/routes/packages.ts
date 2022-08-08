@@ -16,7 +16,6 @@ const mappings: { [key: string]: Function } = {
 
 const handlePackage = async (pkg: NLUPackage) => {
   try {
-    console.log("Handling package", pkg);
     const { current_step, steps } = pkg;
     const {
       action,
@@ -27,8 +26,6 @@ const handlePackage = async (pkg: NLUPackage) => {
 
     let result: any;
 
-    console.log("Data:", deposited);
-
     const res = await mappings[action](deposited);
     result = res;
     steps[current_step].data.gathered = res;
@@ -36,8 +33,6 @@ const handlePackage = async (pkg: NLUPackage) => {
     if (deposit >= 0) {
       steps[deposit].data.deposited = result;
     }
-
-    console.log("Result:", result);
 
     if (next) {
       return [

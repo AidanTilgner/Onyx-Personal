@@ -13,7 +13,7 @@ const parseAndUseNLU = async (nlu: {
 }) => {
   try {
     const { action, metaData } = nlu;
-    return await mappings[action](metaData);
+    return await mappings[action + "_from_nlu"](metaData);
   } catch (err) {
     console.log("Error parsing NLU:", err);
     return {
@@ -24,7 +24,6 @@ const parseAndUseNLU = async (nlu: {
 
 const handlePackage = async (pkg: ActionsPackage) => {
   try {
-    console.log("Handling package", pkg);
     const { current_step, steps } = pkg;
     const {
       action,
@@ -34,8 +33,6 @@ const handlePackage = async (pkg: ActionsPackage) => {
     } = steps[current_step];
 
     let result: any;
-
-    console.log("Data:", deposited);
 
     const parsingNLU = "parse_and_use_nlu";
 
@@ -54,8 +51,6 @@ const handlePackage = async (pkg: ActionsPackage) => {
     if (deposit >= 0) {
       steps[deposit].data.deposited = result;
     }
-
-    console.log("Result:", result);
 
     if (next) {
       return [
@@ -91,7 +86,6 @@ const handlePackage = async (pkg: ActionsPackage) => {
 const upload = multer({ dest: "tmp/" });
 router.post("/", upload.any(), async (req, res) => {
   try {
-    console.log("Recieved package", req.body);
     const { pkg } = req.body as ActionsPackageBody;
     const [newPkg, next] = await handlePackage(JSON.parse(pkg));
     const newBody = { pkg: JSON.stringify(newPkg), files: req.files };

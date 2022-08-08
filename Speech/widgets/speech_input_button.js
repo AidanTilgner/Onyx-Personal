@@ -1,5 +1,3 @@
-console.log("Initilizing Speech Input Button");
-
 // * Add Links to HMTL
 const links = `
     <link
@@ -142,7 +140,7 @@ async function sendAudio(blob) {
     current_step: 0,
     steps: {
       0: {
-        query: "stt",
+        action: "stt",
         deposit: 1,
         data: {
           deposited: null,
@@ -155,7 +153,7 @@ async function sendAudio(blob) {
         use_files: [],
       },
       1: {
-        query: "get_nlu_for_speech_server",
+        action: "get_nlu_for_speech_server",
         deposit: 2,
         data: {
           deposited: null,
@@ -165,8 +163,7 @@ async function sendAudio(blob) {
         next: "http://localhost:5002",
       },
       2: {
-        query: "parse_and_use_nlu",
-        command: "parse_and_use_nlu",
+        action: "parse_and_use_nlu",
         deposit: 3,
         data: {
           deposited: null,
@@ -176,7 +173,7 @@ async function sendAudio(blob) {
         next: "http://localhost:3000",
       },
       3: {
-        command: "display_action_output",
+        action: "display_action_output",
         data: {
           deposited: null,
         },
@@ -186,8 +183,6 @@ async function sendAudio(blob) {
     },
   };
   formData.append("pkg", JSON.stringify(pkg));
-
-  console.log("Sending audio...");
 
   axios("http://localhost:5000/package-hook", {
     method: "POST",
