@@ -7,10 +7,26 @@
     <title>Document</title>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="./static/proxy.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
   </head>
   <body>
     Hello World!
     <div id="container-speech_input"></div>
-    <script src="http://localhost:5000/widgets/speech_input_button"></script>
+    <!-- <script src="http://localhost:5000/widgets/speech_input_button"></script> -->
+    <div id="message-container"></div>
+    <script>
+      const socket = io();
+      socket.on("connect", () => {
+        console.log("connected");
+      });
+      socket.on("message", (message) => {
+        console.log(message);
+        const messageElement = document.createElement("div");
+        messageElement.innerText = message;
+        document
+          .getElementById("message-container")
+          .appendChild(messageElement);
+      });
+    </script>
   </body>
 </html>
