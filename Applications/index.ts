@@ -3,17 +3,16 @@ import path from "path";
 import { Request, Response } from "./index.d";
 import proxyRouter from "./routes/proxy";
 import packagesRouter from "./routes/packages";
+import dashboardRouter from "./routes/dashboard";
 import cors from "cors";
 import { config } from "dotenv";
-import { Server } from "socket.io";
 import { createServer } from "http";
-import { initIO } from "./config/socket-io";
+import { initIO } from "./utils/socket-io";
 const app = express();
 const server = createServer(app);
-const io = new Server(server);
 
 config();
-initIO(io);
+initIO(server);
 
 app.use(
   cors({
@@ -31,6 +30,7 @@ app.get("/home", (req: Request, res: Response) => {
 
 app.use("/package-hook", packagesRouter);
 app.use("/proxy", proxyRouter);
+app.use("/dashboard", dashboardRouter);
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
