@@ -22,15 +22,15 @@ app.use(
 );
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, "public")));
-
-app.get("/home", (req: Request, res: Response) => {
-  res.sendFile(path.join(__dirname, "public", "home/index.html"));
-});
 
 app.use("/package-hook", packagesRouter);
 app.use("/proxy", proxyRouter);
 app.use("/dashboard", dashboardRouter);
+
+app.use(express.static(path.join(__dirname, "public")));
+app.get("/*", (req: Request, res: Response) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
+});
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
