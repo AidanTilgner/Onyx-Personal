@@ -1,20 +1,3 @@
-export type TextToIntent = {
-  name: string;
-  examples: {
-    text: string;
-    intent: string;
-    language: string;
-  }[];
-}[];
-
-export type IntentToAction = {
-  [key: string]: {
-    [key: string]: {
-      action: string;
-    };
-  };
-};
-
 export type Entity = {
   start: number;
   end: number;
@@ -51,6 +34,7 @@ export type MetaData = {
   languageGuessed: false;
   localeIso2: string;
   language: string;
+  intent: string;
   nluAnswer: { classifications: Object[] };
   classifications: [{ intent: string; score: number }];
   score: number;

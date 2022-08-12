@@ -1,16 +1,16 @@
-export type AppsPackageBody = {
+export type ActionsPackageBody = {
   pkg: string;
   files: string[];
 };
 
-export type AppsPackage = {
+export type ActionsPackage = {
   current_step: number;
   steps: {
     [key: number]: {
       action: string;
       deposit: number;
       data: {
-        deposited: string;
+        deposited: any;
         gathered: any;
       };
       next: string;

@@ -31,8 +31,8 @@ router.get("/", async (req, res) => {
       lon = locations.home.coords.lon;
     }
     const url = req.query.location
-      ? `https://api.openweathermap.org/data/2.5/weather?q=${req.query.location}&appid=${env}`
-      : `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${env}`;
+      ? `https://api.openweathermap.org/data/2.5/weather?q=${req.query.location}&units=imperial&appid=${env}`
+      : `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=imperial&appid=${env}`;
 
     const { data } = await axios.get(url);
     res.send({ data, message: "Successfully retrieved weather data" });

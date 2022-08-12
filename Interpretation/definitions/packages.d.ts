@@ -1,9 +1,9 @@
-export type AppsPackageBody = {
+export type NLUPackageBody = {
   pkg: string;
   files: string[];
 };
 
-export type AppsPackage = {
+export type NLUPackage = {
   current_step: number;
   steps: {
     [key: number]: {
@@ -16,7 +16,6 @@ export type AppsPackage = {
       next: string;
       completed: boolean;
       errors: any[];
-      use_file: string;
       use_files: number[];
     };
   };
