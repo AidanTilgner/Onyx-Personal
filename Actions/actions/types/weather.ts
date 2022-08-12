@@ -31,7 +31,13 @@ export const getWeatherFromNlu = async (nlu: MetaData) => {
         error: data.error,
       };
     }
-    return data;
+    const message = `The weather in ${city} is "${data.data.weather[0].description}" with a temperature of ${data.data.main.temp} degrees.`;
+    console.log("Weather data:", {
+      data: data.data.main,
+      display_type: "weather",
+      custom_message: message,
+    });
+    return { data, display_type: "weather", custom_message: message };
   } catch (err) {
     console.log("Error: ", err);
     return {
