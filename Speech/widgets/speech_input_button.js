@@ -17,6 +17,15 @@ const links = `
 `;
 document.head.innerHTML += links;
 
+const scripts = ["https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"];
+
+scripts.forEach((script) => {
+  const scriptElement = document.createElement("script");
+  scriptElement.setAttribute("async", false);
+  scriptElement.src = script;
+  document.head.appendChild(scriptElement);
+});
+
 //* Create interface UI
 const root = document.getElementById("container-speech_input");
 const interfaceHTML = `
@@ -28,7 +37,8 @@ const interfaceHTML = `
     </div>
 `;
 root.innerHTML += interfaceHTML;
-document.body.innerHTML += `
+// ! Adding to document body broke the svelte app in the applications server for some reason, keep this to head tags and the root of the component
+root.innerHTML += `
     <style>
         #interface-speech_input {
             background-color: white;
@@ -45,7 +55,7 @@ document.body.innerHTML += `
         #interface-speech_input > p {
             font-family: "Quicksand", sans-serif;
         }
-        
+
         #interface-speech_input > .button {
             background-color: #2256f2;
             display: inline-block;
@@ -60,13 +70,13 @@ document.body.innerHTML += `
             cursor: pointer;
             box-shadow: 2px 2px 10px 0 rgba(0, 0, 0, 0.25);
         }
-        
+
         #interface-speech_input > .button:active {
             box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.15);
             background-color: white;
             color: #2256f2;
         }
-        
+
         #interface-speech_input:active {
             animation: animateBg 6s infinite ease-in-out;
             background-color: #fff;
@@ -75,7 +85,7 @@ document.body.innerHTML += `
             background-size: 300% 100%;
             color: white;
         }
-        
+
         @keyframes animateBg {
             0% {
                 background-position: 0 0;
@@ -86,7 +96,7 @@ document.body.innerHTML += `
             100% {
                 background-position: 0% 0;
             }
-        }      
+        }
     </style>
 `;
 

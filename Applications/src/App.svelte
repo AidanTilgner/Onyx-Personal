@@ -1,19 +1,33 @@
 <script>
-  export let name;
   import { initSocket } from "./config/socket.io";
+  import { getExternalWidgets } from "./config/external_widgets";
   import { messages } from "./stores/socket";
+  import { onMount } from "svelte";
 
-  initSocket();
+  const initialized = initSocket();
   let messagesArray = [];
   messages.subscribe((data) => {
     console.log("Message received: ", data);
-    messagesArray = [...messagesArray, data];
+    messagesArray = [...data];
   });
+
+  $: if (initialized) {
+    const widgets = getExternalWidgets();
+    console.log("Widgets: ", widgets);
+    widgets.forEach((widget) => {
+      document.body.appendChild(widget);
+    });
+  }
+
+  $: console.log("Messages: ", messagesArray);
 </script>
 
 <main>
+  <div id="container-speech_input" class="external-widget" />
+  <div>Here is some additional stuff {messagesArray.length}</div>
   <div>
     {#each messagesArray as message}
+      {console.log("messagesArray: ", messagesArray, messagesArray.length)}
       <p>{message}</p>
     {/each}
   </div>
@@ -25,13 +39,6 @@
     padding: 1em;
     max-width: 240px;
     margin: 0 auto;
-  }
-
-  h1 {
-    color: #ff3e00;
-    text-transform: uppercase;
-    font-size: 4em;
-    font-weight: 100;
   }
 
   @media (min-width: 640px) {

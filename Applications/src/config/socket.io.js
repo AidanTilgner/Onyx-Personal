@@ -26,6 +26,7 @@ export const initSocket = async () => {
         messages.update((messages) => [...messages, message]);
       });
     });
+    return true;
   } catch (err) {
     console.log(err);
   }
