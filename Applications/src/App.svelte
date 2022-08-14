@@ -1,36 +1,27 @@
 <script>
-  import { initSocket } from "./config/socket.io";
-  import { getExternalWidgets } from "./config/external_widgets";
-  import { messages } from "./stores/socket";
+  import { initSocket } from "./bootstrap/socket.io";
+  import {
+    getExternalWidgets,
+    setExternalWidgets,
+  } from "./bootstrap/external_widgets";
+  import { Router, Route, navigate } from "svelte-routing";
+  import Home from "./pages/Home.svelte";
   import { onMount } from "svelte";
+  export let url;
 
   const initialized = initSocket();
-  let messagesArray = [];
-  messages.subscribe((data) => {
-    console.log("Message received: ", data);
-    messagesArray = [...data];
-  });
 
   $: if (initialized) {
     const widgets = getExternalWidgets();
-    console.log("Widgets: ", widgets);
-    widgets.forEach((widget) => {
-      document.body.appendChild(widget);
-    });
+    setExternalWidgets(widgets);
   }
-
-  $: console.log("Messages: ", messagesArray);
 </script>
 
 <main>
-  <div id="container-speech_input" class="external-widget" />
-  <div>Here is some additional stuff {messagesArray.length}</div>
-  <div>
-    {#each messagesArray as message}
-      {console.log("messagesArray: ", messagesArray, messagesArray.length)}
-      <p>{message}</p>
-    {/each}
-  </div>
+  <Router {url}>
+    <Route path="*" component={Home} />
+    <Route path="/" component={Home} />
+  </Router>
 </main>
 
 <style>

@@ -16,3 +16,9 @@ export const getExternalWidgets = () => {
     return script;
   });
 };
+
+export const setExternalWidgets = (widgets) => {
+  widgets.forEach((widget) => {
+    document.body.appendChild(widget);
+  });
+};

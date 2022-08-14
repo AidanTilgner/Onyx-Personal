@@ -1,4 +1,4 @@
-import { socket, messages } from "../stores/socket";
+import { socket, messages } from "../lib/stores/socket";
 
 export const getSocket = async () => {
   const script = document.createElement("script");
