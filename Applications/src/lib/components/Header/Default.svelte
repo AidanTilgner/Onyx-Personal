@@ -11,14 +11,28 @@
   <h1 class="header_title">
     Hello{currUser ? `, ${currUser.first_name}` : "There"}
   </h1>
+  <h3>How can I be of service today?</h3>
 </div>
 
-<style>
+<style lang="scss">
+  @use "../../styles/partials/variables" as *;
   h1 {
     font-size: 48px;
-    font-family: "Quicksand", sans-serif;
+    font-family: $primary-font;
     font-weight: 400;
     margin: 0;
     margin-top: 36px;
+    color: $dark-blue;
+  }
+
+  h3 {
+    font-family: $secondary-font;
+    font-size: 24px;
+    font-weight: 400;
+    margin: 0;
+    margin-top: 14px;
+    margin-bottom: 36px;
+    font-weight: 300;
+    color: $cool-blue;
   }
 </style>
