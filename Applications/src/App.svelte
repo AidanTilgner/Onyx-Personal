@@ -4,9 +4,9 @@
     getExternalWidgets,
     setExternalWidgets,
   } from "./bootstrap/external_widgets";
-  import { Router, Route, navigate } from "svelte-routing";
+  import { Router, Route } from "svelte-routing";
   import Home from "./pages/Home.svelte";
-  import { onMount } from "svelte";
+  import SideBar from "./lib/components/SideBar/SideBar.svelte";
   export let url;
 
   const initialized = initSocket();
@@ -18,23 +18,22 @@
 </script>
 
 <main>
+  <SideBar />
   <Router {url}>
-    <Route path="*" component={Home} />
-    <Route path="/" component={Home} />
+    <div class="content-container">
+      <Route path="*" component={Home} />
+      <Route path="/" component={Home} />
+    </div>
   </Router>
 </main>
 
-<style>
-  main {
-    text-align: center;
-    padding: 1em;
-    max-width: 240px;
-    margin: 0 auto;
-  }
+<style lang="scss">
+  @use "./lib/styles/partials/mixins" as *;
 
-  @media (min-width: 640px) {
-    main {
-      max-width: none;
+  .content-container {
+    @include desktop {
+      margin-left: 256px;
+      background-color: #fdfdfd;
     }
   }
 </style>

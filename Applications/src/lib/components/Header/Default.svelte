@@ -8,9 +8,17 @@
 </script>
 
 <div class="header">
-  <h1>Hello{currUser ? `, ${currUser.first_name}` : "There"}</h1>
+  <h1 class="header_title">
+    Hello{currUser ? `, ${currUser.first_name}` : "There"}
+  </h1>
 </div>
 
-<style lang="sass">
-
+<style>
+  h1 {
+    font-size: 48px;
+    font-family: "Quicksand", sans-serif;
+    font-weight: 400;
+    margin: 0;
+    margin-top: 36px;
+  }
 </style>

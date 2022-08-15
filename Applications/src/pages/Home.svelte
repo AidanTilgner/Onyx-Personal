@@ -1,5 +1,6 @@
 <script>
   import Header from "../lib/components/Header/Default.svelte";
+  import VoiceInput from "../lib/components/VoiceInput/VoiceInput.svelte";
   import { messages } from "../lib/stores/socket";
   import { getContext } from "svelte";
   import { ROUTER } from "svelte-routing/src/contexts";
@@ -7,7 +8,12 @@
   console.log("Home");
 
   const { activeRoute } = getContext(ROUTER);
-  if (activeRoute.uri === "/") {
+  let uri;
+  activeRoute.subscribe((route) => {
+    uri = route.uri;
+  });
+  console.log("activeRoute", uri);
+  if (uri === "/") {
     navigate("/home");
   }
   let messagesArray = [];
@@ -18,8 +24,8 @@
 
 <main>
   <Header />
+  <VoiceInput />
   <p>Home page</p>
-  <div id="container-speech_input" class="external-widget" />
   <div>
     {#each messagesArray as message}
       <p>{message}</p>
