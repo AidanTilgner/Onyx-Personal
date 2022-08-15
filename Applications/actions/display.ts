@@ -24,6 +24,21 @@ const display_weather_data = ({
   emitMessage("message", JSON.stringify(toSend));
 };
 
+export const voice_response = ({
+  data,
+  custom_message,
+}: {
+  data: any;
+  custom_message: string;
+}) => {
+  console.log("Voice response:", JSON.stringify(data.data.voice));
+  const toSend = {
+    voice: data.data.voice,
+    custom_message: custom_message,
+  };
+  emitMessage("voice_response", JSON.stringify(toSend));
+};
+
 const display_type_mappings: { [key: string]: Function } = {
   weather: display_weather_data,
 };

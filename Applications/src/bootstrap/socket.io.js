@@ -1,4 +1,4 @@
-import { socket, messages } from "../stores/socket";
+import { socket, messages, voice_response } from "../lib/stores/socket";
 
 export const getSocket = async () => {
   const script = document.createElement("script");
@@ -25,7 +25,12 @@ export const initSocket = async () => {
         console.log(message);
         messages.update((messages) => [...messages, message]);
       });
+      io.on("voice_response", (response) => {
+        console.log(response);
+        voice_response.set(response);
+      });
     });
+    return true;
   } catch (err) {
     console.log(err);
   }
