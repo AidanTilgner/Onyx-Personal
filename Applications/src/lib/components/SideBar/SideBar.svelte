@@ -101,7 +101,7 @@
     margin-bottom: 18px;
 
     &:hover {
-      outline: 1px solid #eaeaea;
+      outline: 1px solid rgba($color: $dark-blue, $alpha: 0.15);
     }
 
     i {

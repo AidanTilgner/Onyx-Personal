@@ -24,6 +24,19 @@
   </div>
 </main>
 
-<style lang="sass">
+<style lang="scss">
+  @use "../lib/styles/partials/mixins" as *;
 
+  main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100vh;
+    text-align: center;
+
+    @include desktop {
+      text-align: initial;
+      align-items: flex-start;
+    }
+  }
 </style>

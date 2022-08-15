@@ -16,6 +16,7 @@
 
 <style lang="scss">
   @use "../../styles/partials/variables" as *;
+  @use "../../styles/partials/mixins" as *;
   h1 {
     font-size: 48px;
     font-family: $primary-font;
@@ -23,6 +24,11 @@
     margin: 0;
     margin-top: 36px;
     color: $dark-blue;
+    text-align: center;
+
+    @include desktop {
+      text-align: left;
+    }
   }
 
   h3 {
@@ -34,5 +40,10 @@
     margin-bottom: 36px;
     font-weight: 300;
     color: $cool-blue;
+    text-align: center;
+
+    @include desktop {
+      text-align: left;
+    }
   }
 </style>

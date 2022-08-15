@@ -183,7 +183,7 @@ async function sendAudio(blob) {
         next: "http://localhost:3000",
       },
       3: {
-        action: "display_action_output",
+        action: "voice_response",
         data: {
           deposited: null,
         },

@@ -9,3 +9,5 @@ export const currentMessage = new derived(
   },
   ""
 );
+
+export const voice_response = new writable(null);
