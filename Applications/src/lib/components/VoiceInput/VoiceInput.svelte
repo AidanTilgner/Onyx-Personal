@@ -12,12 +12,9 @@
     return custom_message;
   };
 
-  let openResponse = true;
-
-  $: console.log("Open response", openResponse);
+  let openResponse = false;
 
   voice_response.subscribe((res) => {
-    console.log("Voice response", res);
     if (res) {
       openResponse = true;
     }
@@ -57,7 +54,7 @@
     background-color: white;
     box-shadow: 0 -4px 24px 0 rgba($color: #000000, $alpha: 0.05);
     padding: 24px 0;
-    z-index: 5;
+    z-index: 10;
 
     @include desktop {
       background-color: #fdfdfd;
@@ -113,5 +110,6 @@
     text-align: left;
     font-weight: 400;
     box-shadow: 0.2px 0.2px 20px 0 rgba($color: #000000, $alpha: 0.15);
+    z-index: 9;
   }
 </style>
