@@ -1,7 +1,8 @@
 {
   "greeting": {
     "hello": {
-      "default": "say_hello"
+      "default": "say_hello",
+      "how_are_you": "say_hello.explain_state"
     },
     "goodbye": {
       "default": "say_goodbye",
@@ -29,6 +30,19 @@
     },
     "who_built_you": {
       "default": "explain_developers"
+    },
+    "temperature": {
+      "default": "get_temperature",
+      "tomorrow": "get_temperature.tomorrow"
+    }
+  },
+  "describe_state": {
+    "good": { "default": "respond_to_good_state" },
+    "bad": { "default": "respond_to_bad_state" },
+    "emotions": {
+      "default": "interpret_emotions",
+      "good": "respond_to_good_emotions",
+      "bad": "respond_to_bad_emotions"
     }
   }
 }

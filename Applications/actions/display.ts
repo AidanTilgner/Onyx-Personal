@@ -22,7 +22,7 @@ const display_weather_data = ({
     custom_message: custom_message,
   };
   emitMessage("message", JSON.stringify(toSend));
-  globalLog(toSend);
+  globalLog("Weather Data:", toSend);
 };
 
 export const voice_response = ({
@@ -32,12 +32,16 @@ export const voice_response = ({
   data: any;
   custom_message: string;
 }) => {
+  if (custom_message === "custom_message") {
+    custom_message =
+      "Oops. Something went wrong. I guess I don't know what to say.";
+  }
   const toSend = {
-    voice: data.data.voice,
+    data: data ? data : null,
     custom_message: custom_message,
   };
   emitMessage("voice_response", JSON.stringify(toSend));
-  globalLog(toSend);
+  globalLog("Voice Data:", toSend);
 };
 
 const display_type_mappings: { [key: string]: Function } = {

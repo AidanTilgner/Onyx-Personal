@@ -103,7 +103,7 @@
   },
   {
     "text": "What is the temperature tomorrow?",
-    "intent": "faq.temperature",
+    "intent": "faq.temperature.tomorrow",
     "language": "en"
   },
   { "text": "Describe the weather", "intent": "faq.weather", "language": "en" },
@@ -123,5 +123,10 @@
     "intent": "greeting.hello.how_are_you",
     "language": "en"
   },
-  { "text": "I am good", "intent": "describe_state.good", "language": "en" }
+  { "text": "I am good", "intent": "describe_state.good", "language": "en" },
+  {
+    "text": "I am feeling good",
+    "intent": "describe_state.emotions.good",
+    "language": "en"
+  }
 ]

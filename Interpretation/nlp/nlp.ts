@@ -23,7 +23,8 @@ export const trainModel = async () => {
     // Current timestamp
     const timestamp = new Date().getTime();
     const filename = `models/model-${timestamp}.json`;
-    manager.save(filename);
+    // ! Right now there's no point in saving this because it trains every load. However, this is how it would be done, and in production we might want to load from the saved version.
+    // manager.save(filename);
     console.log("Trained");
     return manager;
   } catch (err) {
@@ -104,15 +105,19 @@ export const getIntent = async (lang: string, input: string) => {
 
 export const getAction = (int: string) => {
   const [intent, subintent, type] = int.split(".");
-  const action = intent_to_action_json[intent][subintent][type || "default"];
+  // If intent doesn't exist on intent_to_action, return null, if it does, if subintent doesn't exist, return null, if it does, check the property at type or default, return the action
+  const action =
+    intent_to_action_json[intent]?.[subintent]?.[type || "default"] || null;
   if (!action) {
-    return "i_dont_understand";
+    return "no_action";
   }
   return action;
 };
 
-export const getResponse = (action: string, metaData?: any | null) => {
-  const responses = action_to_response_json[action]?.responses?.default;
+export const getResponse = (act: string, metaData?: any | null) => {
+  const [action, subaction] = act.split(".");
+  const responses =
+    action_to_response_json[action]?.[subaction || "default"]?.responses;
   if (!responses) {
     return "custom_message";
   }
@@ -120,11 +125,38 @@ export const getResponse = (action: string, metaData?: any | null) => {
   return response;
 };
 
-export const getIntentAndAction = async (lang: string, input: string) => {
+export const getIntentAndAction = async (input: string, lang: string) => {
   try {
     const { intent, ...rest } = await manager.process(lang, input);
     const foundIntent = intent || rest.classifications[0].intent;
     const foundAction = getAction(foundIntent);
+
+    if (!foundIntent || rest.classifications[0].score < 0.5) {
+      return {
+        intent: "i_dont_understand",
+        action: "attempt_understanding",
+        metaData: {
+          ...rest,
+        },
+        nlu_response: "Sorry, I don't understand",
+      };
+    }
+
+    if (foundAction === "no_action") {
+      const corrected = await spellCheckText(input);
+      if (corrected) {
+        return {
+          intent: intent,
+          action: "no_action_found",
+          metaData: {
+            ...rest,
+            corrected: corrected,
+          },
+          nlu_response:
+            "I get what you mean, but I don't know what to say to that.",
+        };
+      }
+    }
 
     return {
       intent: foundIntent,

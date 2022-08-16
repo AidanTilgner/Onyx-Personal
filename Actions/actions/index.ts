@@ -8,12 +8,13 @@ const parseAndUseNLU = async (nlu: {
 }) => {
   try {
     const { action, metaData, nlu_response } = nlu;
+    const [act, subact] = action.split(".");
     if (nlu_response) {
       return {
         custom_message: nlu_response,
       };
     }
-    return await mappings[action + "_from_nlu"](metaData);
+    return await mappings[act + "_from_nlu"]({ metaData, subact });
   } catch (err) {
     console.log("Error parsing NLU:", err);
     return {
