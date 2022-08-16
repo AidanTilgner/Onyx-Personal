@@ -6,22 +6,6 @@ import multer from "multer";
 
 const router = Router();
 
-const parseAndUseNLU = async (nlu: {
-  intent: string;
-  action: string;
-  metaData: any;
-}) => {
-  try {
-    const { action, metaData } = nlu;
-    return await mappings[action + "_from_nlu"](metaData);
-  } catch (err) {
-    console.log("Error parsing NLU:", err);
-    return {
-      error: "There was an error parsing the NLU.",
-    };
-  }
-};
-
 const handlePackage = async (pkg: ActionsPackage) => {
   try {
     const { current_step, steps } = pkg;
@@ -34,19 +18,9 @@ const handlePackage = async (pkg: ActionsPackage) => {
 
     let result: any;
 
-    const parsingNLU = "parse_and_use_nlu";
-
-    if (parsingNLU) {
-      const nlu = await parseAndUseNLU(deposited);
-      result = nlu;
-      steps[current_step].data.gathered = nlu;
-    }
-
-    if (!parsingNLU) {
-      const res = await mappings[action](deposited);
-      result = res;
-      steps[current_step].data.gathered = res;
-    }
+    const res = await mappings[action](deposited);
+    result = res;
+    steps[current_step].data.gathered = res;
 
     if (deposit >= 0) {
       steps[deposit].data.deposited = result;

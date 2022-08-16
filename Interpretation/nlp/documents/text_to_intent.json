@@ -56,6 +56,16 @@
         "text": "What is the weather like in Salem?",
         "intent": "faq.weather",
         "language": "en"
+      },
+      {
+        "text": "Tell me about the weather today",
+        "intent": "faq.weather",
+        "language": "en"
+      },
+      {
+        "text": "Describe the weather",
+        "intent": "faq.weather",
+        "language": "en"
       }
     ]
   }

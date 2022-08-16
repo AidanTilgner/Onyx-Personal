@@ -2,6 +2,7 @@ import { NlpManager } from "node-nlp";
 import { TextToIntent } from "./index.d";
 import text_to_intent_json from "./documents/text_to_intent.json";
 import intent_to_action_json from "./documents/intent_to_action.json";
+import action_to_response_json from "./documents/action_to_response.json";
 import { spellCheckText } from "./similarity/spellcheck";
 
 const manager = new NlpManager({
@@ -113,12 +114,27 @@ export const getAction = (int: string) => {
   return action;
 };
 
+export const getResponse = (action: string, metaData?: any | null) => {
+  const responses = action_to_response_json[action]?.responses?.default;
+  if (!responses) {
+    return "custom_message";
+  }
+  const response = responses[Math.floor(Math.random() * responses.length)];
+  return response;
+};
+
 export const getIntentAndAction = async (lang: string, input: string) => {
   try {
     const { intent, ...rest } = await manager.process(lang, input);
     const foundIntent = intent || rest.classifications[0].intent;
+    const foundAction = getAction(foundIntent);
 
-    return { intent: foundIntent, action: getAction(intent), metaData: rest };
+    return {
+      intent: foundIntent,
+      action: foundAction,
+      metaData: rest,
+      nlu_response: getResponse(foundAction),
+    };
   } catch (err) {
     console.error(err);
     return null;
@@ -132,7 +148,13 @@ export const getIntentAndActionForSpeechServer = async (input: {
     const newText = spellCheckText(input.text.toLocaleLowerCase());
     const { intent, ...rest } = await manager.process("en", newText);
     const foundIntent = intent || rest.classifications[0].intent;
-    return { intent: foundIntent, action: getAction(intent), metaData: rest };
+    const foundAction = getAction(foundIntent);
+    return {
+      intent: foundIntent,
+      action: foundAction,
+      metaData: rest,
+      nlu_response: getResponse(foundAction),
+    };
   } catch (err) {
     console.error(err);
     return null;
