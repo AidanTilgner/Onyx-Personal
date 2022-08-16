@@ -1,17 +1,34 @@
 {
   "greeting": {
     "hello": {
-      "action": "say_hello"
+      "default": "say_hello"
+    },
+    "goodbye": {
+      "default": "say_goodbye",
+      "well_wishing": "say_goodbye.well_wishing",
+      "informative": "say_goodbye.informative"
     }
   },
   "inquiry": {
     "how_are_you": {
-      "action": "describe_current_state"
+      "default": "describe_current_state"
+    },
+    "obtain_important_information": {
+      "default": "share_important_information"
+    },
+    "obtain_interesting_information": {
+      "default": "share_interesting_information"
+    },
+    "about_you": {
+      "default": "explain_existence"
     }
   },
   "faq": {
     "weather": {
-      "action": "get_weather"
+      "default": "get_weather"
+    },
+    "who_built_you": {
+      "default": "explain_developers"
     }
   }
 }

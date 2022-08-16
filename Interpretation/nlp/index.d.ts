@@ -1,10 +1,7 @@
 export type TextToIntent = {
-  name: string;
-  examples: {
-    text: string;
-    intent: string;
-    language: string;
-  }[];
+  text: string;
+  intent: string;
+  language: string;
 }[];
 
 export type IntentToAction = {

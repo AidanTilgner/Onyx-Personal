@@ -1,7 +1,7 @@
 {
   "say_hello": {
-    "responses": {
-      "default": ["Hello!", "Hi there!", "Howdy!", "Hey there!"]
+    "default": {
+      "responses": ["Hello!", "Hi there!", "Howdy!", "Hey there!"]
     }
   }
 }

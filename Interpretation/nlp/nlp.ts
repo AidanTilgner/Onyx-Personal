@@ -16,11 +16,8 @@ export const trainModel = async () => {
     console.log("Training model...");
     const text_to_intent: TextToIntent = text_to_intent_json;
     text_to_intent.forEach((item) => {
-      const { name, examples } = item;
-      examples.forEach((example) => {
-        const { text, intent, language } = example;
-        manager.addDocument(language || "en", text, intent);
-      });
+      const { text, intent, language } = item;
+      manager.addDocument(language || "en", text, intent);
     });
     await manager.train();
     // Current timestamp
@@ -106,8 +103,8 @@ export const getIntent = async (lang: string, input: string) => {
 };
 
 export const getAction = (int: string) => {
-  const [intent, subintent] = int.split(".");
-  const action = intent_to_action_json[intent][subintent].action;
+  const [intent, subintent, type] = int.split(".");
+  const action = intent_to_action_json[intent][subintent][type || "default"];
   if (!action) {
     return "i_dont_understand";
   }
