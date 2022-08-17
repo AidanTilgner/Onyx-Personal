@@ -1,0 +1,72 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800&family=Quicksand:wght@300;400;500;600;700&display=swap");
+body {
+  margin: 0;
+  font-family: "Inter", sans-serif;
+}
+
+.navbar {
+  padding: 24px 56px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  position: -webkit-sticky;
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  box-shadow: 0.2px 0.2px 56px 0 rgba(0, 0, 0, 0.1);
+}
+.navbar__title {
+  font-size: 24px;
+  font-weight: 500;
+  font-family: "Quicksand", sans-serif;
+  margin: 0;
+}
+.navbar__items {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  list-style-type: none;
+  font-family: "Inter", sans-serif;
+  margin: 0;
+}
+.navbar__item {
+  font-size: 16px;
+  margin-left: 8px;
+  cursor: pointer;
+}
+.navbar__link {
+  color: #000;
+  text-decoration: none;
+}
+.navbar .active {
+  font-weight: 500;
+  text-decoration: underline;
+}
+
+.content {
+  padding: 24px 56px;
+}
+.content .title {
+  font-size: 48px;
+  font-weight: 400;
+  font-family: "Quicksand", sans-serif;
+  margin: 24px 0;
+}
+.content p {
+  font-size: 16px;
+  font-weight: 300;
+  font-family: "Inter", sans-serif;
+  margin: 0;
+  margin-bottom: 14px;
+}
+.content strong {
+  font-weight: 400;
+}
+
+.warning {
+  font-weight: 500 !important;
+  background-color: #bfb621;
+  display: block;
+  padding: 14px;
+  color: white;
+}/*# sourceMappingURL=main.css.map */
