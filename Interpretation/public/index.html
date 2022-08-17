@@ -28,27 +28,104 @@
       </ul>
     </nav>
     <main class="content">
-      <p class="warning">
-        This feature of Onyx is experimental and therefore unstable, use with
-        caution. It could potentionall cause issues with interpretation that
-        will require manual fixes.
-      </p>
-      <h1 class="title">Welcome</h1>
-      <p>
-        This is the Onyx Interpretation Server. It is responsible for all all
-        <strong>Natural Language Processing</strong> performed by the system.
-        This portal allows you to modify the training data and therefore the
-        model. It's effectively a GUI that lets you modify the model.
-      </p>
-      <p>
-        On the other pages, navigatable via the navigation bar above, you'll
-        find the different modifications you can make, as well as explanations
-        as to what they are. If you have questions, please ask them, as this
-        feature is still in development.
-        <strong>You should know what you're doing before using it.</strong>
-      </p>
+      <section>
+        <p class="warning">
+          This feature of Onyx is experimental and therefore unstable, use with
+          caution. It could potentionall cause issues with interpretation that
+          will require manual fixes.
+        </p>
+        <h1 class="title">Welcome</h1>
+        <p>
+          This is the Onyx Interpretation Server. It is responsible for all all
+          <strong>Natural Language Processing</strong> performed by the system.
+          This portal allows you to modify the training data and therefore the
+          model. It's effectively a GUI that lets you modify the model.
+        </p>
+        <p>
+          On the other pages, navigatable via the navigation bar above, you'll
+          find the different modifications you can make, as well as explanations
+          as to what they are. If you have questions, please ask them, as this
+          feature is still in development.
+          <strong>You should know what you're doing before using it.</strong>
+        </p>
+      </section>
+      <section>
+        <h1 class="title">Testing</h1>
+        <p>
+          Here you can test the model with the text input below. Simply type
+          something, press enter, and you'll get a response in the text box. You
+          can then edit the expected intent for the text. Or if you think a
+          different action should map to the intent given, you can edit that
+          too.
+        </p>
+        <div class="stage">
+          <div class="input-group">
+            <input
+              type="text"
+              placeholder="Type something..."
+              class="text-input"
+              id="testing-input"
+            />
+            <button type="button" id="testing-submit">Send</button>
+          </div>
+          <div class="output-box" id="testing-output"></div>
+          <div class="output-properties" id="testing-properties">
+            <div
+              class="output-property"
+              id="testing-intent-container"
+              data-state="intent"
+            >
+              <span id="testing-intent"></span>
+              <div class="icons">
+                <i
+                  class="material-symbols-outlined primary"
+                  title="Edit intent for this text"
+                  id="edit-intent"
+                  >edit</i
+                >
+              </div>
+            </div>
+            <div
+              class="output-property"
+              id="testing-action-container"
+              data-state="action"
+            >
+              <span id="testing-action"></span>
+              <div class="icons">
+                <i
+                  class="material-symbols-outlined primary"
+                  title="Edit action for this intent"
+                  id="edit-action"
+                  >edit</i
+                >
+              </div>
+            </div>
+            <div
+              class="output-property"
+              id="testing-response-container"
+              data-state="nlu_response"
+            >
+              <span id="testing-response"></span>
+              <div class="icons">
+                <i
+                  class="material-symbols-outlined danger"
+                  title="Remove this response to this text"
+                  id="remove-response"
+                  >delete</i
+                >
+                <i
+                  class="material-symbols-outlined primary"
+                  title="Add a possible response to this text"
+                  id="add-response"
+                  >add</i
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
     </main>
-    <script type="module" src="./scripts/portal.js"></script>
+    <script type="module" src="./scripts/main.js"></script>
     <script type="module" src="./scripts/home.js"></script>
   </body>
 </html>
