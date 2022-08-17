@@ -49,9 +49,9 @@ const clickHandler = async () => {
   state.nlu_response = nlu.nlu_response;
   state.action = nlu.action;
   TestingOutput.innerHTML = nlu.nlu_response;
-  TestingIntent.innerHTML = `<span><strong>Intent</strong>: ${nlu.intent}</span>`;
-  TestingAction.innerHTML = `<span><strong>Action</strong>: ${nlu.action}</span>`;
-  TestingResponse.innerHTML = `<span><strong>Response</strong>: ${nlu.nlu_response}</span>`;
+  TestingIntent.innerHTML = `<strong>Intent</strong>: ${nlu.intent}`;
+  TestingAction.innerHTML = `<strong>Action</strong>: ${nlu.action}`;
+  TestingResponse.innerHTML = `<strong>Response</strong>: ${nlu.nlu_response}`;
   checkDisplayOutput();
   checkDisplayProperties();
   addPropertyEventListeners();
@@ -110,7 +110,6 @@ const handleEditIntentClick = (e) => {
         icon: "cancel",
         type: "danger",
         action: () => {
-          console.log("Cancel clicked");
           EditInputGroup.remove();
           TestingIntentContainer.style.display = "flex";
         },
@@ -146,7 +145,6 @@ const handleEditActionClick = (e) => {
         icon: "cancel",
         type: "danger",
         action: () => {
-          console.log("Cancel clicked");
           EditInputGroup.remove();
           TestingActionContainer.style.display = "flex";
         },

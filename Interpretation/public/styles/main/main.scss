@@ -174,6 +174,11 @@ body {
       background-color: #f8f8f8;
     }
 
+    span {
+      display: inline-block;
+      height: 24px;
+    }
+
     strong {
       font-weight: 400;
     }
@@ -232,13 +237,14 @@ body {
 
     &__input {
       border: none;
-      border-bottom: 1px solid #eaeaea;
+      border-bottom: 1px solid rgba(34, 86, 242, 0.35);
       font-size: 16px;
       background-color: inherit;
       font-weight: 400;
       font-family: "Inter", sans-serif;
       width: 50%;
-      padding: 4px 0;
+      height: 24px;
+      padding-bottom: 4px;
       box-sizing: border-box;
 
       &:focus {
