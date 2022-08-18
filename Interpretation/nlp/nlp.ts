@@ -121,7 +121,7 @@ export const getResponse = (act: string, metaData?: any | null) => {
   if (!responses) {
     return {
       response: "custom_message",
-      responses,
+      responses: ["custom_message"],
     };
   }
   const response = responses[Math.floor(Math.random() * responses.length)];
@@ -161,6 +161,7 @@ export const getIntentAndAction = async (input: string, lang: string) => {
       }
     }
     const { response, responses } = getResponse(foundAction);
+    console.log("Response: ", response, responses);
 
     return {
       intent: foundIntent,

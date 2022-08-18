@@ -5,6 +5,7 @@ const TestingOutput = document.getElementById("testing-output");
 const TestingAction = document.getElementById("testing-action");
 const TestingIntent = document.getElementById("testing-intent");
 const TestingResponse = document.getElementById("testing-response");
+const TestingRespones = document.getElementById("testing-responses");
 
 const state = {
   input: TestingInput.value,
@@ -54,10 +55,18 @@ const getNLUForInput = async () => {
   state.intent = nlu.intent;
   state.nlu_response = nlu.nlu_response;
   state.action = nlu.action;
+  state.responses = nlu.responses;
+  console.log("State:", state);
   TestingOutput.innerHTML = nlu.nlu_response;
   TestingIntent.innerHTML = `<strong>Intent</strong>: ${nlu.intent}`;
   TestingAction.innerHTML = `<strong>Action</strong>: ${nlu.action}`;
   TestingResponse.innerHTML = `<strong>Response</strong>: ${nlu.nlu_response}`;
+  nlu.responses.forEach((response) => {
+    const responseItem = document.createElement("span");
+    responseItem.classList.add("output-list-item");
+    responseItem.innerHTML = response;
+    TestingRespones.appendChild(responseItem);
+  });
   checkDisplayOutput();
   checkDisplayProperties();
   addPropertyEventListeners();

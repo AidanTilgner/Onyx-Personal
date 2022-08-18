@@ -244,4 +244,45 @@ body {
 }
 .output-edit-property__icons .danger:hover {
   color: #e05252;
+}
+.output-list {
+  display: flex;
+  align-items: space-between;
+  justify-content: flex-start;
+  margin: 8px;
+  font-weight: 300;
+  position: relative;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 8px;
+  font-size: 16px;
+}
+.output-list:hover {
+  background-color: #f8f8f8;
+}
+.output-list-item {
+  position: relative;
+  margin-right: 8px;
+  border-right: 1px solid #eaeaea;
+  padding-right: 8px;
+}
+.output-list-item:hover {
+  cursor: pointer;
+  text-decoration: underline;
+}
+.output-list-item:last-child {
+  border-right: none;
+  padding-right: 0;
+}
+.output-list-title {
+  display: flex;
+  align-items: space-between;
+  justify-content: flex-start;
+  margin: 8px;
+  font-weight: 300;
+  position: relative;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 8px;
+  font-size: 16px;
 }/*# sourceMappingURL=main.css.map */
