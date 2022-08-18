@@ -3,8 +3,6 @@
   import { navigate } from "svelte-routing";
   import { currentPath } from "../../stores/env";
 
-  $: console.log("pathname", $currentPath);
-
   const navigateLink = (link) => {
     navigate(link);
   };
@@ -17,7 +15,8 @@
   <div class="nav-items">
     <div
       on:click={() => navigateLink("/home")}
-      class="nav-item {$currentPath === '/home' && 'active'}"
+      class="nav-item {($currentPath === '/home' || $currentPath === '/') &&
+        'active'}"
     >
       <i class="material-symbols-outlined">dashboard</i>
       <p>Home</p>

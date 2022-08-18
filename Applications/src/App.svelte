@@ -4,7 +4,7 @@
     getExternalWidgets,
     setExternalWidgets,
   } from "./bootstrap/external_widgets";
-  import { Router, Route } from "svelte-routing";
+  import { Router, Route, navigate } from "svelte-routing";
   import { currentPath } from "./lib/stores/env";
   import { onMount, onDestroy } from "svelte";
   import { globalHistory } from "svelte-routing/src/history";
@@ -15,6 +15,8 @@
   import News from "./pages/News.svelte";
   import Robots from "./pages/Robots.svelte";
   import SideBar from "./lib/components/SideBar/SideBar.svelte";
+  import Console from "./lib/components/Console/Console.svelte";
+  import VoiceInput from "./lib/components/VoiceInput/VoiceInput.svelte";
   export let url;
 
   const initialized = initSocket();
@@ -23,7 +25,6 @@
 
   onMount(() => {
     unsub = globalHistory.listen(({ location, action }) => {
-      console.log(location, action);
       $currentPath = location.pathname;
     });
   });
@@ -40,6 +41,8 @@
 
 <main>
   <SideBar />
+  <Console />
+  <VoiceInput />
   <Router {url}>
     <div class="content-container">
       <Route path="/" component={Home} />

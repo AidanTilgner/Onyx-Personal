@@ -1,3 +1,4 @@
+import { globalLog } from "../utils/logger";
 import { emitMessage } from "../utils/socket-io";
 
 export const display_action_output = (out: any) => {
@@ -16,12 +17,12 @@ const display_weather_data = ({
   data: any;
   custom_message: string;
 }) => {
-  console.log("Weather data:", JSON.stringify(data.data.weather));
   const toSend = {
     weather: data.data.weather,
     custom_message: custom_message,
   };
   emitMessage("message", JSON.stringify(toSend));
+  globalLog("Weather Data:", toSend);
 };
 
 export const voice_response = ({
@@ -31,12 +32,16 @@ export const voice_response = ({
   data: any;
   custom_message: string;
 }) => {
-  console.log("Voice response:", JSON.stringify(data.data.voice));
+  if (custom_message === "custom_message") {
+    custom_message =
+      "Oops. Something went wrong. I guess I don't know what to say.";
+  }
   const toSend = {
-    voice: data.data.voice,
+    data: data ? data : null,
     custom_message: custom_message,
   };
   emitMessage("voice_response", JSON.stringify(toSend));
+  globalLog("Voice Data:", toSend);
 };
 
 const display_type_mappings: { [key: string]: Function } = {

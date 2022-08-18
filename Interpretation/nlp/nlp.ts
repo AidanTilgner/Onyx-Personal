@@ -2,6 +2,7 @@ import { NlpManager } from "node-nlp";
 import { TextToIntent } from "./index.d";
 import text_to_intent_json from "./documents/text_to_intent.json";
 import intent_to_action_json from "./documents/intent_to_action.json";
+import action_to_response_json from "./documents/action_to_response.json";
 import { spellCheckText } from "./similarity/spellcheck";
 
 const manager = new NlpManager({
@@ -15,17 +16,15 @@ export const trainModel = async () => {
     console.log("Training model...");
     const text_to_intent: TextToIntent = text_to_intent_json;
     text_to_intent.forEach((item) => {
-      const { name, examples } = item;
-      examples.forEach((example) => {
-        const { text, intent, language } = example;
-        manager.addDocument(language || "en", text, intent);
-      });
+      const { text, intent, language } = item;
+      manager.addDocument(language || "en", text, intent);
     });
     await manager.train();
     // Current timestamp
     const timestamp = new Date().getTime();
     const filename = `models/model-${timestamp}.json`;
-    manager.save(filename);
+    // ! Right now there's no point in saving this because it trains every load. However, this is how it would be done, and in production we might want to load from the saved version.
+    // manager.save(filename);
     console.log("Trained");
     return manager;
   } catch (err) {
@@ -60,7 +59,6 @@ export const testModel = async () => {
       const { try: text } = test;
       const intent = await manager.process(language, text);
       if (intent.hasOwnProperty("nluAnswer")) {
-        console.log(`${text} => ${intent.nluAnswer.classifications[0].intent}`);
         console.assert(
           intent.nluAnswer?.classifications[0].intent === test.expected,
           "Error in test: ",
@@ -78,7 +76,6 @@ export const testModel = async () => {
         );
         return;
       }
-      console.log(`${text} => ${intent.classifications[0].intent}`);
       console.assert(
         intent.classifications[0].intent === test.expected,
         "Error in test: ",
@@ -105,20 +102,72 @@ export const getIntent = async (lang: string, input: string) => {
 };
 
 export const getAction = (int: string) => {
-  const [intent, subintent] = int.split(".");
-  const action = intent_to_action_json[intent][subintent].action;
+  const [intent, subintent, type] = int.split(".");
+  // If intent doesn't exist on intent_to_action, return null, if it does, if subintent doesn't exist, return null, if it does, check the property at type or default, return the action
+  const action =
+    intent_to_action_json[intent]?.[subintent]?.[type || "default"] || null;
   if (!action) {
-    return "i_dont_understand";
+    return "no_action";
   }
   return action;
 };
 
-export const getIntentAndAction = async (lang: string, input: string) => {
+export const getResponse = (act: string, metaData?: any | null) => {
+  const [action, subaction] = act.split(".");
+  const responses =
+    action_to_response_json[action]?.[subaction || "default"]?.responses;
+  if (!responses) {
+    return {
+      response: "custom_message",
+      responses: ["custom_message"],
+    };
+  }
+  const response = responses[Math.floor(Math.random() * responses.length)];
+  return { response, responses };
+};
+
+export const getIntentAndAction = async (input: string, lang: string) => {
   try {
     const { intent, ...rest } = await manager.process(lang, input);
     const foundIntent = intent || rest.classifications[0].intent;
+    const foundAction = getAction(foundIntent);
 
-    return { intent: foundIntent, action: getAction(intent), metaData: rest };
+    if (!foundIntent || rest.classifications[0].score < 0.5) {
+      return {
+        intent: "exception.unknown",
+        action: "attempt_understanding",
+        metaData: {
+          ...rest,
+        },
+        nlu_response: "Sorry, I don't understand",
+      };
+    }
+
+    if (foundAction === "no_action") {
+      const corrected = await spellCheckText(input);
+      if (corrected) {
+        return {
+          intent: intent,
+          action: "no_action_found",
+          metaData: {
+            ...rest,
+            corrected: corrected,
+          },
+          nlu_response:
+            "I get what you mean, but I don't know how to respond to that yet.",
+        };
+      }
+    }
+    const { response, responses } = getResponse(foundAction);
+    console.log("Response: ", response, responses);
+
+    return {
+      intent: foundIntent,
+      action: foundAction,
+      metaData: rest,
+      nlu_response: response,
+      responses,
+    };
   } catch (err) {
     console.error(err);
     return null;
@@ -132,7 +181,15 @@ export const getIntentAndActionForSpeechServer = async (input: {
     const newText = spellCheckText(input.text.toLocaleLowerCase());
     const { intent, ...rest } = await manager.process("en", newText);
     const foundIntent = intent || rest.classifications[0].intent;
-    return { intent: foundIntent, action: getAction(intent), metaData: rest };
+    const foundAction = getAction(foundIntent);
+    const { response, responses } = getResponse(foundAction);
+    return {
+      intent: foundIntent,
+      action: foundAction,
+      metaData: rest,
+      nlu_response: response,
+      responses,
+    };
   } catch (err) {
     console.error(err);
     return null;

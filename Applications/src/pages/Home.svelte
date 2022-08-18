@@ -16,12 +16,6 @@
 
 <main>
   <Header />
-  <VoiceInput />
-  <div>
-    {#each messagesArray as message}
-      <p>{message}</p>
-    {/each}
-  </div>
 </main>
 
 <style lang="scss">
