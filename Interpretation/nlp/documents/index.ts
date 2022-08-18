@@ -149,9 +149,6 @@ export const changeActionForIntent = (int: string, action: string) => {
 
   let copyJSON = { ...intent_to_action_json };
   const [intent, subintent, type = "default"] = int.split(".");
-  console.log("intent", intent);
-  console.log("subintent", subintent);
-  console.log("type", type);
 
   // If obj[intent][subintent][type] exists, change it to action
   // If obj[intent][subintent][type] does not exist, create it and change it to action

@@ -56,7 +56,6 @@ const getNLUForInput = async () => {
   state.nlu_response = nlu.nlu_response;
   state.action = nlu.action;
   state.responses = nlu.responses;
-  console.log("State:", state);
   TestingOutput.innerHTML = nlu.nlu_response;
   TestingIntent.innerHTML = `<strong>Intent</strong>: ${nlu.intent}`;
   TestingAction.innerHTML = `<strong>Action</strong>: ${nlu.action}`;

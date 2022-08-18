@@ -59,7 +59,6 @@ export const testModel = async () => {
       const { try: text } = test;
       const intent = await manager.process(language, text);
       if (intent.hasOwnProperty("nluAnswer")) {
-        console.log(`${text} => ${intent.nluAnswer.classifications[0].intent}`);
         console.assert(
           intent.nluAnswer?.classifications[0].intent === test.expected,
           "Error in test: ",
@@ -77,7 +76,6 @@ export const testModel = async () => {
         );
         return;
       }
-      console.log(`${text} => ${intent.classifications[0].intent}`);
       console.assert(
         intent.classifications[0].intent === test.expected,
         "Error in test: ",
