@@ -119,10 +119,13 @@ export const getResponse = (act: string, metaData?: any | null) => {
   const responses =
     action_to_response_json[action]?.[subaction || "default"]?.responses;
   if (!responses) {
-    return "custom_message";
+    return {
+      response: "custom_message",
+      responses,
+    };
   }
   const response = responses[Math.floor(Math.random() * responses.length)];
-  return response;
+  return { response, responses };
 };
 
 export const getIntentAndAction = async (input: string, lang: string) => {
@@ -133,7 +136,7 @@ export const getIntentAndAction = async (input: string, lang: string) => {
 
     if (!foundIntent || rest.classifications[0].score < 0.5) {
       return {
-        intent: "i_dont_understand",
+        intent: "exception.unknown",
         action: "attempt_understanding",
         metaData: {
           ...rest,
@@ -153,16 +156,18 @@ export const getIntentAndAction = async (input: string, lang: string) => {
             corrected: corrected,
           },
           nlu_response:
-            "I get what you mean, but I don't know what to say to that.",
+            "I get what you mean, but I don't know how to respond to that yet.",
         };
       }
     }
+    const { response, responses } = getResponse(foundAction);
 
     return {
       intent: foundIntent,
       action: foundAction,
       metaData: rest,
-      nlu_response: getResponse(foundAction),
+      nlu_response: response,
+      responses,
     };
   } catch (err) {
     console.error(err);
@@ -178,11 +183,13 @@ export const getIntentAndActionForSpeechServer = async (input: {
     const { intent, ...rest } = await manager.process("en", newText);
     const foundIntent = intent || rest.classifications[0].intent;
     const foundAction = getAction(foundIntent);
+    const { response, responses } = getResponse(foundAction);
     return {
       intent: foundIntent,
       action: foundAction,
       metaData: rest,
-      nlu_response: getResponse(foundAction),
+      nlu_response: response,
+      responses,
     };
   } catch (err) {
     console.error(err);

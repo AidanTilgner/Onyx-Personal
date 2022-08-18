@@ -157,6 +157,7 @@ body {
 .output-property span {
   display: inline-block;
   height: 24px;
+  width: 80%;
 }
 .output-property strong {
   font-weight: 400;

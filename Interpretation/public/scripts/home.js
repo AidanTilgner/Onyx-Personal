@@ -6,7 +6,13 @@ const TestingAction = document.getElementById("testing-action");
 const TestingIntent = document.getElementById("testing-intent");
 const TestingResponse = document.getElementById("testing-response");
 
-const state = {};
+const state = {
+  input: TestingInput.value,
+};
+
+TestingInput.onkeyup = () => {
+  state.input = TestingInput.value;
+};
 
 const checkDisplayProperties = () => {
   const OutputProperties = document.querySelectorAll(".output-property");
@@ -29,10 +35,10 @@ const checkDisplayOutput = () => {
 };
 checkDisplayOutput();
 
-const clickHandler = async () => {
+const getNLUForInput = async () => {
   const { nlu } = await axios
     .post("/nlu", {
-      text: TestingInput.value,
+      text: state.input,
     })
     .then((res) => {
       console.log("Response:", res.data);
@@ -58,11 +64,11 @@ const clickHandler = async () => {
   return nlu;
 };
 
-TestingSubmit.addEventListener("click", clickHandler);
-// Testing Input should also call clickHandler when enter is pressed.
+TestingSubmit.addEventListener("click", getNLUForInput);
+// Testing Input should also call getNLUForInput when enter is pressed.
 TestingInput.addEventListener("keyup", (event) => {
   if (event.key === "Enter") {
-    clickHandler();
+    getNLUForInput();
   }
 });
 
@@ -118,7 +124,23 @@ const handleEditIntentClick = (e) => {
         title: "Submit new intent",
         icon: "check",
         type: "primary",
-        action: () => {},
+        action: () => {
+          const { value } = input;
+          axios
+            .put("/training/intent", {
+              text: state.input,
+              intent: value,
+            })
+            .then((res) => {
+              setAlert(res.data.message, "success");
+              EditInputGroup.remove();
+              getNLUForInput();
+            })
+            .catch((err) => {
+              console.log("Error:", err);
+              setAlert(err.response.data.error, "danger");
+            });
+        },
       },
     ],
   });
@@ -129,6 +151,7 @@ const handleEditIntentClick = (e) => {
   // Set display none on testing-intent and make EditInputGroup the first child of testing-properties.
   TestingIntentContainer.style.display = "none";
   OutputProperties.insertBefore(EditInputGroup, TestingIntentContainer);
+  input.focus();
 };
 
 const handleEditActionClick = (e) => {
@@ -153,7 +176,23 @@ const handleEditActionClick = (e) => {
         title: "Submit new action",
         icon: "check",
         type: "primary",
-        action: () => {},
+        action: () => {
+          const { value } = input;
+          axios
+            .put("/training/action", {
+              intent: state.intent,
+              action: value,
+            })
+            .then((res) => {
+              setAlert(res.data.message, "success");
+              EditInputGroup.remove();
+              getNLUForInput();
+            })
+            .catch((err) => {
+              console.log("Error:", err);
+              setAlert(err.response.data.error, "danger");
+            });
+        },
       },
     ],
   });
@@ -161,6 +200,7 @@ const handleEditActionClick = (e) => {
   // Set display none on testing-intent and make EditInputGroup the first child of testing-properties.
   TestingActionContainer.style.display = "none";
   OutputProperties.insertBefore(EditInputGroup, TestingActionContainer);
+  input.focus();
 };
 
 const addPropertyEventListeners = () => {
