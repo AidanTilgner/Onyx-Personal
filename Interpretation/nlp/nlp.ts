@@ -86,6 +86,7 @@ export const testModel = async () => {
         intent.classifications[0].intent
       );
     });
+    console.log("Model tested");
   } catch (err) {
     console.error(err);
   }
@@ -140,6 +141,7 @@ export const getIntentAndAction = async (input: string, lang: string) => {
           ...rest,
         },
         nlu_response: "Sorry, I don't understand",
+        responses: [],
       };
     }
 
@@ -155,11 +157,11 @@ export const getIntentAndAction = async (input: string, lang: string) => {
           },
           nlu_response:
             "I get what you mean, but I don't know how to respond to that yet.",
+          responses: [],
         };
       }
     }
     const { response, responses } = getResponse(foundAction);
-    console.log("Response: ", response, responses);
 
     return {
       intent: foundIntent,

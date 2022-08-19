@@ -14,27 +14,32 @@ export const getTrainingData = () => {
   };
 };
 
-export const addResponseToAction = (
-  action: string,
-  response: string,
-  type: string = "default"
-) => {
-  if (!action || !response) {
+export const addResponseToAction = (act: string, response: string) => {
+  if (!act || !response) {
     return {
       error: "Action and response required",
     };
   }
+  const [action, type = "default"] = act.split(".");
   const copyJSON = { ...action_to_response_json };
-  const exists = copyJSON[action]?.[type]?.includes(response);
+  const exists = copyJSON[action]?.[type]?.responses.includes(response);
   if (exists) {
     return {
       error: "Response already exists",
     };
   }
-  copyJSON[action][type].responses = [
-    ...copyJSON[action][type].responses,
-    response,
-  ];
+  // TODO: Figure out a cleaner way to do this
+  copyJSON[action]
+    ? copyJSON[action][type]
+      ? copyJSON[action][type].responses.push(response)
+      : (copyJSON[action][type] = {
+          responses: [response],
+        })
+    : (copyJSON[action] = {
+        [type]: {
+          responses: [response],
+        },
+      });
   const path = `${pathToLocal}/action_to_response.json`;
   writeFileSync(path, JSON.stringify(copyJSON));
   return {
@@ -150,9 +155,7 @@ export const changeActionForIntent = (int: string, action: string) => {
   let copyJSON = { ...intent_to_action_json };
   const [intent, subintent, type = "default"] = int.split(".");
 
-  // If obj[intent][subintent][type] exists, change it to action
-  // If obj[intent][subintent][type] does not exist, create it and change it to action
-
+  // TODO: Figure out a cleaner way to do this
   copyJSON[intent]
     ? copyJSON[intent][subintent]
       ? (copyJSON[intent][subintent][type] = action)
@@ -168,18 +171,15 @@ export const changeActionForIntent = (int: string, action: string) => {
   };
 };
 
-export const removeResponseFromAction = (
-  action: string,
-  response: string,
-  type: string = "default"
-) => {
-  if (!action || !response) {
+export const removeResponseFromAction = (act: string, response: string) => {
+  if (!act || !response) {
     return {
       error: "Action and response required",
     };
   }
+  const [action, type = "default"] = act.split(".");
   const copyJSON = { ...action_to_response_json };
-  const exists = copyJSON[action]?.[type]?.includes(response);
+  const exists = copyJSON[action]?.[type]?.responses.includes(response);
   if (!exists) {
     return {
       error: "Response does not exist",
