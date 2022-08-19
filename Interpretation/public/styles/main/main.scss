@@ -289,8 +289,9 @@ body {
 
   &-list {
     display: flex;
-    align-items: space-between;
+    align-items: center;
     justify-content: flex-start;
+    flex-wrap: wrap;
     margin: 8px;
     font-weight: 300;
     position: relative;
@@ -324,12 +325,12 @@ body {
       display: flex;
       align-items: space-between;
       justify-content: flex-start;
-      margin: 8px;
-      font-weight: 300;
+      margin: 4px 0 !important;
+      font-weight: 400 !important;
       position: relative;
       width: 100%;
       box-sizing: border-box;
-      padding: 8px;
+      padding: 2px 0 8px 0;
       font-size: 16px;
     }
   }

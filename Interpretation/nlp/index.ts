@@ -9,3 +9,13 @@ export const startNLP = async () => {
     console.log(err);
   }
 };
+
+export const restartNLP = async () => {
+  try {
+    console.log("Restarting NLP...");
+    await trainModel();
+    await testModel();
+  } catch (err) {
+    console.log(err);
+  }
+};

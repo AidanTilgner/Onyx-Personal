@@ -31,8 +31,8 @@ router.post("/action", (req, res) => {
 });
 
 router.post("/response", (req, res) => {
-  const { action, response, type } = req.body;
-  return res.send(addResponseToAction(action, response, type));
+  const { action, response } = req.body;
+  return res.send(addResponseToAction(action, response));
 });
 
 router.put("/intent", (req, res) => {
@@ -51,8 +51,8 @@ router.delete("/action", (req, res) => {
 });
 
 router.delete("/response", (req, res) => {
-  const { action, response, type } = req.body;
-  return res.send(removeResponseFromAction(action, response, type));
+  const { action, response } = req.body;
+  return res.send(removeResponseFromAction(action, response));
 });
 
 router.delete("/example", (req, res) => {
