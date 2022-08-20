@@ -7,6 +7,7 @@
     <title>NLU Portal</title>
     <link rel="stylesheet" href="../styles/main/main.css" />
     <link rel="stylesheet" href="../styles/components/components.css" />
+    <link rel="stylesheet" href="../styles/examples/examples.css" />
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   </head>
   <body>
@@ -27,7 +28,25 @@
         </li>
       </ul>
     </nav>
-    <div>Examples</div>
+    <main class="content">
+      <section>
+        <h1 class="title">Examples List</h1>
+        <div class="search">
+          <input
+            type="text"
+            placeholder="Search something..."
+            id="search-input"
+            class="search__input"
+            tabindex="1"
+          />
+          <button class="search__button" id="search-button" tabindex="2">
+            <i class="material-symbols-outlined">search</i>
+          </button>
+        </div>
+        <div class="examples" id="examples-list"></div>
+      </section>
+    </main>
     <script type="module" src="../scripts/main.js"></script>
+    <script type="module" src="../scripts/examples.js"></script>
   </body>
 </html>

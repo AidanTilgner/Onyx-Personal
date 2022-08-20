@@ -286,4 +286,41 @@ body {
   box-sizing: border-box;
   padding: 2px 0 8px 0;
   font-size: 16px;
+}
+
+.search {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 50%;
+  margin: 24px auto;
+}
+.search__input {
+  box-sizing: border-box;
+  padding: 0px 14px;
+  height: 45px;
+  width: 82%;
+  border: 1px solid #eaeaea;
+  border-radius: 0;
+  font-size: 16px;
+  font-family: "Quicksand", sans-serif;
+}
+.search__input:focus {
+  outline: none;
+  border: 1px solid #2256f2;
+}
+.search__button {
+  box-sizing: border-box;
+  display: inline-block;
+  height: 45px;
+  border: 1px solid #2256f2;
+  background-color: #2256f2;
+  color: white;
+  border-radius: 0;
+  font-size: 16px;
+  cursor: pointer;
+  width: 18%;
+}
+.search__button:hover {
+  background-color: #1f4ee0;
 }/*# sourceMappingURL=main.css.map */

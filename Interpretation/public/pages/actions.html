@@ -27,7 +27,23 @@
         </li>
       </ul>
     </nav>
-    <div>Actions</div>
+    <div class="content">
+      <h1 class="title">Actions Mappings</h1>
+      <div class="search">
+        <input
+          type="text"
+          placeholder="Search something..."
+          id="search-input"
+          class="search__input"
+          tabindex="1"
+        />
+        <button class="search__button" id="search-button" tabindex="2">
+          <i class="material-symbols-outlined">search</i>
+        </button>
+      </div>
+      <div class="actions" id="actions-list"></div>
+    </div>
     <script type="module" src="../scripts/main.js"></script>
+    <script type="module" src="../scripts/actions.js"></script>
   </body>
 </html>

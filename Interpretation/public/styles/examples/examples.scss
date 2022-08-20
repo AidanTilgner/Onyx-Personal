@@ -1,0 +1,25 @@
+.examples {
+  display: flex;
+  flex-direction: column;
+}
+
+.example {
+  list-style-type: none;
+  padding: 0;
+  padding-left: 14px;
+  margin: 0;
+  margin-bottom: 14px;
+  border-left: 1px solid #eaeaea;
+  display: flex;
+  flex-direction: column;
+
+  li {
+    font-size: 16px;
+    margin-bottom: 8px;
+    cursor: pointer;
+  }
+
+  li:last-child {
+    margin-bottom: 0;
+  }
+}
