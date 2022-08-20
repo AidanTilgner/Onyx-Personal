@@ -43,39 +43,34 @@ Object.keys(actionsObject).forEach((action) => {
   });
 });
 
-console.log(actions);
-
-for (const intent in actions) {
-  ActionsList.innerHTML += `<ul class="action">
-
-        <li class="action__intent">${intent}</li>
-        <ul class="action__subactions">
-            ${Object.keys(actions[intent])
-              .map((subaction) => {
-                return `<li class="action__subaction">${subaction}</li>
-                <ul class="action__types">
-                    ${Object.keys(actions[intent][subaction])
-                      .map((type) => {
-                        return `<li class="action__type">${type}</li>
-                        <li class="action__action">${actions[intent][subaction][type]}</li>`;
-                      })
-                      .join("")}
-                </ul>`;
-              })
-              .join("")}
-        </ul>
-    </ul>`;
-}
-
 const filterExamples = (e) => {
   const filter = SearchInput.value.toLowerCase();
-  const exElements = document.getElementsByClassName("example");
+  const actionElements = document.getElementsByClassName("action");
+  const subactionElements =
+    document.getElementsByClassName("action__subaction");
+  const typeElements = document.getElementsByClassName("action__type");
 
-  Array.from(exElements).forEach((ex) => {
-    if (ex.innerText.toLowerCase().includes(filter)) {
-      ex.style.display = "flex";
+  Array.from(actionElements).forEach((action) => {
+    if (action.innerText.toLowerCase().includes(filter)) {
+      action.style.display = "flex";
     } else {
-      ex.style.display = "none";
+      action.style.display = "none";
+    }
+  });
+
+  Array.from(subactionElements).forEach((subaction) => {
+    if (subaction.innerText.toLowerCase().includes(filter)) {
+      subaction.style.display = "flex";
+    } else {
+      subaction.style.display = "none";
+    }
+  });
+
+  Array.from(typeElements).forEach((type) => {
+    if (type.innerText.toLowerCase().includes(filter)) {
+      type.style.display = "flex";
+    } else {
+      type.style.display = "none";
     }
   });
 };

@@ -10,10 +10,21 @@ if (data.error) {
 }
 console.log("Data:", data);
 
+const intentHasAction = (intent) => {
+  const [int, subint, type = "default"] = intent.split(".");
+  const has = data.data.intent_to_action[int]?.[subint]?.[type];
+  console.log("Intent has action:", has);
+  return has;
+};
+
 data.data.text_to_intent.forEach(({ text, intent, language }) => {
   ExamplesList.innerHTML += `<ul class="example">
         <li class="example__text">${text}</li>
-        <li class="example__intent">${intent}</li>
+        <li class="example__intent">${intent}${
+    !intentHasAction(intent)
+      ? `<span class="check-intent" title="An intent requires a subsequent action to determine a response, this one does not have one.">*Intent does not yet have an action</span>`
+      : ""
+  }</li>
         <li class="example__language">${language}</li>
     </ul>`;
 });
