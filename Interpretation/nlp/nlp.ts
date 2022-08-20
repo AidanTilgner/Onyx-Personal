@@ -4,6 +4,7 @@ import text_to_intent_json from "./documents/text_to_intent.json";
 import intent_to_action_json from "./documents/intent_to_action.json";
 import action_to_response_json from "./documents/action_to_response.json";
 import { spellCheckText } from "./similarity/spellcheck";
+import { writeFileSync } from "fs";
 
 const manager = new NlpManager({
   languages: ["en"],
@@ -15,8 +16,13 @@ export const trainModel = async () => {
   try {
     console.log("Training model...");
     const text_to_intent: TextToIntent = text_to_intent_json;
+    // Get a list of all intents with no duplicates
+    const intentsList = [];
     text_to_intent.forEach((item) => {
       const { text, intent, language } = item;
+      if (!intentsList.includes(intent)) {
+        intentsList.push(intent);
+      }
       manager.addDocument(language || "en", text, intent);
     });
     await manager.train();
@@ -25,6 +31,8 @@ export const trainModel = async () => {
     const filename = `models/model-${timestamp}.json`;
     // ! Right now there's no point in saving this because it trains every load. However, this is how it would be done, and in production we might want to load from the saved version.
     // manager.save(filename);
+    const list_intents = `nlp/documents/intents.json`;
+    // writeFileSync(list_intents, JSON.stringify(intentsList)); // TODO: Make this happen without triggering reload in dev mode
     console.log("Trained");
     return manager;
   } catch (err) {

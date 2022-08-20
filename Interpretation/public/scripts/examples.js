@@ -19,13 +19,13 @@ const intentHasAction = (intent) => {
 
 data.data.text_to_intent.forEach(({ text, intent, language }) => {
   ExamplesList.innerHTML += `<ul class="example">
-        <li class="example__text">${text}</li>
-        <li class="example__intent">${intent}${
+        <li class="example__text"><strong>Text:</strong> ${text}</li>
+        <li class="example__intent"><strong>Intent:</strong> ${intent}${
     !intentHasAction(intent)
       ? `<span class="check-intent" title="An intent requires a subsequent action to determine a response, this one does not have one.">*Intent does not yet have an action</span>`
       : ""
   }</li>
-        <li class="example__language">${language}</li>
+        <li class="example__language"><strong>Language:</strong> ${language}</li>
     </ul>`;
 });
 

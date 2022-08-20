@@ -3,6 +3,7 @@ import { writeFileSync } from "fs";
 import action_to_response_json from "./action_to_response.json";
 import intent_to_action_json from "./intent_to_action.json";
 import text_to_intent_json from "./text_to_intent.json";
+import intents_json from "./intents.json";
 
 const pathToLocal = "./nlp/documents";
 
@@ -11,6 +12,7 @@ export const getTrainingData = () => {
     action_to_response: action_to_response_json,
     intent_to_action: intent_to_action_json,
     text_to_intent: text_to_intent_json,
+    intents: intents_json,
   };
 };
 

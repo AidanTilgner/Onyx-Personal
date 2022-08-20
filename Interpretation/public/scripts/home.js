@@ -1,4 +1,5 @@
 import { setAlert } from "./display.js";
+import { getTrainingData } from "./main.js";
 const TestingInput = document.getElementById("testing-input");
 const TestingSubmit = document.getElementById("testing-submit");
 const TestingOutput = document.getElementById("testing-output");
@@ -13,6 +14,22 @@ const state = {
   action: "",
   nlu_response: "",
   responses: [],
+};
+
+async () => {
+  try {
+    const training = await getTrainingData();
+    if (training.data.error) {
+      setAlert(training.data.error, "danger");
+      return;
+    }
+  } catch (err) {
+    console.log(err);
+    setAlert(
+      "Error getting training data, check console for more info.",
+      "danger"
+    );
+  }
 };
 
 TestingInput.onkeyup = () => {
@@ -203,6 +220,10 @@ const handleEditIntentClick = (e) => {
   TestingIntentContainer.style.display = "none";
   OutputProperties.insertBefore(EditInputGroup, TestingIntentContainer);
   input.focus();
+
+  const closeIntents = () => {
+    // find all intents in
+  };
 };
 
 const handleEditActionClick = (e) => {
@@ -394,4 +415,44 @@ const addPropertyEventListeners = () => {
   PossibleResponses.forEach((poss) => {
     poss.onclick = onPossibleResponseClick;
   });
+};
+
+const getLevenshteinDistance = (a, b) => {
+  if (a.length === 0) {
+    return b.length;
+  }
+  if (b.length === 0) {
+    return a.length;
+  }
+
+  const matrix = [];
+
+  // increment along the first column of each row
+  let i;
+  for (i = 0; i <= b.length; i++) {
+    matrix[i] = [i];
+  }
+
+  // increment each column in the first row
+  let j;
+  for (j = 0; j <= a.length; j++) {
+    matrix[0][j] = j;
+  }
+
+  // Fill in the rest of the matrix
+  for (i = 1; i <= b.length; i++) {
+    for (j = 1; j <= a.length; j++) {
+      if (b.charAt(i - 1) == a.charAt(j - 1)) {
+        matrix[i][j] = matrix[i - 1][j - 1];
+      } else {
+        matrix[i][j] = Math.min(
+          matrix[i - 1][j - 1] + 1, // substitution
+          matrix[i][j - 1] + 1, // insertion
+          matrix[i - 1][j] + 1 // deletion
+        );
+      }
+    }
+  }
+
+  return matrix[b.length][a.length];
 };
