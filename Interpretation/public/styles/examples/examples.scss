@@ -1,0 +1,39 @@
+.examples {
+  display: flex;
+  flex-direction: column;
+}
+
+.example {
+  list-style-type: none;
+  padding: 0;
+  padding-left: 14px;
+  margin: 0;
+  margin-bottom: 14px;
+  border-left: 1px solid #eaeaea;
+  display: flex;
+  flex-direction: column;
+
+  &:hover {
+    border-left: 1px solid #c0c0c0;
+  }
+
+  li {
+    font-size: 16px;
+    margin-bottom: 8px;
+    cursor: pointer;
+  }
+
+  li:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.check-intent {
+  color: #a63a1f;
+  margin-left: 14px;
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 2px;
+  border: 1px solid #eaeaea;
+  background-color: #f8f8f8;
+}
