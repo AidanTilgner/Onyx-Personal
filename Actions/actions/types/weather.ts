@@ -1,8 +1,9 @@
 import { thirdPartyApi } from "../../config/axios";
 import { MetaData } from "../../definitions/misc";
 
-const getWeather = async (city: string) => {
+const getWeather = async ({ city }: { city: string }) => {
   try {
+    console.log("Getting weather for city: ", city);
     if (!city) {
       city = "Salem,OR,US";
     }
@@ -12,7 +13,9 @@ const getWeather = async (city: string) => {
         error: data.error,
       };
     }
-    return data;
+    const message = `The weather in ${city} is "${data.data.weather[0].description}" with a temperature of ${data.data.main.temp} degrees.`;
+
+    return { data: data, custom_message: message };
   } catch (err) {
     console.log("Error: ", err);
     return {
@@ -21,6 +24,7 @@ const getWeather = async (city: string) => {
   }
 };
 
+// ! Deprecate
 export const getWeatherFromNlu = async (nlu: MetaData) => {
   try {
     let city = "Salem,OR,US";

@@ -28,20 +28,35 @@ const display_weather_data = ({
 export const voice_response = ({
   data,
   custom_message,
+  action,
+  subaction,
+  full_action,
 }: {
   data: any;
   custom_message: string;
+  action: string;
+  subaction: string;
+  full_action: string;
 }) => {
+  console.log("Action in voice_response:", action);
   if (custom_message === "custom_message") {
     custom_message =
-      "Oops. Something went wrong. I guess I don't know what to say.";
+      "Oops. It looks like I understand what you're saying, but I have no action to perform for that yet.";
+    globalLog(
+      "Voice Data",
+      "It looks like this voice response is understood, but there is no action associated with it.",
+      { action, subaction, full_action }
+    );
   }
   const toSend = {
     data: data ? data : null,
     custom_message: custom_message,
+    action: action,
+    subaction: subaction,
+    full_action: full_action,
   };
   emitMessage("voice_response", JSON.stringify(toSend));
-  globalLog("Voice Data:", toSend);
+  globalLog("Voice Data", toSend);
 };
 
 const display_type_mappings: { [key: string]: Function } = {

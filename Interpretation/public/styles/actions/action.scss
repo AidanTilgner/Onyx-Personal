@@ -6,6 +6,7 @@
   border-left: 1px solid #eaeaea;
   display: flex;
   flex-direction: column;
+  font-weight: 300;
 
   &:hover {
     border-left: 1px solid #c0c0c0;
@@ -17,7 +18,7 @@
     cursor: pointer;
 
     &:hover {
-      text-decoration: underline;
+      font-weight: 400;
     }
   }
 
@@ -37,7 +38,7 @@
       cursor: pointer;
 
       &:hover {
-        text-decoration: underline;
+        font-weight: 400;
       }
     }
 

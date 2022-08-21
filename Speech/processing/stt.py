@@ -63,6 +63,6 @@ def predict_audio_from_file(file):
     filename = "temp." + ext
     ROOT = os.path.abspath(os.curdir)
     file.save(os.path.join(ROOT, "tmp/" + filename))
-    text = predict_audio_with_autocorrect(os.path.join(ROOT, "tmp/" + filename))
+    text = predict_audio(os.path.join(ROOT, "tmp/" + filename))
     os.remove(os.path.join(ROOT, "tmp/" + filename))
-    return text
+    return {"text": text}

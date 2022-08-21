@@ -88,10 +88,38 @@ body {
 
 .warning {
   font-weight: 500 !important;
-  background-color: #a69a07;
+  color: #a69a07;
+  border: 1px solid #a69a07;
+  font-weight: 300;
   display: block;
   padding: 14px;
-  color: white;
+  box-shadow: 0.2px 0.2px 15px 0 rgba($color: #000000, $alpha: 0.15);
+}
+
+.tip {
+  border-left: 1px solid #c0c0c0;
+  padding-left: 14px;
+}
+
+.tooltip {
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  display: inline-block;
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 2px;
+  border: 1px solid #eaeaea;
+  max-width: 25vw;
+  background-color: #f8f8f8;
+  box-shadow: 0.2px 0.2px 10px 0 rgba($color: #000000, $alpha: 0.15);
+}
+
+.similar-intent {
+  cursor: pointer;
+  &:hover {
+    text-decoration: underline;
+  }
 }
 
 .input-group {
