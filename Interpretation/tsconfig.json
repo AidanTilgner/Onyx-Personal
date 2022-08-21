@@ -99,5 +99,5 @@
   },
   "include": ["**/*.ts"],
   // Ignore changes to json files
-  "exclude": ["node_modules", "**/*.d.ts", "**/*.json"]
+  "exclude": ["node_modules", "**/*.d.ts", "**/*.json"] // Make sure ts-node-dev also gets this array in package.json
 }

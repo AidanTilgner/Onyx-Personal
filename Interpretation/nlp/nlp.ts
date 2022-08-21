@@ -32,7 +32,8 @@ export const trainModel = async () => {
     // ! Right now there's no point in saving this because it trains every load. However, this is how it would be done, and in production we might want to load from the saved version.
     // manager.save(filename);
     const list_intents = `nlp/documents/intents.json`;
-    // writeFileSync(list_intents, JSON.stringify(intentsList)); // TODO: Make this happen without triggering reload in dev mode
+    console.log("Intents: ", intentsList);
+    writeFileSync(list_intents, JSON.stringify(intentsList));
     console.log("Trained");
     return manager;
   } catch (err) {
