@@ -14,15 +14,19 @@ const state = {
   action: "",
   nlu_response: "",
   responses: [],
+  intents: [],
+  currentTooltip: null,
 };
 
-async () => {
+(async () => {
   try {
     const training = await getTrainingData();
     if (training.data.error) {
       setAlert(training.data.error, "danger");
       return;
     }
+    console.log("Training:", training.data);
+    state.intents = training.data.intents;
   } catch (err) {
     console.log(err);
     setAlert(
@@ -30,7 +34,7 @@ async () => {
       "danger"
     );
   }
-};
+})();
 
 TestingInput.onkeyup = () => {
   state.input = TestingInput.value;
@@ -221,9 +225,37 @@ const handleEditIntentClick = (e) => {
   OutputProperties.insertBefore(EditInputGroup, TestingIntentContainer);
   input.focus();
 
-  const closeIntents = () => {
-    // find all intents in
-  };
+  // every keypress, search the state.intents for the closests 5 intents by levenshtein distance.
+  input.addEventListener("keyup", (e) => {
+    const closest = state.intents
+      .sort((a, b) => {
+        return (
+          getLevenshteinDistance(a, e.target.value) -
+          getLevenshteinDistance(b, e.target.value)
+        );
+      })
+      .slice(0, 5);
+    console.log(closest);
+    state.currentTooltip?.remove();
+    const tooltip = document.createElement("div");
+    state.currentTooltip = tooltip;
+    tooltip.classList.add("tooltip");
+    tooltip.innerHTML = `<p><strong>Similar Intents:</strong> ${closest
+      .map(
+        (intent, idx) =>
+          `${
+            idx ? "," : ""
+          } <span class="similar-intent" title="Select this intent">${intent}</span>`
+      )
+      .join("")}</p>`;
+    EditInputGroup.appendChild(tooltip);
+    document.querySelectorAll(".similar-intent").forEach((intent) => {
+      intent.addEventListener("click", (e) => {
+        input.value = e.target.innerHTML;
+        state.currentTooltip.remove();
+      });
+    });
+  });
 };
 
 const handleEditActionClick = (e) => {

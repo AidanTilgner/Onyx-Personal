@@ -103,15 +103,23 @@ body {
 
 .tooltip {
   position: absolute;
-  top: -10px;
-  left: -10px;
+  bottom: 100%;
+  left: 0;
   display: inline-block;
-  margin-left: 14px;
   font-size: 12px;
   padding: 4px 8px;
   border-radius: 2px;
   border: 1px solid #eaeaea;
+  max-width: 25vw;
   background-color: #f8f8f8;
+  box-shadow: 0.2px 0.2px 10px 0 rgba($color: #000000, $alpha: 0.15);
+}
+
+.similar-intent {
+  cursor: pointer;
+  &:hover {
+    text-decoration: underline;
+  }
 }
 
 .input-group {
