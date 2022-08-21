@@ -18,7 +18,9 @@ const handlePackage = async (pkg: ActionsPackage) => {
 
     let result: any;
 
-    const res = await mappings[action](deposited);
+    const [act, subact = "default"] = action.split(".");
+
+    const res = await mappings[act][subact](deposited);
     result = res;
     steps[current_step].data.gathered = res;
 
@@ -32,7 +34,7 @@ const handlePackage = async (pkg: ActionsPackage) => {
           current_step: current_step + 1,
           steps: steps,
         },
-        next,
+        next, // ! Could just be a boolean in the bottom return
       ];
     }
 

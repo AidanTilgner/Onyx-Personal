@@ -60,8 +60,8 @@
     box-sizing: border-box;
 
     .close-button {
-      position: absolute;
-      top: 24px;
+      position: fixed;
+      bottom: 24px;
       right: 24px;
       padding: 8px;
       font-size: 18px;

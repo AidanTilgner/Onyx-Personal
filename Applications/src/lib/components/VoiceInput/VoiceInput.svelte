@@ -27,15 +27,16 @@
 {#if openResponse}
   <div class="voice-response-container">
     <div class="voice-response">
-      {formatVoiceResponse($voice_response)}
+      <p>{formatVoiceResponse($voice_response)}</p>
+      <i
+        class="material-icons close-button"
+        title="Close voice response"
+        on:click={() => {
+          openResponse = false;
+          voice_response.set(null);
+        }}>close</i
+      >
     </div>
-    <i
-      class="material-icons close-button"
-      on:click={() => {
-        openResponse = false;
-        voice_response.set(null);
-      }}>close</i
-    >
   </div>
 {/if}
 
@@ -80,23 +81,13 @@
     justify-content: center;
     padding: 36px 24px 100px 24px;
 
-    .close-button {
-      position: fixed;
-      bottom: 136px;
-      right: 14px;
-      padding: 14px;
-      background-color: white;
-      border-radius: 50%;
-      box-shadow: 0.2px 0.2px 4px 0 rgba($color: #000000, $alpha: 0.1);
-      color: $cool-blue;
-      cursor: pointer;
-
-      @include desktop {
-        bottom: initial;
-        right: initial;
-        top: 120px;
-        right: 56px;
-      }
+    @include desktop {
+      top: initial;
+      right: initial;
+      left: initial;
+      bottom: initial;
+      padding: 0;
+      border-radius: 0;
     }
   }
 
@@ -109,7 +100,38 @@
     font-size: 18px;
     text-align: left;
     font-weight: 400;
-    box-shadow: 0.2px 0.2px 20px 0 rgba($color: #000000, $alpha: 0.15);
+    box-shadow: 0.2px 0.2px 10px 0 rgba($color: #000000, $alpha: 0.1);
     z-index: 9;
+    position: relative;
+
+    @include desktop {
+      position: fixed;
+      width: 200px;
+      margin: 0;
+      right: 56px;
+      top: 120px;
+    }
+
+    .close-button {
+      position: fixed;
+      bottom: 136px;
+      right: 14px;
+      padding: 8px;
+      background-color: white;
+      border-radius: 50%;
+      box-shadow: 0.2px 0.2px 10px 0 rgba($color: #000000, $alpha: 0.1);
+      color: $danger-red;
+      border: 1px solid $danger-red;
+      font-size: 18px;
+      cursor: pointer;
+
+      @include desktop {
+        position: absolute;
+        bottom: initial;
+        right: initial;
+        right: 0;
+        bottom: -45px;
+      }
+    }
   }
 </style>

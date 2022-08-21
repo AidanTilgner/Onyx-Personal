@@ -32,6 +32,6 @@ export const initIO = (server: http.Server) => {
   });
 };
 
-export const emitMessage = (key: string, message: string) => {
-  io.emit(key, message);
+export const emitMessage = (key: string, message: string, ...args: any[]) => {
+  io.emit(key, message, ...args);
 };

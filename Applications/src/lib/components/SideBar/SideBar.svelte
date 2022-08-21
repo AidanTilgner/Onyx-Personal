@@ -117,5 +117,6 @@
   .active {
     color: white;
     background-color: $dark-blue;
+    box-shadow: 0.2px 0.2px 16px 0 rgba($color: #000000, $alpha: 0.25);
   }
 </style>

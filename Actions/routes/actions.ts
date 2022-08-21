@@ -13,7 +13,8 @@ router.post("/", async (req, res) => {
         error: `Action "${action}" not found`,
       });
     }
-    const actionResponse = await mappings[action](req);
+    const [act, subact = "default"] = action.split(".");
+    const actionResponse = await mappings[act][subact](req);
     return res.send({
       message: "Action executed successfully",
       response: actionResponse,
@@ -33,7 +34,8 @@ router.post("/:action", async (req, res) => {
         error: `Action "${action}" not found`,
       });
     }
-    const actionResponse = await mappings[action](req);
+    const [act, subact = "default"] = action.split(".");
+    const actionResponse = await mappings[act][subact](req);
     return res.send({
       message: "Action executed successfully",
       response: actionResponse,
