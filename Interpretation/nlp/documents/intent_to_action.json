@@ -21,11 +21,11 @@
     "about_you": { "default": "explain_existence" }
   },
   "faq": {
-    "weather": { "default": "get_weather" },
+    "weather": { "default": "weather" },
     "who_built_you": { "default": "explain_developers" },
     "temperature": {
-      "default": "get_temperature",
-      "tomorrow": "get_temperature.tomorrow"
+      "default": "weather.temperature",
+      "tomorrow": "weather.temperature.tomorrow"
     },
     "what_should_i_wear": {
       "default": "recommend_clothing",

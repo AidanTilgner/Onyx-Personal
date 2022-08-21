@@ -31,12 +31,14 @@ export const voice_response = ({
   action,
   subaction,
   full_action,
+  metaData,
 }: {
   data: any;
   custom_message: string;
   action: string;
   subaction: string;
   full_action: string;
+  metaData: any;
 }) => {
   console.log("Action in voice_response:", action);
   if (custom_message === "custom_message") {
@@ -45,7 +47,7 @@ export const voice_response = ({
     globalLog(
       "Voice Data",
       "It looks like this voice response is understood, but there is no action associated with it.",
-      { action, subaction, full_action }
+      { action, subaction, full_action, utterance: metaData.utterance }
     );
   }
   const toSend = {
@@ -54,6 +56,7 @@ export const voice_response = ({
     action: action,
     subaction: subaction,
     full_action: full_action,
+    utterance: metaData,
   };
   emitMessage("voice_response", JSON.stringify(toSend));
   globalLog("Voice Data", toSend);
