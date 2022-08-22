@@ -1,6 +1,6 @@
 <script>
   import Header from "../lib/components/Header/Default.svelte";
-  import VoiceInput from "../lib/components/VoiceInput/VoiceInput.svelte";
+  import SearchBar from "../lib/components/SearchBar/SearchBar.svelte";
   import { messages } from "../lib/stores/socket";
   import { currentPath } from "../lib/stores/env";
   import { navigate } from "svelte-routing";
@@ -16,6 +16,7 @@
 
 <main>
   <Header />
+  <SearchBar />
 </main>
 
 <style lang="scss">
