@@ -180,7 +180,7 @@ async function sendAudio(blob) {
         },
         completed: false,
         errors: [],
-        next: "http://localhost:3000",
+        next: "http://localhost:3000/api",
       },
       3: {
         action: "voice_response",

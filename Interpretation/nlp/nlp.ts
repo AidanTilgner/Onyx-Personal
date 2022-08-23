@@ -111,20 +111,18 @@ export const getIntent = async (lang: string, input: string) => {
 };
 
 export const getAction = (int: string) => {
-  const [intent, subintent, type] = int.split(".");
+  const [intent, subintent, type = "default"] = int.split(".");
   // If intent doesn't exist on intent_to_action, return null, if it does, if subintent doesn't exist, return null, if it does, check the property at type or default, return the action
-  const action =
-    intent_to_action_json[intent]?.[subintent]?.[type || "default"] || null;
+  const action = intent_to_action_json[intent]?.[subintent]?.[type] || null;
   if (!action) {
-    return "no_action";
+    return "exception.no_action";
   }
   return action;
 };
 
 export const getResponse = (act: string, metaData?: any | null) => {
-  const [action, subaction] = act.split(".");
-  const responses =
-    action_to_response_json[action]?.[subaction || "default"]?.responses;
+  const [action, subaction = "default"] = act.split(".");
+  const responses = action_to_response_json[action]?.[subaction]?.responses;
   if (!responses) {
     return {
       response: "custom_message",

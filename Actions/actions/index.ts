@@ -1,4 +1,5 @@
 import weatherMappings from "./types/weather";
+import exceptionMappings from "./types/exceptions";
 
 const parseAndUseNLU = async (nlu: {
   intent: string;
@@ -47,23 +48,9 @@ const mappings: {
     default: Function;
   };
 } = {
-  get_weather: { default: weatherMappings["get_weather"] },
-  get_weather_from_nlu: { default: weatherMappings["get_weather_from_nlu"] },
+  weather: weatherMappings,
   parse_and_use_nlu: { default: parseAndUseNLU },
-  exception: {
-    default: (err: any) => {
-      console.log("Exception:", err);
-      return {
-        error: "There was an error performing that action.",
-      };
-    },
-    action_not_found: (err: any) => {
-      console.log("Exception:", err);
-      return {
-        error: "There was an error performing that action.",
-      };
-    },
-  },
+  exception: exceptionMappings,
 };
 
 export default mappings;
