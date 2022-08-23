@@ -209,6 +209,8 @@ async function sendAudio(blob) {
     });
 }
 
+const reload = onLoad();
+
 // ! Recorder.js dependency stuff
 (function (f) {
   if (typeof exports === "object" && typeof module !== "undefined") {
