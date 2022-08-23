@@ -41,7 +41,6 @@
     unsub();
   });
   $: if (initialized) {
-    console.log("Loading widgets");
     const widgets = getExternalWidgets();
     setExternalWidgets(widgets);
   }
@@ -49,10 +48,10 @@
 
 <main>
   <Router {url}>
+    <Alert />
     <Route path="/login" component={Login} />
     <Route path="*">
       <div class="content-container">
-        <Alert />
         <SideBar />
         <Console />
         <VoiceInput />

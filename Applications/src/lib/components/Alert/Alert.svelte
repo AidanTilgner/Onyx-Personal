@@ -20,7 +20,7 @@
 
 {#if currentAlertData.show}
   <div class="alert {currentAlertData.type}">
-    {#if currentAlertData.title.length}
+    {#if currentAlertData.title?.length}
       <h4>{currentAlertData.title}</h4>
     {/if}
     <p>{currentAlertData.message}</p>

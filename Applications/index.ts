@@ -4,6 +4,7 @@ import { Request, Response } from "./index.d";
 import proxyRouter from "./routes/proxy";
 import packagesRouter from "./routes/packages";
 import dashboardRouter from "./routes/dashboard";
+import authRouter from "./routes/auth";
 import cors from "cors";
 import { config } from "dotenv";
 import { createServer } from "http";
@@ -25,7 +26,7 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use("/api/auth", proxyRouter);
+app.use("/api/auth", authRouter);
 app.use("/api/package-hook", checkAuth, packagesRouter);
 app.use("/api/proxy", checkAuth, proxyRouter);
 app.use("/api/dashboard", checkAuth, dashboardRouter);

@@ -2,7 +2,7 @@ import axios from "axios";
 import { currentAlert } from "../../stores/alerts";
 
 export const checkAuth = async () => {
-  if (!localStorage.getItem("token")) {
+  if (!localStorage.getItem("app_key")) {
     currentAlert.set({
       title: "Error",
       message: "You are not logged in",
@@ -13,13 +13,18 @@ export const checkAuth = async () => {
   }
 
   axios
-    .get("/api/auth/check", {
-      headers: {
-        Authorization: "Bearer " + localStorage.getItem("token"),
-      },
+    .post("/api/auth/check", {
+      token: localStorage.getItem("app_key"),
     })
     .then((res) => {
-      if (res.data.status === 200) {
+      console.log("Auth res: ", res);
+      if (res.data.authorized) {
+        currentAlert.set({
+          message: "You have been logged in successfully",
+          type: "success",
+          show: true,
+          timeout: 2000,
+        });
         return true;
       }
       currentAlert.set({
