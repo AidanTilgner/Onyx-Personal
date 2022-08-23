@@ -100,7 +100,7 @@
     border-radius: 50%;
     background-color: #fff;
     box-shadow: 0.2px 0.2px 10px 0 rgba($color: #000000, $alpha: 0.1);
-    color: $dark-blue;
+    color: $cool-blue;
     position: fixed;
     right: 56px;
     bottom: 36px;

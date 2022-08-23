@@ -8,6 +8,8 @@ import cors from "cors";
 import { config } from "dotenv";
 import { createServer } from "http";
 import { initIO } from "./utils/socket-io";
+import { checkAuth } from "./middleware/auth";
+
 const app = express();
 const server = createServer(app);
 
@@ -23,11 +25,13 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use("/package-hook", packagesRouter);
-app.use("/proxy", proxyRouter);
-app.use("/dashboard", dashboardRouter);
+app.use("/api/auth", proxyRouter);
+app.use("/api/package-hook", checkAuth, packagesRouter);
+app.use("/api/proxy", checkAuth, proxyRouter);
+app.use("/api/dashboard", checkAuth, dashboardRouter);
 
 app.use(express.static(path.join(__dirname, "public")));
+
 app.get("/*", (req: Request, res: Response) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });

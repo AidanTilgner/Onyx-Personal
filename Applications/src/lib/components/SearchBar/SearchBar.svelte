@@ -53,6 +53,10 @@
       i {
         font-size: 16px;
       }
+
+      &:hover {
+        box-shadow: 0.2px 0.2px 10px 0 rgba($color: #000000, $alpha: 0.35);
+      }
     }
   }
 </style>
