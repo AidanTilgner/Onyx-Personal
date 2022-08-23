@@ -5,6 +5,8 @@ const widgets = [
   },
 ];
 
+let widgetElements = [];
+
 export const getExternalWidgets = () => {
   return widgets.map((widget) => {
     // ! Widgets cannot append to body directly or it will mess up the app
@@ -12,6 +14,7 @@ export const getExternalWidgets = () => {
     const script = document.createElement("script");
     script.setAttribute("async", false);
     script.src = `${widget.host}/widgets/${widget.name}`;
+    widgetElements.push(script);
 
     return script;
   });

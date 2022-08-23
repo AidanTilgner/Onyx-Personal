@@ -5,15 +5,23 @@ config({ path: "../.env" });
 
 const router = Router();
 
-router.get("/", (req, res) => {
+router.get("/check", (req, res) => {
   const token = req.headers?.authorization?.split(" ")[1];
   if (!token) {
-    res.status(401).send({ message: "Unauthorized" });
+    res
+      .status(401)
+      .send({
+        message: "You are currently unauthorized to use Onyx Dashboard.",
+      });
   }
   if (token !== process.env.API_KEY) {
-    res.status(401).send({ message: "Unauthorized" });
+    res
+      .status(401)
+      .send({
+        message: "You are currently unauthorized to use Onyx Dashboard.",
+      });
   }
-  res.send({
+  res.status(200).send({
     message: "Authorized",
   });
 });
