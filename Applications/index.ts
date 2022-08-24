@@ -9,7 +9,7 @@ import cors from "cors";
 import { config } from "dotenv";
 import { createServer } from "http";
 import { initIO } from "./utils/socket-io";
-import { checkAuth } from "./middleware/auth";
+import { checkAppAuth, checkApiAuth } from "./middleware/auth";
 
 const app = express();
 const server = createServer(app);
@@ -27,9 +27,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use("/api/auth", authRouter);
-app.use("/api/package-hook", checkAuth, packagesRouter);
-app.use("/api/proxy", checkAuth, proxyRouter);
-app.use("/api/dashboard", checkAuth, dashboardRouter);
+app.use("/api/package-hook", packagesRouter);
+app.use("/api/proxy", proxyRouter);
+app.use("/api/dashboard", dashboardRouter);
 
 app.use(express.static(path.join(__dirname, "public")));
 

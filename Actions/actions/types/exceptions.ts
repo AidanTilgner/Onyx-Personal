@@ -6,7 +6,7 @@ export const standard = (err: any) => {
 };
 
 export const action_not_found = (err: any) => {
-  console.log("Exception:", err);
+  console.log("Exception: No action found for that action.", err);
   return {
     error: "There was an error performing that action.",
   };

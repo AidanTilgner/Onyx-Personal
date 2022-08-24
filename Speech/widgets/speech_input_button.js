@@ -145,6 +145,11 @@ function stopRecording() {
 async function sendAudio(blob) {
   const formData = new FormData();
   formData.append("audio", blob);
+  const authToken = localStorage.getItem("app_key");
+  if (!authToken) {
+    alert("Please login to use this feature");
+    return;
+  }
 
   const pkg = {
     current_step: 0,
@@ -199,6 +204,7 @@ async function sendAudio(blob) {
     data: formData,
     headers: {
       "Content-Type": "multipart/form-data",
+      Authorization: `Bearer ${authToken}`,
     },
   })
     .then((res) => {

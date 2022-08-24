@@ -4,9 +4,20 @@ config({
   path: "../.env",
 });
 
-console.log("Process env: ", process.env.API_KEY);
+export const checkAppAuth = (req: Request, res: Response, next: Function) => {
+  if (req.headers.Authorization) {
+    const token = req.headers.Authorization.split(" ")[1];
+    if (token !== process.env.APP_KEY) {
+      res.status(401).send("Unauthorized");
+    }
 
-export const checkAuth = (req: Request, res: Response, next: Function) => {
+    next();
+  } else {
+    res.status(401).send("Unauthorized");
+  }
+};
+
+export const checkApiAuth = (req: Request, res: Response, next: Function) => {
   if (req.headers.Authorization) {
     const token = req.headers.Authorization.split(" ")[1];
     if (token !== process.env.API_KEY) {
