@@ -6,9 +6,7 @@ config({ path: "../.env" });
 const router = Router();
 
 router.post("/check", (req, res) => {
-  console.log("Body", req.body);
   const token = req.body.token;
-  console.log("Process Token: ", process.env.APP_KEY);
   if (!token) {
     return res.send({
       message: "You are currently unauthorized to use Onyx Dashboard.",

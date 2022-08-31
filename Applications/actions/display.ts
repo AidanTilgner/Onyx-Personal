@@ -40,7 +40,6 @@ export const voice_response = ({
   full_action: string;
   metaData: any;
 }) => {
-  console.log("Action in voice_response:", action);
   if (custom_message === "custom_message") {
     custom_message =
       "Oops. It looks like I understand what you're saying, but I have no action to perform for that yet.";
