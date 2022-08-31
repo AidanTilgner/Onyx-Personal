@@ -1,5 +1,6 @@
 import weatherMappings from "./types/weather";
 import exceptionMappings from "./types/exceptions";
+import stateMappings from "./types/state";
 
 const parseAndUseNLU = async (nlu: {
   intent: string;
@@ -10,11 +11,11 @@ const parseAndUseNLU = async (nlu: {
   try {
     const { action, metaData, nlu_response } = nlu;
     const [act, subact = "default"] = action.split(".");
+    // TODO: If in production, use the default action instead of saying "action not found"
     const performAction = mappings[act]?.[subact]
       ? mappings[act][subact]
       : mappings.exception.action_not_found;
-    console.log("Info", nlu_response);
-    if (nlu_response !== "custom_message") {
+    if (nlu_response && nlu_response !== "custom_message") {
       performAction({
         metaData,
         action: act,
@@ -50,6 +51,7 @@ const mappings: {
 } = {
   weather: weatherMappings,
   parse_and_use_nlu: { default: parseAndUseNLU },
+  state: stateMappings,
   exception: exceptionMappings,
 };
 

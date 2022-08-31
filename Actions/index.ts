@@ -11,7 +11,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use("/package-hook", packagesRouter);
-app.use("/action", actionsRouter);
+app.use("/actions", actionsRouter);
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
