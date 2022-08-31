@@ -4,7 +4,6 @@ import onnxruntime
 from omegaconf import OmegaConf
 import os
 from processing.te import apply_te
-from processing.spellcheck import auto_correct_sentence
 
 # import everything from utils in ./utils/utils.py
 # from utils.utils import *
@@ -45,12 +44,6 @@ def predict_audio_with_te(audio_path):
     decoded = predict_audio(audio_path)
     decoded = apply_te(decoded)
     return decoded
-
-
-def predict_audio_with_autocorrect(audio_path):
-    decoded = predict_audio(audio_path)
-    corrected = auto_correct_sentence(decoded)
-    return {"text": decoded, "corrected": corrected}
 
 
 def save_to_file(content, filename):

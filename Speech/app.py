@@ -1,8 +1,7 @@
 from struct import pack
 from time import time
 from flask import Flask, request, render_template, redirect, url_for, jsonify
-from processing.stt import predict_audio, predict_audio_with_autocorrect
-from processing.spellcheck import auto_correct_sentence
+from processing.stt import predict_audio
 import os
 from flask_cors import CORS
 from handlers.widgets import widgets as widgetsHandler
@@ -33,10 +32,9 @@ def sst():
         filename = "temp." + ext
         file.save(os.path.join(os.path.dirname(__file__), "tmp/" + filename))
         text = predict_audio(os.path.join(os.path.dirname(__file__), "tmp/" + filename))
-        corrected = auto_correct_sentence(text)
         os.remove(os.path.join(os.path.dirname(__file__), "tmp/" + filename))
 
-        res = jsonify({"text": text, "corrected": corrected})
+        res = jsonify({"text": text})
         return res
 
 
