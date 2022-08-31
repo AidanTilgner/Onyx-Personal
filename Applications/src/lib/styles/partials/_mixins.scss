@@ -1,0 +1,26 @@
+@mixin tablet {
+  @media (min-width: 768px) {
+    @content;
+  }
+}
+
+@mixin desktop {
+  @media (min-width: 900px) {
+    @content;
+  }
+}
+
+// * Styles
+@mixin input-standard {
+  width: 100%;
+  padding: 14px 24px;
+  border: 1px solid #eaeaea;
+  font-family: "Quicksand", sans-serif;
+  font-size: 14px;
+  box-sizing: border-box;
+
+  &:focus {
+    outline: none;
+    border: 1px solid #2256f2;
+  }
+}

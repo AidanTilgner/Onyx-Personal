@@ -1,5 +1,3 @@
-console.log("Initilizing Speech Input Button");
-
 // * Add Links to HMTL
 const links = `
     <link
@@ -19,6 +17,15 @@ const links = `
 `;
 document.head.innerHTML += links;
 
+const scripts = ["https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"];
+
+scripts.forEach((script) => {
+  const scriptElement = document.createElement("script");
+  scriptElement.setAttribute("async", false);
+  scriptElement.src = script;
+  document.head.appendChild(scriptElement);
+});
+
 //* Create interface UI
 const root = document.getElementById("container-speech_input");
 const interfaceHTML = `
@@ -30,7 +37,8 @@ const interfaceHTML = `
     </div>
 `;
 root.innerHTML += interfaceHTML;
-document.body.innerHTML += `
+// ! Adding to document body broke the svelte app in the applications server for some reason, keep this to head tags and the root of the component
+root.innerHTML += `
     <style>
         #interface-speech_input {
             background-color: white;
@@ -47,7 +55,7 @@ document.body.innerHTML += `
         #interface-speech_input > p {
             font-family: "Quicksand", sans-serif;
         }
-        
+
         #interface-speech_input > .button {
             background-color: #2256f2;
             display: inline-block;
@@ -62,13 +70,13 @@ document.body.innerHTML += `
             cursor: pointer;
             box-shadow: 2px 2px 10px 0 rgba(0, 0, 0, 0.25);
         }
-        
+
         #interface-speech_input > .button:active {
             box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.15);
             background-color: white;
             color: #2256f2;
         }
-        
+
         #interface-speech_input:active {
             animation: animateBg 6s infinite ease-in-out;
             background-color: #fff;
@@ -77,7 +85,7 @@ document.body.innerHTML += `
             background-size: 300% 100%;
             color: white;
         }
-        
+
         @keyframes animateBg {
             0% {
                 background-position: 0 0;
@@ -88,7 +96,7 @@ document.body.innerHTML += `
             100% {
                 background-position: 0% 0;
             }
-        }      
+        }
     </style>
 `;
 
@@ -131,23 +139,76 @@ function startRecording() {
 function stopRecording() {
   rec.stop();
   gumStream.getAudioTracks()[0].stop();
-  rec.exportWAV(createDownloadLink);
+  rec.exportWAV(sendAudio);
 }
 
-async function createDownloadLink(blob) {
+async function sendAudio(blob) {
   const formData = new FormData();
-  formData.append("file", blob);
-  axios("http://localhost:5000/stt", {
+  formData.append("audio", blob);
+  const authToken = localStorage.getItem("app_key");
+  if (!authToken) {
+    alert("Please login to use this feature");
+    return;
+  }
+
+  const pkg = {
+    current_step: 0,
+    steps: {
+      0: {
+        action: "stt",
+        deposit: 1,
+        data: {
+          deposited: null,
+          gathered: null,
+        },
+        next: "http://localhost:5001",
+        completed: false,
+        errors: [],
+        use_file: "audio",
+        use_files: [],
+      },
+      1: {
+        action: "get_nlu_for_speech_server",
+        deposit: 2,
+        data: {
+          deposited: null,
+        },
+        completed: false,
+        errors: [],
+        next: "http://localhost:5002",
+      },
+      2: {
+        action: "parse_and_use_nlu",
+        deposit: 3,
+        data: {
+          deposited: null,
+        },
+        completed: false,
+        errors: [],
+        next: "http://localhost:3000/api",
+      },
+      3: {
+        action: "voice_response",
+        data: {
+          deposited: null,
+        },
+        completed: false,
+        errors: [],
+      },
+    },
+  };
+  formData.append("pkg", JSON.stringify(pkg));
+
+  axios("http://localhost:5000/package-hook", {
     method: "POST",
     data: formData,
     headers: {
       "Content-Type": "multipart/form-data",
+      Authorization: `Bearer ${authToken}`,
     },
   })
     .then((res) => {
-      console.log(res);
       console.log(res.data);
-      console.log(res.data.text);
     })
     .catch((err) => {
       console.log(err);
