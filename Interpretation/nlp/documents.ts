@@ -5,8 +5,9 @@ import intent_to_action_json from "./documents/intent_to_action.json";
 import text_to_intent_json from "./documents/text_to_intent.json";
 import intents_json from "./documents/intents.json";
 import existing_actions from "./documents/existing_actions.json";
+import existing_actions_without_response from "./documents/existing_actions_without_response.json";
 
-import { getAction } from "./nlp";
+import { getAction, getResponse } from "./nlp";
 
 const pathToLocal = "./nlp/documents";
 
@@ -35,8 +36,30 @@ export const generateExistingActions = () => {
   );
 };
 
+export const generateExistingActionsWithoutResponse = () => {
+  const existingActions = [];
+
+  intents_json.forEach((intent) => {
+    const action = getAction(intent);
+    if (action && getResponse(action).response === "custom_message") {
+      existingActions.push(action);
+    }
+  });
+
+  writeFileSync(
+    `${pathToLocal}/existing_actions_without_response.json`,
+    JSON.stringify(existingActions)
+  );
+};
+
 export const getExistingActions = () => {
   return existing_actions ? existing_actions : [];
+};
+
+export const getExistingActionsWithoutResponse = () => {
+  return existing_actions_without_response
+    ? existing_actions_without_response
+    : [];
 };
 
 export const addResponseToAction = (act: string, response: string) => {

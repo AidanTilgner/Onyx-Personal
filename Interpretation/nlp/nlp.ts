@@ -5,7 +5,10 @@ import intent_to_action_json from "./documents/intent_to_action.json";
 import action_to_response_json from "./documents/action_to_response.json";
 import { spellCheckText } from "./similarity/spellcheck";
 import { writeFileSync } from "fs";
-import { generateExistingActions } from "./documents";
+import {
+  generateExistingActions,
+  generateExistingActionsWithoutResponse,
+} from "./documents";
 
 const manager = new NlpManager({
   languages: ["en"],
@@ -103,6 +106,7 @@ export const testModel = async () => {
 
 export const generateMetaData = () => {
   generateExistingActions();
+  generateExistingActionsWithoutResponse();
 };
 
 export const getIntent = async (lang: string, input: string) => {

@@ -10,6 +10,7 @@ import {
   removeResponseFromAction,
   removeAsExample,
   getExistingActions,
+  getExistingActionsWithoutResponse,
 } from "../nlp/documents";
 import axios from "axios";
 import { config } from "dotenv";
@@ -93,6 +94,13 @@ router.get("/actions/existing", (req, res) => {
   return res.send({
     actions: getExistingActions(),
     message: "Successfully retrieved existing actions",
+  });
+});
+
+router.get("/actions/without-response", (req, res) => {
+  return res.send({
+    actions: getExistingActionsWithoutResponse(),
+    message: "Successfully retrieved existing actions without response",
   });
 });
 
