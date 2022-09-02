@@ -12,7 +12,6 @@ const data = await getTrainingData();
 if (data.error) {
   setAlert(data.error, "danger");
 }
-console.log("Data:", data);
 let intentToActionObject = data.data.intent_to_action;
 // intentToActionObject schema:
 // {
@@ -94,7 +93,6 @@ const getActionServerActions = async () => {
       .catch((err) => {
         console.log(err);
       });
-    console.log("Server actions:", res);
     return res;
   } catch (err) {
     console.log(err);
@@ -113,8 +111,6 @@ const actionServerActions = await getActionServerActions();
 
 const flagUnsupportedActions = () => {
   // Go through each action in the state and check if it is in the server actions list. If it isn't, put a span tag in front of it with the class "unsupported".
-
-  console.log("Action mappings:", state.actionMappings);
   state.actionMappings.forEach((actionMapping) => {
     const { action: act, element: actionElement } = actionMapping;
     const [action, subaction = "default"] = act.split(".");

@@ -9,8 +9,12 @@ import {
   removeActionFromIntent,
   removeResponseFromAction,
   removeAsExample,
-} from "../nlp/documents/index";
+  getExistingActions,
+} from "../nlp/documents";
 import axios from "axios";
+import { config } from "dotenv";
+
+config();
 
 const router = Router();
 
@@ -64,7 +68,7 @@ router.delete("/example", (req, res) => {
 router.get("/actions/supported", async (req, res) => {
   try {
     const actions = await axios
-      .get("http://localhost:5002/actions")
+      .get(`${process.env.ACTION_SERVER_HOST}/actions`)
       .then((res) => {
         return res.data.actions;
       })
@@ -74,7 +78,6 @@ router.get("/actions/supported", async (req, res) => {
           error: "There was an error getting the supported actions",
         });
       });
-    console.log("actions", actions);
     return res.send({
       actions: actions,
       message: "Successfully retrieved supported actions",
@@ -84,6 +87,13 @@ router.get("/actions/supported", async (req, res) => {
       error: "There was a problem getting the supported actions.",
     });
   }
+});
+
+router.get("/actions/existing", (req, res) => {
+  return res.send({
+    actions: getExistingActions(),
+    message: "Successfully retrieved existing actions",
+  });
 });
 
 export default router;

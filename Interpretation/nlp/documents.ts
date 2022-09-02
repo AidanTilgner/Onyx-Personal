@@ -1,9 +1,12 @@
 import { writeFileSync } from "fs";
 
-import action_to_response_json from "./action_to_response.json";
-import intent_to_action_json from "./intent_to_action.json";
-import text_to_intent_json from "./text_to_intent.json";
-import intents_json from "./intents.json";
+import action_to_response_json from "./documents/action_to_response.json";
+import intent_to_action_json from "./documents/intent_to_action.json";
+import text_to_intent_json from "./documents/text_to_intent.json";
+import intents_json from "./documents/intents.json";
+import existing_actions from "./documents/existing_actions.json";
+
+import { getAction } from "./nlp";
 
 const pathToLocal = "./nlp/documents";
 
@@ -14,6 +17,26 @@ export const getTrainingData = () => {
     text_to_intent: text_to_intent_json,
     intents: intents_json,
   };
+};
+
+export const generateExistingActions = () => {
+  const existingActions = [];
+
+  intents_json.forEach((intent) => {
+    const action = getAction(intent);
+    if (action) {
+      existingActions.push(action);
+    }
+  });
+
+  writeFileSync(
+    `${pathToLocal}/existing_actions.json`,
+    JSON.stringify(existingActions)
+  );
+};
+
+export const getExistingActions = () => {
+  return existing_actions;
 };
 
 export const addResponseToAction = (act: string, response: string) => {

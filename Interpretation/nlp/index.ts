@@ -1,10 +1,11 @@
-import { testModel, trainModel } from "./nlp";
+import { testModel, trainModel, generateMetaData } from "./nlp";
 
 export const startNLP = async () => {
   try {
     console.log("Starting NLP...");
     await trainModel();
     await testModel();
+    generateMetaData();
   } catch (err) {
     console.log(err);
   }
