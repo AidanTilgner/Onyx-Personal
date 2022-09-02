@@ -1,9 +1,3 @@
 {
-  "ignore": [
-    "node_modules",
-    "nlp/documents/intents.json",
-    "storage/*",
-    "nlp/documents/entities.json",
-    "nlp/documents/utterances.json"
-  ]
+  "ignore": ["node_modules", "nlp/documents", "storage"]
 }

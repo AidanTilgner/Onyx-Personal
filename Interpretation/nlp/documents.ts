@@ -36,7 +36,7 @@ export const generateExistingActions = () => {
 };
 
 export const getExistingActions = () => {
-  return existing_actions;
+  return existing_actions ? existing_actions : [];
 };
 
 export const addResponseToAction = (act: string, response: string) => {
