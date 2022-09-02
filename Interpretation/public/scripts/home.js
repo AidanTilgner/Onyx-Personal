@@ -25,7 +25,6 @@ const state = {
       setAlert(training.data.error, "danger");
       return;
     }
-    console.log("Training:", training.data);
     state.intents = training.data.intents;
   } catch (err) {
     console.log(err);
@@ -79,7 +78,6 @@ const getNLUForInput = async () => {
         setAlert(res.data.error, "danger");
         return;
       }
-      console.log("Response:", res.data);
       return res.data;
     })
     .catch((err) => {
@@ -235,7 +233,6 @@ const handleEditIntentClick = (e) => {
         );
       })
       .slice(0, 5);
-    console.log(closest);
     state.currentTooltip?.remove();
     const tooltip = document.createElement("div");
     state.currentTooltip = tooltip;

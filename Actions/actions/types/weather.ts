@@ -2,7 +2,6 @@ import { thirdPartyApi } from "../../config/axios";
 
 const getWeather = async ({ city }: { city: string }) => {
   try {
-    console.log("Getting weather for city: ", city);
     if (!city) {
       city = "Salem,OR,US";
     }

@@ -9,7 +9,13 @@ import {
   removeActionFromIntent,
   removeResponseFromAction,
   removeAsExample,
-} from "../nlp/documents/index";
+  getExistingActions,
+  getExistingActionsWithoutResponse,
+} from "../nlp/documents";
+import axios from "axios";
+import { config } from "dotenv";
+
+config();
 
 const router = Router();
 
@@ -58,6 +64,44 @@ router.delete("/response", (req, res) => {
 router.delete("/example", (req, res) => {
   const { text } = req.body;
   return res.send(removeAsExample(text));
+});
+
+router.get("/actions/supported", async (req, res) => {
+  try {
+    const actions = await axios
+      .get(`${process.env.ACTION_SERVER_HOST}/actions`)
+      .then((res) => {
+        return res.data.actions;
+      })
+      .catch((err) => {
+        console.log("Error: ", err);
+        return res.send({
+          error: "There was an error getting the supported actions",
+        });
+      });
+    return res.send({
+      actions: actions,
+      message: "Successfully retrieved supported actions",
+    });
+  } catch (err) {
+    return res.send({
+      error: "There was a problem getting the supported actions.",
+    });
+  }
+});
+
+router.get("/actions/existing", (req, res) => {
+  return res.send({
+    actions: getExistingActions(),
+    message: "Successfully retrieved existing actions",
+  });
+});
+
+router.get("/actions/without-response", (req, res) => {
+  return res.send({
+    actions: getExistingActionsWithoutResponse(),
+    message: "Successfully retrieved existing actions without response",
+  });
 });
 
 export default router;
