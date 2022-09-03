@@ -17,7 +17,6 @@ router.post("/package", upload.any(), (req, res) => {
   const { initial } = req.body;
   const pkg = JSON.parse(req.body.pkg);
   const files = req.files as Express.Multer.File[];
-  console.log("Proxy package request received", { initial, pkg });
 
   const form = new FormData();
   form.append("pkg", JSON.stringify(mapDestinations(pkg)));
@@ -31,8 +30,6 @@ router.post("/package", upload.any(), (req, res) => {
       });
     }
   }
-
-  console.log("pkg: ", mapDestinations(pkg));
 
   axios
     .post(`${destinations[initial]}/package-hook`, form)
