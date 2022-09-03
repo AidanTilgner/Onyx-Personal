@@ -1,4 +1,5 @@
 import mappings from "./index";
+import action_metadata_mappings from "./documents/action_metadata_mappings.json";
 
 export const checkActionExists = (act: string) => {
   const [action, subaction = "default"] = act.split(".");
@@ -18,4 +19,13 @@ export const getAction = (act: string) => {
   }
 
   return null;
+};
+
+export const getActionMetadata = (act: string) => {
+  const [action, subaction = "default"] = act.split(".");
+  const jsonCopy = action_metadata_mappings as {
+    [key: string]: { [key: string]: any };
+  };
+
+  return jsonCopy[action]?.[subaction];
 };
