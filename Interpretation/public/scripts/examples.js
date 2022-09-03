@@ -8,12 +8,10 @@ const data = await getTrainingData();
 if (data.error) {
   setAlert(data.error, "danger");
 }
-console.log("Data:", data);
 
 const intentHasAction = (intent) => {
   const [int, subint, type = "default"] = intent.split(".");
   const has = data.data.intent_to_action[int]?.[subint]?.[type];
-  console.log("Intent has action:", has);
   return has;
 };
 

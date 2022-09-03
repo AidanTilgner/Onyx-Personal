@@ -5,6 +5,10 @@ import intent_to_action_json from "./documents/intent_to_action.json";
 import action_to_response_json from "./documents/action_to_response.json";
 import { spellCheckText } from "./similarity/spellcheck";
 import { writeFileSync } from "fs";
+import {
+  generateExistingActions,
+  generateExistingActionsWithoutResponse,
+} from "./documents";
 
 const manager = new NlpManager({
   languages: ["en"],
@@ -100,6 +104,11 @@ export const testModel = async () => {
   }
 };
 
+export const generateMetaData = () => {
+  generateExistingActions();
+  generateExistingActionsWithoutResponse();
+};
+
 export const getIntent = async (lang: string, input: string) => {
   try {
     const intent = await manager.process(lang, input);
@@ -186,7 +195,6 @@ export const getIntentAndActionForSpeechServer = async (input: {
   text: string;
 }) => {
   try {
-    console.log("Getting intent and action for speech server...", input);
     const newText = spellCheckText(input.text.toLocaleLowerCase());
     const { intent, ...rest } = await manager.process("en", newText);
     const foundIntent = intent || rest.classifications[0].intent;

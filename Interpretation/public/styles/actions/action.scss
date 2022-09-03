@@ -54,3 +54,22 @@
     }
   }
 }
+
+.type-value__name {
+  position: relative;
+  width: fit-content;
+}
+
+.unsupported {
+  position: absolute;
+  left: calc(100% + 14px);
+  color: #a63a1f;
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 2px;
+  border: 1px solid #eaeaea;
+  background-color: #f8f8f8;
+  text-align: center;
+  font-weight: 300;
+  width: 125px;
+}

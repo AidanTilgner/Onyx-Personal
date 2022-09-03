@@ -46,8 +46,6 @@ router.post("/:action", async (req, res) => {
 });
 
 router.get("/", (req, res) => {
-  // Send a deep copy of the mappings object to the client
-  console.log("Mappings: ", mappings);
   const mappingsCopy: { [key: string]: string[] } = {};
   Object.keys(mappings).forEach((key) => {
     mappingsCopy[key] = Object.keys(mappings[key]);
