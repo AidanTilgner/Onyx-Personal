@@ -9,28 +9,39 @@ import {
   generateExistingActions,
   generateExistingActionsWithoutResponse,
 } from "./documents";
+import { actionServer } from "../utils/axios";
+import { dockStart } from "@nlpjs/basic";
 
-const manager = new NlpManager({
-  languages: ["en"],
-  forceNER: true,
-  nlu: { log: false, useNoneFeature: false },
-});
+let manager: NlpManager = null;
+export const initModel = async () => {
+  const dock = await dockStart({
+    use: ["Basic", "LangEn"],
+    settings: {
+      nlp: {
+        forceNER: true,
+        languages: ["en-US"],
+      },
+    },
+    locales: ["en"],
+  });
+  manager = dock.get("nlp");
+};
 
 export const trainModel = async () => {
   try {
     console.log("Training model...");
     const text_to_intent: TextToIntent = text_to_intent_json;
-    // Get a list of all intents with no duplicates
+
     const intentsList = [];
     text_to_intent.forEach((item) => {
       const { text, intent, language } = item;
       if (!intentsList.includes(intent)) {
         intentsList.push(intent);
       }
-      manager.addDocument(language || "en", text, intent);
+      manager.addDocument(language || "en-US", text, intent);
     });
     await manager.train();
-    // Current timestamp
+
     const timestamp = new Date().getTime();
     const filename = `models/model-${timestamp}.json`;
     // ! Right now there's no point in saving this because it trains every load. However, this is how it would be done, and in production we might want to load from the saved version.
@@ -48,7 +59,7 @@ export const trainModel = async () => {
 export const testModel = async () => {
   try {
     console.log("Testing model...");
-    const language = "en";
+    const language = "en-US";
     const tests = [
       {
         try: "Hello",
@@ -68,35 +79,39 @@ export const testModel = async () => {
       },
     ];
     tests.forEach(async (test) => {
-      const { try: text } = test;
-      const intent = await manager.process(language, text);
-      if (intent.hasOwnProperty("nluAnswer")) {
+      try {
+        const { try: text } = test;
+        const intent = await manager.process(language, text);
+        if (intent.hasOwnProperty("nluAnswer")) {
+          console.assert(
+            intent.nluAnswer?.classifications[0].intent === test.expected,
+            "Error in test: ",
+            test,
+            "Expected: ",
+            test.expected,
+            "Got: ",
+            intent.nluAnswer?.classifications[0].intent
+          );
+          console.assert(
+            intent.nluAnswer?.classifications[0].score > 0,
+            "Error in test: ",
+            test,
+            "Expected non-zero score"
+          );
+          return;
+        }
         console.assert(
-          intent.nluAnswer?.classifications[0].intent === test.expected,
+          intent.classifications[0].intent === test.expected,
           "Error in test: ",
           test,
           "Expected: ",
           test.expected,
           "Got: ",
-          intent.nluAnswer?.classifications[0].intent
+          intent.classifications[0].intent
         );
-        console.assert(
-          intent.nluAnswer?.classifications[0].score > 0,
-          "Error in test: ",
-          test,
-          "Expected non-zero score"
-        );
-        return;
+      } catch (err) {
+        console.log(err);
       }
-      console.assert(
-        intent.classifications[0].intent === test.expected,
-        "Error in test: ",
-        test,
-        "Expected: ",
-        test.expected,
-        "Got: ",
-        intent.classifications[0].intent
-      );
     });
     console.log("Model tested");
   } catch (err) {
@@ -142,6 +157,19 @@ export const getResponse = (act: string, metaData?: any | null) => {
   return { response, responses };
 };
 
+export const getActionExpectedEntities = async (act: string) => {
+  try {
+    console.log("Getting action expected entities...");
+    const { data } = await actionServer.get(`/actions/metadata/${act}`);
+    console.log("Data: ", data);
+  } catch (err) {
+    console.log("Error getting action expected entities: ", err);
+    return {
+      error: err,
+    };
+  }
+};
+
 export const getIntentAndAction = async (input: string, lang: string) => {
   try {
     const { intent, ...rest } = await manager.process(lang, input);
@@ -177,6 +205,7 @@ export const getIntentAndAction = async (input: string, lang: string) => {
       }
     }
     const { response, responses } = getResponse(foundAction);
+    const customEntities = await getActionExpectedEntities(foundAction);
 
     return {
       intent: foundIntent,
@@ -196,10 +225,41 @@ export const getIntentAndActionForSpeechServer = async (input: {
 }) => {
   try {
     const newText = spellCheckText(input.text.toLocaleLowerCase());
-    const { intent, ...rest } = await manager.process("en", newText);
+    const { intent, ...rest } = await manager.process("en-US", newText);
     const foundIntent = intent || rest.classifications[0].intent;
     const foundAction = getAction(foundIntent);
+
+    if (!foundIntent || rest.classifications[0].score < 0.5) {
+      return {
+        intent: "exception.unknown",
+        action: "attempt_understanding",
+        metaData: {
+          ...rest,
+        },
+        nlu_response: "Sorry, I don't understand",
+        responses: [],
+      };
+    }
+
+    if (foundAction === "no_action") {
+      const corrected = await spellCheckText(input.text);
+      if (corrected) {
+        return {
+          intent: intent,
+          action: "no_action_found",
+          metaData: {
+            ...rest,
+            corrected: corrected,
+          },
+          nlu_response:
+            "I get what you mean, but I don't know how to respond to that yet.",
+          responses: [],
+        };
+      }
+    }
     const { response, responses } = getResponse(foundAction);
+    const customEntities = await getActionExpectedEntities(foundAction);
+
     return {
       intent: foundIntent,
       action: foundAction,
