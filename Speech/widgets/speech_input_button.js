@@ -161,7 +161,7 @@ async function sendAudio(blob) {
           deposited: null,
           gathered: null,
         },
-        next: "http://localhost:5001",
+        next: "INTERPRETATION",
         completed: false,
         errors: [],
         use_file: "audio",
@@ -175,7 +175,7 @@ async function sendAudio(blob) {
         },
         completed: false,
         errors: [],
-        next: "http://localhost:5002",
+        next: "ACTIONS",
       },
       2: {
         action: "parse_and_use_nlu",
@@ -185,7 +185,7 @@ async function sendAudio(blob) {
         },
         completed: false,
         errors: [],
-        next: "http://localhost:3000/api",
+        next: "APPLICATIONS",
       },
       3: {
         action: "voice_response",
@@ -198,8 +198,9 @@ async function sendAudio(blob) {
     },
   };
   formData.append("pkg", JSON.stringify(pkg));
+  formData.append("initial", "SPEECH");
 
-  axios("http://localhost:5000/package-hook", {
+  axios("/api/proxy/package", {
     method: "POST",
     data: formData,
     headers: {
