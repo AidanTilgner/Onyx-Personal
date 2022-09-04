@@ -1,9 +1,0 @@
-{
-  "entities": {
-    "event": {
-      "options": {
-        "date": ["date"]
-      }
-    }
-  }
-}

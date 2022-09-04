@@ -1,0 +1,14 @@
+[
+  {
+    "type": "event",
+    "option": "date",
+    "examples": ["date"],
+    "language": "en"
+  },
+  {
+    "type": "event",
+    "option": "wedding",
+    "examples": ["wedding"],
+    "language": "en"
+  }
+]

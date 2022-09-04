@@ -3,6 +3,7 @@ import { TextToIntent } from "./index.d";
 import text_to_intent_json from "./documents/text_to_intent.json";
 import intent_to_action_json from "./documents/intent_to_action.json";
 import action_to_response_json from "./documents/action_to_response.json";
+import entities_json from "./documents/entities.json";
 import { spellCheckText } from "./similarity/spellcheck";
 import { writeFileSync } from "fs";
 import {
@@ -19,7 +20,7 @@ export const initModel = async () => {
     settings: {
       nlp: {
         forceNER: true,
-        languages: ["en-US"],
+        languages: ["en"],
       },
     },
     locales: ["en"],
@@ -31,6 +32,7 @@ export const trainModel = async () => {
   try {
     console.log("Training model...");
     const text_to_intent: TextToIntent = text_to_intent_json;
+    const entities = entities_json;
 
     const intentsList = [];
     text_to_intent.forEach((item) => {
@@ -38,8 +40,19 @@ export const trainModel = async () => {
       if (!intentsList.includes(intent)) {
         intentsList.push(intent);
       }
-      manager.addDocument(language || "en-US", text, intent);
+      manager.addDocument(language || "en", text, intent);
     });
+
+    entities.forEach((entity) => {
+      // TODO: Add support for regex and other NE types
+      manager.addNerRuleOptionTexts(
+        entity.language || "en",
+        entity.type,
+        entity.option,
+        entity.examples
+      );
+    });
+
     await manager.train();
 
     const timestamp = new Date().getTime();
@@ -59,7 +72,7 @@ export const trainModel = async () => {
 export const testModel = async () => {
   try {
     console.log("Testing model...");
-    const language = "en-US";
+    const language = "en";
     const tests = [
       {
         try: "Hello",
@@ -157,10 +170,17 @@ export const getResponse = (act: string, metaData?: any | null) => {
   return { response, responses };
 };
 
-export const getActionExpectedEntities = async (act: string) => {
+export const getActionExpectedEntities = async (
+  act: string,
+  entities: {
+    entity: string;
+    option: string;
+  }[]
+) => {
   try {
     console.log("Getting action expected entities...");
     const { data } = await actionServer.get(`/actions/metadata/${act}`);
+    const { expected_entities } = data;
     console.log("Data: ", data);
   } catch (err) {
     console.log("Error getting action expected entities: ", err);
@@ -205,7 +225,10 @@ export const getIntentAndAction = async (input: string, lang: string) => {
       }
     }
     const { response, responses } = getResponse(foundAction);
-    const customEntities = await getActionExpectedEntities(foundAction);
+    const customEntities = await getActionExpectedEntities(
+      foundAction,
+      rest.entities
+    );
 
     return {
       intent: foundIntent,
@@ -225,7 +248,7 @@ export const getIntentAndActionForSpeechServer = async (input: {
 }) => {
   try {
     const newText = spellCheckText(input.text.toLocaleLowerCase());
-    const { intent, ...rest } = await manager.process("en-US", newText);
+    const { intent, ...rest } = await manager.process("en", newText);
     const foundIntent = intent || rest.classifications[0].intent;
     const foundAction = getAction(foundIntent);
 
@@ -258,7 +281,10 @@ export const getIntentAndActionForSpeechServer = async (input: {
       }
     }
     const { response, responses } = getResponse(foundAction);
-    const customEntities = await getActionExpectedEntities(foundAction);
+    const customEntities = await getActionExpectedEntities(
+      foundAction,
+      rest.entities
+    );
 
     return {
       intent: foundIntent,

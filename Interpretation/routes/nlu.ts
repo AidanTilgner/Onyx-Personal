@@ -1,6 +1,5 @@
 import { Router } from "express";
 import { startNLP } from "../nlp/index";
-import { startNer } from "../ner/index";
 import { getIntentAndAction } from "../nlp/nlp";
 
 const router = Router();
