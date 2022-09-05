@@ -10,7 +10,11 @@ import {
   generateExistingActions,
   generateExistingActionsWithoutResponse,
 } from "./documents";
-import { actionServer } from "../utils/axios";
+import {
+  getActionExpectedEntities,
+  checkOpensFormAndOpenIfNecessary,
+  getSessionQuestions,
+} from "./forms";
 import { dockStart } from "@nlpjs/basic";
 
 let manager: NlpManager = null;
@@ -21,6 +25,7 @@ export const initModel = async () => {
       nlp: {
         forceNER: true,
         languages: ["en"],
+        log: false,
       },
     },
     locales: ["en"],
@@ -43,14 +48,16 @@ export const trainModel = async () => {
       manager.addDocument(language || "en", text, intent);
     });
 
-    entities.forEach((entity) => {
+    Object.keys(entities).forEach((entity) => {
       // TODO: Add support for regex and other NE types
-      manager.addNerRuleOptionTexts(
-        entity.language || "en",
-        entity.type,
-        entity.option,
-        entity.examples
-      );
+      entities[entity].options.forEach((option) => {
+        manager.addNerRuleOptionTexts(
+          entity,
+          option,
+          option.examples,
+          option.language || "en"
+        );
+      });
     });
 
     await manager.train();
@@ -147,7 +154,7 @@ export const getIntent = async (lang: string, input: string) => {
   }
 };
 
-export const getAction = (int: string) => {
+export const getAction = (int: string): string => {
   const [intent, subintent, type = "default"] = int.split(".");
   // If intent doesn't exist on intent_to_action, return null, if it does, if subintent doesn't exist, return null, if it does, check the property at type or default, return the action
   const action = intent_to_action_json[intent]?.[subintent]?.[type] || null;
@@ -168,26 +175,6 @@ export const getResponse = (act: string, metaData?: any | null) => {
   }
   const response = responses[Math.floor(Math.random() * responses.length)];
   return { response, responses };
-};
-
-export const getActionExpectedEntities = async (
-  act: string,
-  entities: {
-    entity: string;
-    option: string;
-  }[]
-) => {
-  try {
-    console.log("Getting action expected entities...");
-    const { data } = await actionServer.get(`/actions/metadata/${act}`);
-    const { expected_entities } = data;
-    console.log("Data: ", data);
-  } catch (err) {
-    console.log("Error getting action expected entities: ", err);
-    return {
-      error: err,
-    };
-  }
 };
 
 export const getIntentAndAction = async (input: string, lang: string) => {
@@ -229,6 +216,7 @@ export const getIntentAndAction = async (input: string, lang: string) => {
       foundAction,
       rest.entities
     );
+    console.log("Custom entities: ", customEntities);
 
     return {
       intent: foundIntent,
@@ -297,4 +285,72 @@ export const getIntentAndActionForSpeechServer = async (input: {
     console.error(err);
     return null;
   }
+};
+
+export const condenseResponses = (session_id: string, responses: string[]) => {
+  const { custom_queries } = getSessionQuestions(session_id);
+  let response = "";
+
+  responses.forEach((res) => {
+    if (res === "custom_message") {
+      return;
+    }
+    response += response.length ? ". " + res : res;
+  });
+
+  custom_queries.forEach((q) => {
+    response += response.length ? ". " + q : q;
+  });
+
+  return response;
+};
+
+export const unstable_getIntentAndActionBatched = async (
+  session_id: string,
+  input: string,
+  language: string
+) => {
+  const { intent, ...rest } = await manager.process(language || "en", input);
+  const classifications = rest.classifications as {
+    intent: string;
+    score: number;
+  }[];
+  const entities = rest.entities as {
+    entity: string;
+    option: string;
+  }[];
+  console.log("Classifications: ", classifications);
+  console.log("Entities: ", entities);
+  const intents = classifications.filter((cl) => cl.score > 0.7); // * Hardcoded threshold for now // TODO: Make this dynamic
+  const actions = intents.map((int) => {
+    return { action: getAction(int.intent), intent: int.intent };
+  });
+  for (let i = 0; i < actions.length; i++) {
+    const { action } = actions[i];
+    if (action === "no_action") {
+      console.log("No action found");
+      continue;
+    }
+    console.log("Checking action: ", action);
+    const hasForm = await checkOpensFormAndOpenIfNecessary(
+      session_id,
+      action,
+      entities
+    );
+    console.log("Has form: ", hasForm);
+  }
+  const responses = actions.map((act) => getResponse(act.action, rest));
+  console.log("Responses: ", responses);
+  const response = condenseResponses(
+    session_id,
+    responses.map((r) => r.response)
+  );
+  return {
+    intents,
+    actions,
+    responses,
+    classifications,
+    entities,
+    response,
+  };
 };

@@ -29,7 +29,11 @@ router.post("/:action", async (req, res) => {
   try {
     const {
       params: { action },
-    } = req;
+    } = req as {
+      params: {
+        action: string;
+      };
+    };
     if (!mappings.hasOwnProperty(action)) {
       return res.send({
         error: `Action "${action}" not found`,
@@ -81,7 +85,8 @@ router.get("/metadata/:action", (req, res) => {
   const metadata = getActionMetadata(action);
   if (!metadata) {
     return res.send({
-      error: `No metadata for "${action}" was found`,
+      message: "No metadata found for that action",
+      response: {},
     });
   }
   return res.send({

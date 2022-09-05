@@ -1,14 +1,22 @@
-[
-  {
-    "type": "event",
-    "option": "date",
-    "examples": ["date"],
-    "language": "en"
+{
+  "event": {
+    "options": [
+      { "name": "date", "examples": ["date"], "language": "en" },
+      {
+        "name": "wedding",
+        "examples": ["wedding"],
+        "language": "en"
+      }
+    ]
   },
-  {
-    "type": "event",
-    "option": "wedding",
-    "examples": ["wedding"],
-    "language": "en"
+  "clothing_item": {
+    "options": [
+      { "name": "dress", "examples": ["dress"], "language": "en" },
+      {
+        "name": "suit",
+        "examples": ["suit"],
+        "language": "en"
+      }
+    ]
   }
-]
+}

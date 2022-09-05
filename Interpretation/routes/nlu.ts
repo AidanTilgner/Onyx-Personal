@@ -1,6 +1,9 @@
 import { Router } from "express";
 import { startNLP } from "../nlp/index";
-import { getIntentAndAction } from "../nlp/nlp";
+import {
+  getIntentAndAction,
+  unstable_getIntentAndActionBatched,
+} from "../nlp/nlp";
 
 const router = Router();
 
@@ -10,6 +13,19 @@ startNLP();
 router.post("/", async (req, res) => {
   const { text, language } = req.body;
   const nlu = await getIntentAndAction(text, language || "en");
+  res.send({
+    message: "Successfully classified input",
+    nlu: nlu,
+  });
+});
+
+router.post("/unstable", async (req, res) => {
+  const { text, language } = req.body;
+  const nlu = await unstable_getIntentAndActionBatched(
+    "fake_session_id",
+    text,
+    language || "en"
+  );
   res.send({
     message: "Successfully classified input",
     nlu: nlu,

@@ -11,7 +11,7 @@
     "for_item": {
       "expected_entities": [
         {
-          "type": "item",
+          "type": "clothing_item",
           "custom_query": "What else are you wearing?"
         }
       ]

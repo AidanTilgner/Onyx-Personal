@@ -30,7 +30,7 @@
     "what_should_i_wear": {
       "default": "recommend_clothing",
       "at_event": "recommend_clothing.for_event",
-      "with_item": "recommend_clothing.from_item"
+      "with_item": "recommend_clothing.for_item"
     }
   },
   "describe_state": {
