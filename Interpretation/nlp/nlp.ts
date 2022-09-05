@@ -14,6 +14,7 @@ import {
   getActionExpectedEntities,
   checkOpensFormAndOpenIfNecessary,
   getSessionQuestions,
+  checkCompletesFields,
 } from "./forms";
 import { dockStart } from "@nlpjs/basic";
 
@@ -25,8 +26,8 @@ export const initModel = async () => {
       nlp: {
         forceNER: true,
         languages: ["en"],
-        log: false,
       },
+      log: false, // TODO: Figure out where to disable logging on epochs
     },
     locales: ["en"],
   });
@@ -35,7 +36,6 @@ export const initModel = async () => {
 
 export const trainModel = async () => {
   try {
-    console.log("Training model...");
     const text_to_intent: TextToIntent = text_to_intent_json;
     const entities = entities_json;
 
@@ -50,14 +50,16 @@ export const trainModel = async () => {
 
     Object.keys(entities).forEach((entity) => {
       // TODO: Add support for regex and other NE types
-      entities[entity].options.forEach((option) => {
-        manager.addNerRuleOptionTexts(
-          entity,
-          option,
-          option.examples,
-          option.language || "en"
-        );
-      });
+      entities[entity].options.forEach(
+        (option: { name: string; examples: string[]; language: string }) => {
+          manager.addNerRuleOptionTexts(
+            option.language || "en",
+            entity,
+            option.name,
+            option.examples
+          );
+        }
+      );
     });
 
     await manager.train();
@@ -216,7 +218,6 @@ export const getIntentAndAction = async (input: string, lang: string) => {
       foundAction,
       rest.entities
     );
-    console.log("Custom entities: ", customEntities);
 
     return {
       intent: foundIntent,
@@ -319,38 +320,46 @@ export const unstable_getIntentAndActionBatched = async (
     entity: string;
     option: string;
   }[];
-  console.log("Classifications: ", classifications);
-  console.log("Entities: ", entities);
   const intents = classifications.filter((cl) => cl.score > 0.7); // * Hardcoded threshold for now // TODO: Make this dynamic
-  const actions = intents.map((int) => {
-    return { action: getAction(int.intent), intent: int.intent };
+  if (!intents.length) {
+    intents.push(classifications[0]);
+  }
+  const { actions: completedActions } = checkCompletesFields(
+    session_id,
+    entities
+  );
+  const initialActions = intents.map((int) => {
+    return getAction(int.intent);
   });
-  for (let i = 0; i < actions.length; i++) {
-    const { action } = actions[i];
+  const useableActions: string[] = [...completedActions];
+
+  for (let i = 0; i < initialActions.length; i++) {
+    const action = initialActions[i];
     if (action === "no_action") {
-      console.log("No action found");
       continue;
     }
-    console.log("Checking action: ", action);
     const hasForm = await checkOpensFormAndOpenIfNecessary(
       session_id,
       action,
       entities
     );
-    console.log("Has form: ", hasForm);
+    const { custom_entities, open } = hasForm;
+    if (!open) {
+      useableActions.push(action);
+    }
   }
-  const responses = actions.map((act) => getResponse(act.action, rest));
-  console.log("Responses: ", responses);
+  const responses = useableActions.map((act) => getResponse(act, rest));
   const response = condenseResponses(
     session_id,
     responses.map((r) => r.response)
   );
   return {
     intents,
-    actions,
+    actions: useableActions,
+    nlu_response: response,
+    entities,
     responses,
     classifications,
-    entities,
-    response,
+    initial_actions: initialActions,
   };
 };

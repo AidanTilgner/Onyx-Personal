@@ -50,9 +50,14 @@ export const getActionExpectedEntities = async (
         has_custom_entities: false,
       };
     }
-    const found = entities.map((en) => {
-      return expected_entities.find((ee) => ee.type === en.entity);
-    });
+    const found = entities
+      .map((en) => {
+        return {
+          ...expected_entities.find((ee) => ee.type === en.entity),
+          option: en.option,
+        };
+      })
+      .filter((en) => en);
     const missing = expected_entities.filter((ee) => {
       return !entities.find((en) => ee.type === en.entity);
     });
@@ -96,7 +101,6 @@ export const checkOpensFormAndOpenIfNecessary = async (
       error: response.error,
     };
   }
-  console.log("Expected entities: ", response);
   const { missing, has_custom_entities, expected_entities, found } = response;
 
   if (has_custom_entities && missing.length > 0) {
@@ -106,7 +110,7 @@ export const checkOpensFormAndOpenIfNecessary = async (
         return {
           entity: m.type,
           custom_query: m.custom_query,
-          complete: found.includes(m),
+          complete: found.find((f) => f.type === m.type) ? true : false,
           value: found.find((f) => f.type === m.type)?.option || "",
         };
       }),
@@ -127,26 +131,52 @@ export const checkOpensFormAndOpenIfNecessary = async (
 
   return {
     open: false,
-    custom_entities: has_custom_entities ? found : [],
+    custom_entities: found,
   };
 };
 
-const checkCompletesFields = (
+export const checkCompletesFields = (
   session_id: string,
   entities: {
     entity: string;
     option: string;
   }[]
 ) => {
-  for (const form of openQuestions[session_id].forms) {
+  const actions: string[] = [];
+
+  const forms = openQuestions[session_id]?.forms;
+  if (!forms) {
+    return {
+      actions: actions,
+    };
+  }
+
+  for (const form of forms) {
+    let complete = true;
     for (const field of form.fields) {
       const entity = entities.find((en) => en.entity === field.entity);
       if (entity) {
         field.complete = true;
         field.value = entity.option;
       }
+      if (!field.complete) {
+        complete = false;
+      }
+    }
+    if (complete) {
+      actions.push(form.action);
+      filterCompletedForms(session_id);
     }
   }
+  return { actions };
+};
+
+export const filterCompletedForms = (session_id: string) => {
+  const forms = openQuestions[session_id]?.forms;
+  if (!forms) {
+    return;
+  }
+  openQuestions[session_id].forms = forms.filter((form) => !form.complete);
 };
 
 export const getFieldsForForm = (session_id: string, name: string) => {
@@ -156,7 +186,15 @@ export const getFieldsForForm = (session_id: string, name: string) => {
 export const getSessionQuestions = (session_id: string) => {
   const custom_queries: string[] = [];
 
-  for (const form of openQuestions[session_id].forms) {
+  const forms = openQuestions[session_id]?.forms;
+
+  if (!forms) {
+    return {
+      custom_queries: [],
+    };
+  }
+
+  for (const form of forms) {
     for (const field of form.fields) {
       if (!field.complete) {
         custom_queries.push(field.custom_query);
