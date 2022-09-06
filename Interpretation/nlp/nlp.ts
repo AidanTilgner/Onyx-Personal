@@ -306,16 +306,84 @@ export const condenseResponses = (session_id: string, responses: string[]) => {
   return response;
 };
 
-export const unstable_getIntentAndActionBatched = async (
+export const unstable_getNLUData = async (
   session_id: string,
   input: string,
   language: string
 ) => {
+  console.log("Language: ", input);
   const { intent, ...rest } = await manager.process(language || "en", input);
   const classifications = rest.classifications as {
     intent: string;
     score: number;
   }[];
+  console.log("Classifications: ", classifications);
+  const entities = rest.entities as {
+    entity: string;
+    option: string;
+  }[];
+  const intents = classifications
+    .filter((cl) => cl.score > 0.7)
+    .map((int) => int.intent); // * Hardcoded threshold for now // TODO: Make this dynamic
+  if (!intents.length) {
+    intents.push(classifications[0].intent);
+  }
+  const { actions: completedActions } = checkCompletesFields(
+    session_id,
+    entities
+  );
+  const initialActions = intents.map((int) => {
+    return getAction(int);
+  });
+  const useableActions: string[] = [...completedActions];
+
+  for (let i = 0; i < initialActions.length; i++) {
+    const action = initialActions[i];
+    if (action === "no_action") {
+      continue;
+    }
+    const hasForm = await checkOpensFormAndOpenIfNecessary(
+      session_id,
+      action,
+      entities
+    );
+    const { custom_entities, open } = hasForm;
+    if (!open) {
+      useableActions.push(action);
+    }
+  }
+  const responses = useableActions.map(
+    (act) => getResponse(act, rest).response
+  );
+  const response = condenseResponses(session_id, responses);
+  return {
+    intents,
+    actions: useableActions,
+    nlu_response: response,
+    responses,
+    entities,
+    classifications,
+    initial_actions: initialActions,
+    metaData: rest,
+  };
+};
+
+export const unstable_getNLUDataForSpeechServer = async (
+  session_id: string,
+  input: { text: string },
+  language: string = "en"
+) => {
+  console.log("Input: ", input);
+  console.log("Language: ", input);
+  const { intent, ...rest } = await manager.process(
+    language || "en",
+    input.text
+  );
+  const classifications = rest.classifications as {
+    intent: string;
+    score: number;
+  }[];
+  console.log("Classifications: ", classifications);
   const entities = rest.entities as {
     entity: string;
     option: string;

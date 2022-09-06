@@ -1,9 +1,6 @@
 import { Router } from "express";
 import { startNLP } from "../nlp/index";
-import {
-  getIntentAndAction,
-  unstable_getIntentAndActionBatched,
-} from "../nlp/nlp";
+import { getIntentAndAction, unstable_getNLUData } from "../nlp/nlp";
 
 const router = Router();
 
@@ -21,7 +18,7 @@ router.post("/", async (req, res) => {
 
 router.post("/unstable", async (req, res) => {
   const { text, language } = req.body;
-  const nlu = await unstable_getIntentAndActionBatched(
+  const nlu = await unstable_getNLUData(
     "fake_session_id",
     text,
     language || "en"

@@ -19,8 +19,11 @@ const handlePackage = async (pkg: ActionsPackage) => {
     let result: any;
 
     const [act, subact = "default"] = action.split(".");
+    console.log("Executing action: ", act, subact);
+    console.log("With data: ", deposited);
 
-    const res = await mappings[act][subact](deposited);
+    const res = await mappings[act]?.[subact]?.(deposited);
+    console.log("Got result: ", res);
     result = res;
     steps[current_step].data.gathered = res;
 
@@ -48,6 +51,7 @@ const handlePackage = async (pkg: ActionsPackage) => {
   } catch (err: any) {
     console.log("Error handling package: ", err);
     pkg.steps[pkg.current_step].errors.push(err);
+    pkg.current_step = pkg.current_step + 1;
     if (pkg.steps[pkg.current_step].next) {
       return [
         pkg,

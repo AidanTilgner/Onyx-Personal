@@ -1,6 +1,7 @@
 import weatherMappings from "./types/weather";
 import exceptionMappings from "./types/exceptions";
 import stateMappings from "./types/state";
+import { recommendClothingMappings } from "./types/clothing";
 
 const parseAndUseNLU = async (nlu: {
   intents: string[];
@@ -20,6 +21,7 @@ const parseAndUseNLU = async (nlu: {
   metaData: any;
 }) => {
   try {
+    console.log("NLU: ", nlu);
     const {
       intents,
       actions,
@@ -35,36 +37,35 @@ const parseAndUseNLU = async (nlu: {
       custom_message: string;
       actions: string[];
     } = {
-      custom_message: "",
+      custom_message: nlu_response,
       actions: [],
     };
 
     for (let i = 0; i < actions.length; i++) {
       const intent = intents[i];
       const action = actions[i];
+      console.log("Action: ", action);
       const response = responses[i];
       const [act, subact = "default"] = action.split(".");
       // TODO: If in production, use the default action instead of saying "action not found"
       const performAction = mappings[act]?.[subact]
         ? mappings[act][subact]
         : mappings.exception.action_not_found;
+
+      console.log("Entities: ", entities);
+
+      const entitiesObject: { [key: string]: string } = {};
+      for (let i = 0; i < entities.length; i++) {
+        const entity = entities[i];
+        entitiesObject[entity.entity] = entity.option;
+      }
       if (nlu_response && response !== "custom_message") {
         // * Then do this asynchronusly
-        performAction({
-          metaData,
-          action: act,
-          subaction: subact,
-          full_action: action,
-        });
+        performAction(entitiesObject);
         toSend.actions.push(action);
         toSend.custom_message = nlu_response;
       }
-      const { custom_message } = await performAction({
-        metaData,
-        action: act,
-        subaction: subact,
-        full_action: action,
-      });
+      const { custom_message } = await performAction(entitiesObject);
 
       if (custom_message) {
         toSend.custom_message += toSend.custom_message.length
@@ -72,6 +73,8 @@ const parseAndUseNLU = async (nlu: {
           : custom_message;
       }
     }
+
+    console.log("To send: ", toSend);
 
     return toSend;
   } catch (err) {
@@ -82,17 +85,18 @@ const parseAndUseNLU = async (nlu: {
   }
 };
 
-const mappings: {
+interface Mappings {
   [key: string]: {
-    // TODO: Add better type declaration of what the function is
-    [key: string]: Function;
-    default: Function;
+    [key: string]: (data: any) => any;
   };
-} = {
+}
+
+const mappings: Mappings = {
   weather: weatherMappings,
   parse_and_use_nlu: { default: parseAndUseNLU },
   state: stateMappings,
   exception: exceptionMappings,
+  recommend_clothing: recommendClothingMappings,
 };
 
 export default mappings;
