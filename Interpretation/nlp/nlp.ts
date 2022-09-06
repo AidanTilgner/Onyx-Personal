@@ -311,13 +311,11 @@ export const unstable_getNLUData = async (
   input: string,
   language: string
 ) => {
-  console.log("Language: ", input);
   const { intent, ...rest } = await manager.process(language || "en", input);
   const classifications = rest.classifications as {
     intent: string;
     score: number;
   }[];
-  console.log("Classifications: ", classifications);
   const entities = rest.entities as {
     entity: string;
     option: string;
@@ -373,8 +371,6 @@ export const unstable_getNLUDataForSpeechServer = async (
   input: { text: string },
   language: string = "en"
 ) => {
-  console.log("Input: ", input);
-  console.log("Language: ", input);
   const { intent, ...rest } = await manager.process(
     language || "en",
     input.text
@@ -383,7 +379,6 @@ export const unstable_getNLUDataForSpeechServer = async (
     intent: string;
     score: number;
   }[];
-  console.log("Classifications: ", classifications);
   const entities = rest.entities as {
     entity: string;
     option: string;

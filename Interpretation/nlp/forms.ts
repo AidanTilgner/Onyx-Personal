@@ -169,7 +169,6 @@ export const checkCompletesFields = (
       filterCompletedForms(session_id);
     }
   }
-  console.log("Open forms: ", openQuestions[session_id]);
   return { actions };
 };
 

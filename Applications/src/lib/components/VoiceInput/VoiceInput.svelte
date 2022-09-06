@@ -93,14 +93,15 @@
 
   .voice-response {
     background-color: white;
-    border-radius: 0;
+    border-radius: 3px;
     margin: 36px 24px 120px 24px;
     width: 100%;
     padding: 24px 14px;
     font-size: 18px;
     text-align: left;
     font-weight: 400;
-    box-shadow: 0.2px 0.2px 10px 0 rgba($color: #000000, $alpha: 0.1);
+    box-shadow: inset 0.2px 0.2px 4px rgba(0, 0, 0, 0.15);
+    border: 1px solid #eaeaea;
     z-index: 9;
     position: relative;
 

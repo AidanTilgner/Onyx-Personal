@@ -39,7 +39,7 @@
     localStorage.setItem(
       "session",
       JSON.stringify({
-        session_id: "1234567890",
+        session_id: Math.random().toString(36).substring(2, 15),
       })
     );
   });
