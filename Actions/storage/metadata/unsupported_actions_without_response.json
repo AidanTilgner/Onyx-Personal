@@ -8,5 +8,6 @@
   "respond_to_opinion.disinterest",
   "recommend_clothing",
   "recommend_clothing.for_event",
-  "recommend_clothing.from_item"
+  "recommend_clothing.for_item",
+  "comment_on_clothing.specific"
 ]

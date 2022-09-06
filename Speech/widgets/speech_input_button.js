@@ -151,7 +151,10 @@ async function sendAudio(blob) {
     return;
   }
 
+  const { session_id } = JSON.parse(localStorage.getItem("session"));
+
   const pkg = {
+    session_id,
     current_step: 0,
     steps: {
       0: {
@@ -168,7 +171,7 @@ async function sendAudio(blob) {
         use_files: [],
       },
       1: {
-        action: "get_nlu_for_speech_server",
+        action: "get_nlu_for_speech_server_unstable",
         deposit: 2,
         data: {
           deposited: null,

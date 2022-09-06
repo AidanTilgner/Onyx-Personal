@@ -320,16 +320,18 @@ export const unstable_getIntentAndActionBatched = async (
     entity: string;
     option: string;
   }[];
-  const intents = classifications.filter((cl) => cl.score > 0.7); // * Hardcoded threshold for now // TODO: Make this dynamic
+  const intents = classifications
+    .filter((cl) => cl.score > 0.7)
+    .map((int) => int.intent); // * Hardcoded threshold for now // TODO: Make this dynamic
   if (!intents.length) {
-    intents.push(classifications[0]);
+    intents.push(classifications[0].intent);
   }
   const { actions: completedActions } = checkCompletesFields(
     session_id,
     entities
   );
   const initialActions = intents.map((int) => {
-    return getAction(int.intent);
+    return getAction(int);
   });
   const useableActions: string[] = [...completedActions];
 
@@ -348,18 +350,18 @@ export const unstable_getIntentAndActionBatched = async (
       useableActions.push(action);
     }
   }
-  const responses = useableActions.map((act) => getResponse(act, rest));
-  const response = condenseResponses(
-    session_id,
-    responses.map((r) => r.response)
+  const responses = useableActions.map(
+    (act) => getResponse(act, rest).response
   );
+  const response = condenseResponses(session_id, responses);
   return {
     intents,
     actions: useableActions,
     nlu_response: response,
-    entities,
     responses,
+    entities,
     classifications,
     initial_actions: initialActions,
+    metaData: rest,
   };
 };

@@ -35,6 +35,13 @@
     unsub = globalHistory.listen(({ location, action }) => {
       $currentPath = location.pathname;
     });
+
+    localStorage.setItem(
+      "session",
+      JSON.stringify({
+        session_id: "1234567890",
+      })
+    );
   });
 
   onDestroy(() => {

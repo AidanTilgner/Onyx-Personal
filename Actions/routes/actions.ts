@@ -40,7 +40,7 @@ router.post("/:action", async (req, res) => {
       });
     }
     const [act, subact = "default"] = action.split(".");
-    const actionResponse = await mappings[act][subact](req);
+    const actionResponse: any = await mappings[act][subact](req);
     return res.send({
       message: "Action executed successfully",
       response: actionResponse,

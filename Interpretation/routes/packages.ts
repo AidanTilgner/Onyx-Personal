@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
   getIntentAndAction,
   getIntentAndActionForSpeechServer,
+  unstable_getIntentAndActionBatched,
 } from "../nlp/nlp";
 import { NLUPackage, NLUPackageBody } from "../definitions/packages";
 import FormData from "form-data";
@@ -12,6 +13,7 @@ const router = Router();
 const mappings: { [key: string]: Function } = {
   get_nlu: getIntentAndAction,
   get_nlu_for_speech_server: getIntentAndActionForSpeechServer,
+  get_nlu_for_speech_server_unstable: unstable_getIntentAndActionBatched,
 };
 
 const handlePackage = async (pkg: NLUPackage) => {
