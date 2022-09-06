@@ -163,11 +163,13 @@ export const checkCompletesFields = (
         complete = false;
       }
     }
+    form.complete = complete;
     if (complete) {
       actions.push(form.action);
       filterCompletedForms(session_id);
     }
   }
+  console.log("Open forms: ", openQuestions[session_id]);
   return { actions };
 };
 

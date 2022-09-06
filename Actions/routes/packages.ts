@@ -19,11 +19,8 @@ const handlePackage = async (pkg: ActionsPackage) => {
     let result: any;
 
     const [act, subact = "default"] = action.split(".");
-    console.log("Executing action: ", act, subact);
-    console.log("With data: ", deposited);
 
     const res = await mappings[act]?.[subact]?.(deposited);
-    console.log("Got result: ", res);
     result = res;
     steps[current_step].data.gathered = res;
 

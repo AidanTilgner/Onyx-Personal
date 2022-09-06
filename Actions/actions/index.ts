@@ -21,7 +21,6 @@ const parseAndUseNLU = async (nlu: {
   metaData: any;
 }) => {
   try {
-    console.log("NLU: ", nlu);
     const {
       intents,
       actions,
@@ -44,15 +43,12 @@ const parseAndUseNLU = async (nlu: {
     for (let i = 0; i < actions.length; i++) {
       const intent = intents[i];
       const action = actions[i];
-      console.log("Action: ", action);
       const response = responses[i];
       const [act, subact = "default"] = action.split(".");
       // TODO: If in production, use the default action instead of saying "action not found"
       const performAction = mappings[act]?.[subact]
         ? mappings[act][subact]
         : mappings.exception.action_not_found;
-
-      console.log("Entities: ", entities);
 
       const entitiesObject: { [key: string]: string } = {};
       for (let i = 0; i < entities.length; i++) {
