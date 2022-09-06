@@ -7,6 +7,7 @@ config({ path: "../.env" });
 
 export const generateMetaData = async () => {
   try {
+    // TODO: Endpoints for these aren't always gonna be accessible on startup if the other servers are down, so we need to handle that
     generateUnsupportedActions();
     generateUnsupportedActionsWithoutResponse();
   } catch (err) {

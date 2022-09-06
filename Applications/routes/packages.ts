@@ -45,6 +45,7 @@ const handlePackage = async (pkg: AppsPackage) => {
   } catch (err: any) {
     console.log("Error handling package: ", err);
     pkg.steps[pkg.current_step].errors.push(err);
+    pkg.current_step = pkg.current_step + 1;
     if (pkg.steps[pkg.current_step].next) {
       return [
         pkg,

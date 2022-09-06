@@ -1,5 +1,6 @@
 import { Router } from "express";
 import mappings from "../actions";
+import { getActionMetadata } from "../actions/utils";
 
 const router = Router();
 
@@ -28,14 +29,18 @@ router.post("/:action", async (req, res) => {
   try {
     const {
       params: { action },
-    } = req;
+    } = req as {
+      params: {
+        action: string;
+      };
+    };
     if (!mappings.hasOwnProperty(action)) {
       return res.send({
         error: `Action "${action}" not found`,
       });
     }
     const [act, subact = "default"] = action.split(".");
-    const actionResponse = await mappings[act][subact](req);
+    const actionResponse: any = await mappings[act][subact](req);
     return res.send({
       message: "Action executed successfully",
       response: actionResponse,
@@ -69,6 +74,24 @@ router.get("/:action", (req, res) => {
   return res.send({
     message: "Action exists",
     response: mappings[act][subact],
+  });
+});
+
+router.get("/metadata/:action", (req, res) => {
+  const {
+    params: { action },
+  } = req;
+  const [act, subact = "default"] = action.split(".");
+  const metadata = getActionMetadata(action);
+  if (!metadata) {
+    return res.send({
+      message: "No metadata found for that action",
+      response: {},
+    });
+  }
+  return res.send({
+    message: "Action found and metadata returned",
+    response: metadata,
   });
 });
 

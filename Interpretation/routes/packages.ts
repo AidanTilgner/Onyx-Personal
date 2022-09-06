@@ -2,6 +2,8 @@ import { Router } from "express";
 import {
   getIntentAndAction,
   getIntentAndActionForSpeechServer,
+  unstable_getNLUData,
+  unstable_getNLUDataForSpeechServer,
 } from "../nlp/nlp";
 import { NLUPackage, NLUPackageBody } from "../definitions/packages";
 import FormData from "form-data";
@@ -12,11 +14,12 @@ const router = Router();
 const mappings: { [key: string]: Function } = {
   get_nlu: getIntentAndAction,
   get_nlu_for_speech_server: getIntentAndActionForSpeechServer,
+  get_nlu_for_speech_server_unstable: unstable_getNLUDataForSpeechServer,
 };
 
 const handlePackage = async (pkg: NLUPackage) => {
   try {
-    const { current_step, steps } = pkg;
+    const { current_step, steps, session_id } = pkg;
     const {
       action,
       deposit,
@@ -26,7 +29,8 @@ const handlePackage = async (pkg: NLUPackage) => {
 
     let result: any;
 
-    const res = await mappings[action](deposited);
+    console.log("Using data: ", deposited);
+    const res = await mappings[action](session_id, deposited);
     result = res;
     steps[current_step].data.gathered = res;
 
@@ -54,6 +58,7 @@ const handlePackage = async (pkg: NLUPackage) => {
   } catch (err: any) {
     console.log("Error handling package: ", err);
     pkg.steps[pkg.current_step].errors.push(err);
+    pkg.current_step = pkg.current_step + 1;
     if (pkg.steps[pkg.current_step].next) {
       return [
         pkg,

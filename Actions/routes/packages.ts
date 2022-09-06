@@ -20,7 +20,7 @@ const handlePackage = async (pkg: ActionsPackage) => {
 
     const [act, subact = "default"] = action.split(".");
 
-    const res = await mappings[act][subact](deposited);
+    const res = await mappings[act]?.[subact]?.(deposited);
     result = res;
     steps[current_step].data.gathered = res;
 
@@ -48,6 +48,7 @@ const handlePackage = async (pkg: ActionsPackage) => {
   } catch (err: any) {
     console.log("Error handling package: ", err);
     pkg.steps[pkg.current_step].errors.push(err);
+    pkg.current_step = pkg.current_step + 1;
     if (pkg.steps[pkg.current_step].next) {
       return [
         pkg,

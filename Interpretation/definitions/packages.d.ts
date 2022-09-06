@@ -20,4 +20,5 @@ export type NLUPackage = {
     };
   };
   files: string[];
+  session_id: string;
 };

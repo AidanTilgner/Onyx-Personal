@@ -3,24 +3,42 @@ import { TextToIntent } from "./index.d";
 import text_to_intent_json from "./documents/text_to_intent.json";
 import intent_to_action_json from "./documents/intent_to_action.json";
 import action_to_response_json from "./documents/action_to_response.json";
+import entities_json from "./documents/entities.json";
 import { spellCheckText } from "./similarity/spellcheck";
 import { writeFileSync } from "fs";
 import {
   generateExistingActions,
   generateExistingActionsWithoutResponse,
 } from "./documents";
+import {
+  getActionExpectedEntities,
+  checkOpensFormAndOpenIfNecessary,
+  getSessionQuestions,
+  checkCompletesFields,
+} from "./forms";
+import { dockStart } from "@nlpjs/basic";
 
-const manager = new NlpManager({
-  languages: ["en"],
-  forceNER: true,
-  nlu: { log: false, useNoneFeature: false },
-});
+let manager: NlpManager = null;
+export const initModel = async () => {
+  const dock = await dockStart({
+    use: ["Basic", "LangEn"],
+    settings: {
+      nlp: {
+        forceNER: true,
+        languages: ["en"],
+      },
+      log: false, // TODO: Figure out where to disable logging on epochs
+    },
+    locales: ["en"],
+  });
+  manager = dock.get("nlp");
+};
 
 export const trainModel = async () => {
   try {
-    console.log("Training model...");
     const text_to_intent: TextToIntent = text_to_intent_json;
-    // Get a list of all intents with no duplicates
+    const entities = entities_json;
+
     const intentsList = [];
     text_to_intent.forEach((item) => {
       const { text, intent, language } = item;
@@ -29,8 +47,23 @@ export const trainModel = async () => {
       }
       manager.addDocument(language || "en", text, intent);
     });
+
+    Object.keys(entities).forEach((entity) => {
+      // TODO: Add support for regex and other NE types
+      entities[entity].options.forEach(
+        (option: { name: string; examples: string[]; language: string }) => {
+          manager.addNerRuleOptionTexts(
+            option.language || "en",
+            entity,
+            option.name,
+            option.examples
+          );
+        }
+      );
+    });
+
     await manager.train();
-    // Current timestamp
+
     const timestamp = new Date().getTime();
     const filename = `models/model-${timestamp}.json`;
     // ! Right now there's no point in saving this because it trains every load. However, this is how it would be done, and in production we might want to load from the saved version.
@@ -68,35 +101,39 @@ export const testModel = async () => {
       },
     ];
     tests.forEach(async (test) => {
-      const { try: text } = test;
-      const intent = await manager.process(language, text);
-      if (intent.hasOwnProperty("nluAnswer")) {
+      try {
+        const { try: text } = test;
+        const intent = await manager.process(language, text);
+        if (intent.hasOwnProperty("nluAnswer")) {
+          console.assert(
+            intent.nluAnswer?.classifications[0].intent === test.expected,
+            "Error in test: ",
+            test,
+            "Expected: ",
+            test.expected,
+            "Got: ",
+            intent.nluAnswer?.classifications[0].intent
+          );
+          console.assert(
+            intent.nluAnswer?.classifications[0].score > 0,
+            "Error in test: ",
+            test,
+            "Expected non-zero score"
+          );
+          return;
+        }
         console.assert(
-          intent.nluAnswer?.classifications[0].intent === test.expected,
+          intent.classifications[0].intent === test.expected,
           "Error in test: ",
           test,
           "Expected: ",
           test.expected,
           "Got: ",
-          intent.nluAnswer?.classifications[0].intent
+          intent.classifications[0].intent
         );
-        console.assert(
-          intent.nluAnswer?.classifications[0].score > 0,
-          "Error in test: ",
-          test,
-          "Expected non-zero score"
-        );
-        return;
+      } catch (err) {
+        console.log(err);
       }
-      console.assert(
-        intent.classifications[0].intent === test.expected,
-        "Error in test: ",
-        test,
-        "Expected: ",
-        test.expected,
-        "Got: ",
-        intent.classifications[0].intent
-      );
     });
     console.log("Model tested");
   } catch (err) {
@@ -119,7 +156,7 @@ export const getIntent = async (lang: string, input: string) => {
   }
 };
 
-export const getAction = (int: string) => {
+export const getAction = (int: string): string => {
   const [intent, subintent, type = "default"] = int.split(".");
   // If intent doesn't exist on intent_to_action, return null, if it does, if subintent doesn't exist, return null, if it does, check the property at type or default, return the action
   const action = intent_to_action_json[intent]?.[subintent]?.[type] || null;
@@ -177,6 +214,10 @@ export const getIntentAndAction = async (input: string, lang: string) => {
       }
     }
     const { response, responses } = getResponse(foundAction);
+    const customEntities = await getActionExpectedEntities(
+      foundAction,
+      rest.entities
+    );
 
     return {
       intent: foundIntent,
@@ -199,7 +240,41 @@ export const getIntentAndActionForSpeechServer = async (input: {
     const { intent, ...rest } = await manager.process("en", newText);
     const foundIntent = intent || rest.classifications[0].intent;
     const foundAction = getAction(foundIntent);
+
+    if (!foundIntent || rest.classifications[0].score < 0.5) {
+      return {
+        intent: "exception.unknown",
+        action: "attempt_understanding",
+        metaData: {
+          ...rest,
+        },
+        nlu_response: "Sorry, I don't understand",
+        responses: [],
+      };
+    }
+
+    if (foundAction === "no_action") {
+      const corrected = await spellCheckText(input.text);
+      if (corrected) {
+        return {
+          intent: intent,
+          action: "no_action_found",
+          metaData: {
+            ...rest,
+            corrected: corrected,
+          },
+          nlu_response:
+            "I get what you mean, but I don't know how to respond to that yet.",
+          responses: [],
+        };
+      }
+    }
     const { response, responses } = getResponse(foundAction);
+    const customEntities = await getActionExpectedEntities(
+      foundAction,
+      rest.entities
+    );
+
     return {
       intent: foundIntent,
       action: foundAction,
@@ -211,4 +286,145 @@ export const getIntentAndActionForSpeechServer = async (input: {
     console.error(err);
     return null;
   }
+};
+
+export const condenseResponses = (session_id: string, responses: string[]) => {
+  const { custom_queries } = getSessionQuestions(session_id);
+  let response = "";
+
+  responses.forEach((res) => {
+    if (res === "custom_message") {
+      return;
+    }
+    response += response.length ? ". " + res : res;
+  });
+
+  custom_queries.forEach((q) => {
+    response += response.length ? ". " + q : q;
+  });
+
+  return response;
+};
+
+export const unstable_getNLUData = async (
+  session_id: string,
+  input: string,
+  language: string
+) => {
+  const { intent, ...rest } = await manager.process(language || "en", input);
+  const classifications = rest.classifications as {
+    intent: string;
+    score: number;
+  }[];
+  const entities = rest.entities as {
+    entity: string;
+    option: string;
+  }[];
+  const intents = classifications
+    .filter((cl) => cl.score > 0.7)
+    .map((int) => int.intent); // * Hardcoded threshold for now // TODO: Make this dynamic
+  if (!intents.length) {
+    intents.push(classifications[0].intent);
+  }
+  const { actions: completedActions } = checkCompletesFields(
+    session_id,
+    entities
+  );
+  const initialActions = intents.map((int) => {
+    return getAction(int);
+  });
+  const useableActions: string[] = [...completedActions];
+
+  for (let i = 0; i < initialActions.length; i++) {
+    const action = initialActions[i];
+    if (action === "no_action") {
+      continue;
+    }
+    const hasForm = await checkOpensFormAndOpenIfNecessary(
+      session_id,
+      action,
+      entities
+    );
+    const { custom_entities, open } = hasForm;
+    if (!open) {
+      useableActions.push(action);
+    }
+  }
+  const responses = useableActions.map(
+    (act) => getResponse(act, rest).response
+  );
+  const response = condenseResponses(session_id, responses);
+  return {
+    intents,
+    actions: useableActions,
+    nlu_response: response,
+    responses,
+    entities,
+    classifications,
+    initial_actions: initialActions,
+    metaData: rest,
+  };
+};
+
+export const unstable_getNLUDataForSpeechServer = async (
+  session_id: string,
+  input: { text: string },
+  language: string = "en"
+) => {
+  const { intent, ...rest } = await manager.process(
+    language || "en",
+    input.text
+  );
+  const classifications = rest.classifications as {
+    intent: string;
+    score: number;
+  }[];
+  const entities = rest.entities as {
+    entity: string;
+    option: string;
+  }[];
+  const intents = classifications
+    .filter((cl) => cl.score > 0.7)
+    .map((int) => int.intent); // * Hardcoded threshold for now // TODO: Make this dynamic
+  if (!intents.length) {
+    intents.push(classifications[0].intent);
+  }
+  const { actions: completedActions } = checkCompletesFields(
+    session_id,
+    entities
+  );
+  const initialActions = intents.map((int) => {
+    return getAction(int);
+  });
+  const useableActions: string[] = [...completedActions];
+
+  for (let i = 0; i < initialActions.length; i++) {
+    const action = initialActions[i];
+    if (action === "no_action") {
+      continue;
+    }
+    const hasForm = await checkOpensFormAndOpenIfNecessary(
+      session_id,
+      action,
+      entities
+    );
+    const { custom_entities, open } = hasForm;
+    if (!open) {
+      useableActions.push(action);
+    }
+  }
+  const responses = useableActions.map(
+    (act) => getResponse(act, rest).response
+  );
+  const response = condenseResponses(session_id, responses);
+  return {
+    intents,
+    actions: useableActions,
+    nlu_response: response,
+    responses,
+    entities,
+    classifications,
+    initial_actions: initialActions,
+    metaData: rest,
+  };
 };
