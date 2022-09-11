@@ -1,8 +1,5 @@
 <script>
   import { voice_response } from "../../stores/socket";
-  voice_response.subscribe((data) => {
-    console.log(data);
-  });
 
   const formatVoiceResponse = (data) => {
     if (!data) {
@@ -102,7 +99,7 @@
     font-weight: 400;
     box-shadow: inset 0.2px 0.2px 4px rgba(0, 0, 0, 0.15);
     border: 1px solid #eaeaea;
-    z-index: 9;
+    z-index: 20;
     position: relative;
 
     @include desktop {

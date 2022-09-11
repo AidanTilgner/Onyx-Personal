@@ -23,14 +23,17 @@
   @use "../lib/styles/partials/mixins" as *;
 
   main {
+    // @include default-padding;
     display: flex;
     flex-direction: column;
     align-items: center;
     text-align: center;
+    padding: 0 18px;
 
     @include desktop {
       text-align: initial;
       align-items: flex-start;
+      padding: initial;
     }
   }
 </style>

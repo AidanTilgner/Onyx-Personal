@@ -59,9 +59,6 @@
     <Route path="/login" component={Login} />
     <Route path="*">
       <div class="content-container">
-        <SideBar />
-        <Console />
-        <VoiceInput />
         <Router {url}>
           <Route path="/" component={Home} />
           <Route path="*" component={Home} />
@@ -72,6 +69,9 @@
           <Route path="/news" component={News} />
           <Route path="/robots" component={Robots} />
         </Router>
+        <SideBar />
+        <Console />
+        <VoiceInput />
       </div>
     </Route>
   </Router>
