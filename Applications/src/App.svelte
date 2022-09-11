@@ -82,7 +82,7 @@
 
   .content-container {
     @include desktop {
-      margin-left: 256px;
+      margin-left: 216px;
       background-color: #fdfdfd;
     }
   }

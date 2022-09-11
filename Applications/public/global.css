@@ -3,3 +3,14 @@
 body {
   font-family: "Quicksand", sans-serif;
 }
+
+hr {
+  display: block;
+  height: 1px;
+  border: 0;
+  border-top: 2px solid #f0f0f0;
+  border-radius: 99px;
+  padding: 0;
+  margin: 24px 0;
+  width: 100%;
+}
