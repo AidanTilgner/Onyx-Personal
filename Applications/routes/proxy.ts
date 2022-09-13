@@ -55,6 +55,18 @@ router.get("/actions", async (req, res) => {
   }
 });
 
+router.get("/recent-actions", async (req, res) => {
+  try {
+    const response = await actionServer.get("/actions/recent");
+    return res.send(response.data);
+  } catch (err) {
+    console.log("Error: ", err);
+    return res.send({
+      error: err,
+    });
+  }
+});
+
 export default router;
 
 const destinations: { [key: string]: string | undefined } = {

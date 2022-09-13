@@ -4,14 +4,13 @@
   import ActionCard from "../components/Cards/ActionCard.svelte";
   import Subtitle from "../components/Header/Subtitle.svelte";
 
-  let actions = {};
+  let actions = [];
   onMount(async () => {
-    const res = await fetch("/api/proxy/actions").then((res) => res.json());
-    console.log("actions: ", actions);
+    const res = await fetch("/api/proxy/recent-actions").then((res) =>
+      res.json()
+    );
     actions = res.actions;
   });
-
-  $: actArray = Object.keys(actions);
 </script>
 
 <Subtitle
@@ -25,10 +24,8 @@
   ]}
 />
 <div class="actions">
-  {#each actArray as actionType}
-    {#each actions[actionType] as action}
-      <ActionCard action={`${actionType}.${action}`} />
-    {/each}
+  {#each actions as action}
+    <ActionCard {action} />
   {/each}
 </div>
 
