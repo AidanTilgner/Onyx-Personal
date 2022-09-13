@@ -1,8 +1,8 @@
 <script>
-  export let text, icon, onClick;
+  export let text, icon, onClick, title;
 </script>
 
-<button class="button" on:click={onClick}>
+<button class="button" on:click={onClick} {title}>
   {#if icon}
     {#if typeof icon === "string"}
       <i class="material-icons">{icon}</i>

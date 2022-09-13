@@ -26,8 +26,20 @@
   @use "../../styles/partials/mixins" as *;
   .header {
     display: flex;
+    align-items: center;
+    flex-direction: column;
     justify-content: space-between;
     width: 100%;
+    margin-bottom: 36px;
+
+    & > * {
+      margin: 14px 0;
+    }
+
+    @include tablet {
+      flex-direction: row;
+      align-items: center;
+    }
   }
 
   h2 {
@@ -35,7 +47,6 @@
     font-family: $primary-font;
     font-weight: 400;
     margin: 0;
-    margin-bottom: 24px;
     color: $dark-blue;
     text-align: left;
 

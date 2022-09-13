@@ -4,9 +4,7 @@
   import { messages } from "../lib/stores/socket";
   import { currentPath } from "../lib/stores/env";
   import { navigate } from "svelte-routing";
-  import { onMount } from "svelte";
-  import Subtitle from "../lib/components/Header/Subtitle.svelte";
-  import ActionCard from "../lib/components/Cards/ActionCard.svelte";
+  import RecentActions from "../lib/sections/RecentActions.svelte";
 
   if (currentPath === "/") {
     navigate("/home");
@@ -15,11 +13,6 @@
   messages.subscribe((data) => {
     messagesArray = [...data];
   });
-
-  onMount(async () => {
-    const actions = await fetch("/api/proxy/actions").then((res) => res.json());
-    console.log("actions: ", actions);
-  });
 </script>
 
 <main>
@@ -27,17 +20,7 @@
   <SearchBar />
   <hr />
   <div class="action-cards">
-    <Subtitle
-      title="Recent Actions"
-      buttons={[
-        {
-          text: "View All",
-          onClick: () => navigate("/actions"),
-          type: "outline",
-        },
-      ]}
-    />
-    <ActionCard width={"33%"} />
+    <RecentActions />
   </div>
 </main>
 
