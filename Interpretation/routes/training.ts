@@ -12,6 +12,7 @@ import {
   getExistingActions,
   getExistingActionsWithoutResponse,
 } from "../nlp/documents";
+import { restartNLP } from "../nlp";
 import { actionServer } from "../utils/axios";
 import { config } from "dotenv";
 
@@ -24,6 +25,22 @@ router.get("/", (req, res) => {
     message: "Successfully retrieved NLU data",
     data: getTrainingData(),
   });
+});
+
+router.post("/train", async (req, res) => {
+  try {
+    await restartNLP();
+    return res.send({
+      message: "Successfully trained NLU model",
+      trained: "1",
+    });
+  } catch (err) {
+    return res.send({
+      message: "Error while training",
+      error: err,
+      trained: "0",
+    });
+  }
 });
 
 router.post("/intent", (req, res) => {

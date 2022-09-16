@@ -3,18 +3,15 @@ import { getTrainingData } from "./main.js";
 const TestingInput = document.getElementById("testing-input");
 const TestingSubmit = document.getElementById("testing-submit");
 const TestingOutput = document.getElementById("testing-output");
-const TestingAction = document.getElementById("testing-action");
-const TestingIntent = document.getElementById("testing-intent");
-const TestingResponse = document.getElementById("testing-response");
-const TestingResponses = document.getElementById("testing-responses");
+const OutputStage = document.getElementById("output-stage");
 
 const state = {
   input: TestingInput.value,
-  intent: "",
-  action: "",
+  intents: [],
+  actions: [],
   nlu_response: "",
   responses: [],
-  intents: [],
+  split_input: [],
   currentTooltip: null,
 };
 
@@ -68,45 +65,303 @@ const checkDisplayOutput = () => {
 };
 checkDisplayOutput();
 
+const updateModel = async () => {
+  try {
+    const { trained, message } = await axios
+      .post("/training/train")
+      .then((res) => res.data)
+      .catch((err) => {
+        console.log(err);
+        setAlert("There was an error training the model", "danger");
+      });
+
+    const trainedbool = !!Number(trained);
+
+    if (trainedbool) {
+      setAlert(message, "success");
+    }
+
+    console.log("Trained model:", trainedbool);
+    return trainedbool;
+  } catch (err) {
+    console.log(err);
+    setAlert("Error updating model, check console for more info.", "danger");
+    return false;
+  }
+};
+updateModel();
+
 const getNLUForInput = async () => {
-  const { nlu } = await axios
-    .post("/nlu", {
-      text: state.input,
-    })
-    .then((res) => {
-      if (res.data.error) {
-        setAlert(res.data.error, "danger");
-        return;
-      }
-      return res.data;
-    })
-    .catch((err) => {
-      console.log("Error:", err);
-      setAlert(
-        "Error getting NLU response, check console for more info.",
-        "danger"
-      );
+  try {
+    const { nlu } = await axios
+      .post("/nlu", {
+        text: state.input,
+      })
+      .then((res) => {
+        if (res.data.error) {
+          setAlert(res.data.error, "danger");
+          return;
+        }
+        return res.data;
+      })
+      .catch((err) => {
+        console.log("Error:", err);
+        setAlert(
+          "Error getting NLU response, check console for more info.",
+          "danger"
+        );
+      });
+    state.intents = nlu.intents;
+    state.nlu_response = nlu.nlu_response;
+    state.actions = nlu.actions;
+    state.responses = nlu.responses;
+    state.split_input = nlu.split_input;
+    TestingOutput.innerHTML = nlu.nlu_response;
+
+    const currentProperties = document.querySelectorAll(".output-properties");
+    currentProperties.forEach((property) => {
+      property.remove();
     });
-  state.intent = nlu.intent;
-  state.nlu_response = nlu.nlu_response;
-  state.action = nlu.action;
-  state.responses = nlu.responses;
-  TestingOutput.innerHTML = nlu.nlu_response;
-  TestingIntent.innerHTML = `<strong>Intent:</strong> ${nlu.intent}`;
-  TestingAction.innerHTML = `<strong>Action:</strong> ${nlu.action}`;
-  TestingResponse.innerHTML = `<strong>Response:</strong> ${nlu.nlu_response}`;
-  TestingResponses.innerHTML = `<p class="output-list-title">Responses:</p>`;
-  nlu.responses.forEach((response) => {
-    const responseItem = document.createElement("span");
-    responseItem.classList.add("output-list-item", "possible-response");
-    responseItem.setAttribute("title", "Replace current response");
-    responseItem.innerHTML = response;
-    TestingResponses.appendChild(responseItem);
-  });
-  checkDisplayOutput();
-  checkDisplayProperties();
-  addPropertyEventListeners();
-  return nlu;
+
+    state.intents.forEach((intent, idx) => {
+      const action = state.actions[idx];
+      const response = state.responses[idx];
+      const input = state.split_input[idx];
+
+      const OutputProperties = document.createElement("div");
+      OutputProperties.classList.add("output-properties");
+      OutputStage.appendChild(OutputProperties);
+      OutputProperties.dataset.input = input;
+      OutputProperties.dataset.intent = intent;
+      OutputProperties.dataset.action = action;
+      OutputProperties.dataset.response = response;
+
+      const InputProperty = document.createElement("div");
+      InputProperty.classList.add("output-property");
+      InputProperty.dataset.state = "input";
+      InputProperty.dataset.property = "input";
+      InputProperty.dataset.data = input;
+      InputProperty.innerHTML = `<strong>Input</strong>: ${input}`;
+
+      const IntentProperty = document.createElement("div");
+      IntentProperty.classList.add("output-property");
+      IntentProperty.dataset.state = "intents";
+      IntentProperty.dataset.property = "intent";
+      IntentProperty.dataset.data = intent;
+      IntentProperty.innerHTML = `<strong>Intent</strong>: ${intent}`;
+
+      const ActionProperty = document.createElement("div");
+      ActionProperty.classList.add("output-property");
+      ActionProperty.dataset.state = "actions";
+      ActionProperty.dataset.property = "action";
+      ActionProperty.dataset.data = action;
+      ActionProperty.innerHTML = `<strong>Action</strong>: ${action}`;
+
+      const ResponseProperty = document.createElement("div");
+      ResponseProperty.classList.add("output-property");
+      ResponseProperty.dataset.state = "responses";
+      ResponseProperty.dataset.property = "response";
+      ResponseProperty.dataset.data = response;
+      ResponseProperty.innerHTML = `<strong>Response</strong>: ${response}`;
+
+      OutputProperties.appendChild(InputProperty);
+      OutputProperties.appendChild(IntentProperty);
+      OutputProperties.appendChild(ActionProperty);
+      OutputProperties.appendChild(ResponseProperty);
+
+      const IntentIcons = document.createElement("div");
+      IntentIcons.classList.add("icons");
+      IntentProperty.appendChild(IntentIcons);
+      const IntentEdit = document.createElement("i");
+      IntentEdit.classList.add("material-symbols-outlined");
+      IntentEdit.classList.add("primary");
+      IntentEdit.classList.add("edit-intent");
+      IntentEdit.title = `Edit intent for ${input}`;
+      IntentEdit.innerHTML = "edit";
+      IntentIcons.appendChild(IntentEdit);
+
+      const ActionIcons = document.createElement("div");
+      ActionIcons.classList.add("icons");
+      ActionProperty.appendChild(ActionIcons);
+      const ActionEdit = document.createElement("i");
+      ActionEdit.classList.add("material-symbols-outlined");
+      ActionEdit.classList.add("primary");
+      ActionEdit.classList.add("edit-action");
+      ActionEdit.title = `Edit action for ${intent}`;
+      ActionEdit.innerHTML = "edit";
+      ActionIcons.appendChild(ActionEdit);
+
+      const ResponseIcons = document.createElement("div");
+      ResponseIcons.classList.add("icons");
+      ResponseProperty.appendChild(ResponseIcons);
+      const ResponseRemove = document.createElement("i");
+      ResponseRemove.classList.add("material-symbols-outlined");
+      ResponseRemove.classList.add("danger");
+      ResponseRemove.classList.add("remove-response");
+      ResponseRemove.title = `Remove response for ${action}`;
+      ResponseRemove.innerHTML = "delete";
+      const ResponseAdd = document.createElement("i");
+      ResponseAdd.classList.add("material-symbols-outlined");
+      ResponseAdd.classList.add("primary");
+      ResponseAdd.classList.add("add-response");
+      ResponseAdd.title = `Add response for ${action}`;
+      ResponseAdd.innerHTML = "add";
+      ResponseIcons.appendChild(ResponseRemove);
+      ResponseIcons.appendChild(ResponseAdd);
+    });
+
+    checkDisplayOutput();
+    checkDisplayProperties();
+    addPropertyEventListeners();
+    return nlu;
+  } catch (err) {
+    console.log("Error:", err);
+    setAlert(
+      "Error getting NLU response, check console for more info.",
+      "danger"
+    );
+  }
+};
+
+const UpdateAndGetNLUForInput = async () => {
+  try {
+    const trained = await updateModel();
+
+    console.log("Trained 2:", trained);
+
+    if (!trained) {
+      setAlert("Model not trained, please train the model", "danger");
+      return;
+    }
+
+    const { nlu } = await axios
+      .post("/nlu", {
+        text: state.input,
+      })
+      .then((res) => {
+        if (res.data.error) {
+          setAlert(res.data.error, "danger");
+          return;
+        }
+        return res.data;
+      })
+      .catch((err) => {
+        console.log("Error:", err);
+        setAlert(
+          "Error getting NLU response, check console for more info.",
+          "danger"
+        );
+      });
+    state.intents = nlu.intents;
+    state.nlu_response = nlu.nlu_response;
+    state.actions = nlu.actions;
+    state.responses = nlu.responses;
+    state.split_input = nlu.split_input;
+    TestingOutput.innerHTML = nlu.nlu_response;
+
+    const currentProperties = document.querySelectorAll(".output-properties");
+    currentProperties.forEach((property) => {
+      property.remove();
+    });
+
+    state.intents.forEach((intent, idx) => {
+      const action = state.actions[idx];
+      const response = state.responses[idx];
+      const input = state.split_input[idx];
+
+      const OutputProperties = document.createElement("div");
+      OutputProperties.classList.add("output-properties");
+      OutputStage.appendChild(OutputProperties);
+      OutputProperties.dataset.input = input;
+      OutputProperties.dataset.intent = intent;
+      OutputProperties.dataset.action = action;
+      OutputProperties.dataset.response = response;
+
+      const InputProperty = document.createElement("div");
+      InputProperty.classList.add("output-property");
+      InputProperty.dataset.state = "input";
+      InputProperty.dataset.property = "input";
+      InputProperty.dataset.data = input;
+      InputProperty.innerHTML = `<strong>Input</strong>: ${input}`;
+
+      const IntentProperty = document.createElement("div");
+      IntentProperty.classList.add("output-property");
+      IntentProperty.dataset.state = "intents";
+      IntentProperty.dataset.property = "intent";
+      IntentProperty.dataset.data = intent;
+      IntentProperty.innerHTML = `<strong>Intent</strong>: ${intent}`;
+
+      const ActionProperty = document.createElement("div");
+      ActionProperty.classList.add("output-property");
+      ActionProperty.dataset.state = "actions";
+      ActionProperty.dataset.property = "action";
+      ActionProperty.dataset.data = action;
+      ActionProperty.innerHTML = `<strong>Action</strong>: ${action}`;
+
+      const ResponseProperty = document.createElement("div");
+      ResponseProperty.classList.add("output-property");
+      ResponseProperty.dataset.state = "responses";
+      ResponseProperty.dataset.property = "response";
+      ResponseProperty.dataset.data = response;
+      ResponseProperty.innerHTML = `<strong>Response</strong>: ${response}`;
+
+      OutputProperties.appendChild(InputProperty);
+      OutputProperties.appendChild(IntentProperty);
+      OutputProperties.appendChild(ActionProperty);
+      OutputProperties.appendChild(ResponseProperty);
+
+      const IntentIcons = document.createElement("div");
+      IntentIcons.classList.add("icons");
+      IntentProperty.appendChild(IntentIcons);
+      const IntentEdit = document.createElement("i");
+      IntentEdit.classList.add("material-symbols-outlined");
+      IntentEdit.classList.add("primary");
+      IntentEdit.classList.add("edit-intent");
+      IntentEdit.title = `Edit intent for ${input}`;
+      IntentEdit.innerHTML = "edit";
+      IntentIcons.appendChild(IntentEdit);
+
+      const ActionIcons = document.createElement("div");
+      ActionIcons.classList.add("icons");
+      ActionProperty.appendChild(ActionIcons);
+      const ActionEdit = document.createElement("i");
+      ActionEdit.classList.add("material-symbols-outlined");
+      ActionEdit.classList.add("primary");
+      ActionEdit.classList.add("edit-action");
+      ActionEdit.title = `Edit action for ${intent}`;
+      ActionEdit.innerHTML = "edit";
+      ActionIcons.appendChild(ActionEdit);
+
+      const ResponseIcons = document.createElement("div");
+      ResponseIcons.classList.add("icons");
+      ResponseProperty.appendChild(ResponseIcons);
+      const ResponseRemove = document.createElement("i");
+      ResponseRemove.classList.add("material-symbols-outlined");
+      ResponseRemove.classList.add("danger");
+      ResponseRemove.classList.add("remove-response");
+      ResponseRemove.title = `Remove response for ${action}`;
+      ResponseRemove.innerHTML = "delete";
+      const ResponseAdd = document.createElement("i");
+      ResponseAdd.classList.add("material-symbols-outlined");
+      ResponseAdd.classList.add("primary");
+      ResponseAdd.classList.add("add-response");
+      ResponseAdd.title = `Add response for ${action}`;
+      ResponseAdd.innerHTML = "add";
+      ResponseIcons.appendChild(ResponseRemove);
+      ResponseIcons.appendChild(ResponseAdd);
+    });
+
+    checkDisplayOutput();
+    checkDisplayProperties();
+    addPropertyEventListeners();
+    return nlu;
+  } catch (err) {
+    console.log("Error:", err);
+    setAlert(
+      "Error getting NLU response, check console for more info.",
+      "danger"
+    );
+  }
 };
 
 TestingSubmit.addEventListener("click", getNLUForInput);
@@ -160,9 +415,11 @@ const createEditInputGroup = ({
 
 const handleEditIntentClick = (e) => {
   e.preventDefault();
+  const PropertyItem = e.target.closest(".output-property");
+  const OutputProperties = PropertyItem.closest(".output-properties");
   const { EditInputGroup, input, icons } = createEditInputGroup({
     placeholder: "Enter the correct intent",
-    value: state.intent,
+    value: PropertyItem.dataset.data,
     buttons: [
       {
         title: "Cancel",
@@ -170,7 +427,7 @@ const handleEditIntentClick = (e) => {
         type: "danger",
         action: () => {
           EditInputGroup.remove();
-          TestingIntentContainer.style.display = "flex";
+          PropertyItem.style.display = "flex";
         },
       },
       {
@@ -178,20 +435,21 @@ const handleEditIntentClick = (e) => {
         icon: "check",
         type: "primary",
         action: () => {
+          const inputText = OutputProperties.dataset.input;
           const confirmed = confirm(
-            `Are you sure? This will change the intent to ${input.value} for the text "${state.input}".`
+            `Are you sure? This will change the intent to ${input.value} for the text "${inputText}".`
           );
           if (!confirmed) {
             return;
           }
           const { value } = input;
           EditInputGroup.remove();
-          TestingIntentContainer.style.display = "flex";
-          state.intent = value;
-          TestingIntent.innerHTML = `<strong>Intent:</strong> ${value}`;
-          TestingAction.innerHTML = `<strong>Action:</strong> loading...`;
-          TestingResponse.innerHTML = `<strong>Response:</strong> loading...`;
-          TestingResponses.innerHTML = `<p class="output-list-title">Responses:</p><span class="output-list-item">loading...</span>`;
+          PropertyItem.style.display = "flex";
+          PropertyItem.dataset.data = value;
+          // TestingIntent.innerHTML = `<strong>Intent:</strong> ${value}`;
+          // TestingAction.innerHTML = `<strong>Action:</strong> loading...`;
+          // TestingResponse.innerHTML = `<strong>Response:</strong> loading...`;
+          // TestingResponses.innerHTML = `<p class="output-list-title">Responses:</p><span class="output-list-item">loading...</span>`;
 
           axios
             .put("/training/intent", {
@@ -204,7 +462,7 @@ const handleEditIntentClick = (e) => {
                 return;
               }
               setAlert(res.data.message, "success");
-              getNLUForInput();
+              UpdateAndGetNLUForInput();
             })
             .catch((err) => {
               console.log("Error:", err);
@@ -214,13 +472,9 @@ const handleEditIntentClick = (e) => {
       },
     ],
   });
-  const OutputProperties = document.getElementById("testing-properties");
-  const TestingIntentContainer = document.getElementById(
-    "testing-intent-container"
-  );
   // Set display none on testing-intent and make EditInputGroup the first child of testing-properties.
-  TestingIntentContainer.style.display = "none";
-  OutputProperties.insertBefore(EditInputGroup, TestingIntentContainer);
+  PropertyItem.style.display = "none";
+  OutputProperties.insertBefore(EditInputGroup, PropertyItem);
   input.focus();
 
   // every keypress, search the state.intents for the closests 5 intents by levenshtein distance.
@@ -257,12 +511,11 @@ const handleEditIntentClick = (e) => {
 
 const handleEditActionClick = (e) => {
   e.preventDefault();
-  const TestingActionContainer = document.getElementById(
-    "testing-action-container"
-  );
+  const PropertyItem = e.target.closest(".output-property");
+  const OutputProperties = PropertyItem.closest(".output-properties");
   const { EditInputGroup, input, icons } = createEditInputGroup({
     placeholder: "Enter the correct action for this intent",
-    value: state.action,
+    value: PropertyItem.dataset.data,
     buttons: [
       {
         title: "Cancel",
@@ -270,7 +523,7 @@ const handleEditActionClick = (e) => {
         type: "danger",
         action: () => {
           EditInputGroup.remove();
-          TestingActionContainer.style.display = "flex";
+          PropertyItem.style.display = "flex";
         },
       },
       {
@@ -278,23 +531,24 @@ const handleEditActionClick = (e) => {
         icon: "check",
         type: "primary",
         action: () => {
+          const intent = OutputProperties.dataset.intent;
           const confirmed = confirm(
-            `Are you sure? This will change the action of the intent "${state.intent}" to "${input.value}".`
+            `Are you sure? This will change the action of the intent "${intent}" to "${input.value}".`
           );
           if (!confirmed) {
             return;
           }
           const { value } = input;
           EditInputGroup.remove();
-          TestingActionContainer.style.display = "flex";
-          TestingAction.innerHTML = `<strong>Action:</strong> ${value}`;
-          TestingResponse.innerHTML = `<strong>Response:</strong> loading...`;
-          TestingResponses.innerHTML = `<p class="output-list-title">Responses:</p><span class="output-list-item">loading...</span>`;
-          state.action = value;
+          // TestingActionContainer.style.display = "flex";
+          // TestingAction.innerHTML = `<strong>Action:</strong> ${value}`;
+          // TestingResponse.innerHTML = `<strong>Response:</strong> loading...`;
+          // TestingResponses.innerHTML = `<p class="output-list-title">Responses:</p><span class="output-list-item">loading...</span>`;
+          PropertyItem.dataset.value = value;
 
           axios
             .put("/training/action", {
-              intent: state.intent,
+              intent: PropertyItem.dataset.intent,
               action: value,
             })
             .then((res) => {
@@ -303,7 +557,7 @@ const handleEditActionClick = (e) => {
                 return;
               }
               setAlert(res.data.message, "success");
-              getNLUForInput();
+              UpdateAndGetNLUForInput();
             })
             .catch((err) => {
               console.log("Error:", err);
@@ -313,15 +567,16 @@ const handleEditActionClick = (e) => {
       },
     ],
   });
-  const OutputProperties = document.getElementById("testing-properties");
   // Set display none on testing-intent and make EditInputGroup the first child of testing-properties.
-  TestingActionContainer.style.display = "none";
-  OutputProperties.insertBefore(EditInputGroup, TestingActionContainer);
+  PropertyItem.style.display = "none";
+  OutputProperties.insertBefore(EditInputGroup, PropertyItem);
   input.focus();
 };
 
 const handleRemoveResponseClick = (e) => {
   e.preventDefault();
+  const PropertyItem = e.target.closest(".output-property");
+  const OutputProperties = PropertyItem.closest(".output-properties");
   if (state.nlu_response === "custom_message") {
     alert(
       "You can't remove the custom message default. Adding a new message will replace the custom message."
@@ -335,14 +590,16 @@ const handleRemoveResponseClick = (e) => {
   state.responses = state.responses.filter((res) => {
     res !== state.nlu_response;
   });
-  TestingResponses.innerHTML = `<p class="output-list-title">Responses:</p><span class="output-list-item">loading...</span>`;
-  TestingResponse.innerHTML = `<strong>Response</strong> loading...`;
+  // TestingResponses.innerHTML = `<p class="output-list-title">Responses:</p><span class="output-list-item">loading...</span>`;
+  // TestingResponse.innerHTML = `<strong>Response</strong> loading...`;
+
+  const action = OutputProperties.dataset.action;
 
   axios
     .delete("/training/response", {
       data: {
-        action: state.action,
-        response: state.nlu_response,
+        action: action,
+        response: PropertyItem.dataset.data,
       },
     })
     .then((res) => {
@@ -351,7 +608,7 @@ const handleRemoveResponseClick = (e) => {
         return;
       }
       setAlert(res.data.message, "success");
-      getNLUForInput();
+      UpdateAndGetNLUForInput();
     })
     .catch((err) => {
       console.log("Error:", err);
@@ -361,6 +618,8 @@ const handleRemoveResponseClick = (e) => {
 
 const handleAddResponseClick = (e) => {
   e.preventDefault();
+  const PropertyItem = e.target.closest(".output-property");
+  const OutputProperties = PropertyItem.closest(".output-properties");
   const { EditInputGroup, input, icons } = createEditInputGroup({
     placeholder: "Enter the new response",
     value: "",
@@ -371,7 +630,7 @@ const handleAddResponseClick = (e) => {
         type: "danger",
         action: () => {
           EditInputGroup.remove();
-          TestingResponseContainer.style.display = "flex";
+          PropertyItem.style.display = "flex";
         },
       },
       {
@@ -379,18 +638,19 @@ const handleAddResponseClick = (e) => {
         icon: "check",
         type: "primary",
         action: () => {
+          const action = OutputProperties.dataset.action;
           const confirmed = confirm(
-            `Are you sure? This will add the response "${input.value}" to the action "${state.action}".`
+            `Are you sure? This will add the response "${input.value}" to the action "${action}".`
           );
           if (!confirmed) {
             return;
           }
           const { value } = input;
           state.responses.push(value);
-          TestingResponses.innerHTML += `<span class="output-list-item">${value}</span>`;
+
           axios
             .post("/training/response", {
-              action: state.action,
+              action: action,
               response: value,
             })
             .then((res) => {
@@ -400,8 +660,8 @@ const handleAddResponseClick = (e) => {
               }
               setAlert(res.data.message, "success");
               EditInputGroup.remove();
-              TestingResponseContainer.style.display = "flex";
-              getNLUForInput();
+              PropertyItem.style.display = "flex";
+              UpdateAndGetNLUForInput();
             })
             .catch((err) => {
               console.log("Error:", err);
@@ -411,13 +671,9 @@ const handleAddResponseClick = (e) => {
       },
     ],
   });
-  const OutputProperties = document.getElementById("testing-properties");
-  const TestingResponseContainer = document.getElementById(
-    "testing-response-container"
-  );
   // Set display none on testing-intent and make EditInputGroup the first child of testing-properties.
-  TestingResponseContainer.style.display = "none";
-  OutputProperties.insertBefore(EditInputGroup, TestingResponseContainer);
+  PropertyItem.style.display = "none";
+  OutputProperties.insertBefore(EditInputGroup, PropertyItem);
   input.focus();
 };
 
@@ -428,17 +684,25 @@ const onPossibleResponseClick = (e) => {
 };
 
 const addPropertyEventListeners = () => {
-  const EditIntent = document.getElementById("edit-intent");
-  EditIntent.onclick = handleEditIntentClick;
+  const EditIntents = document.querySelectorAll(".edit-intent");
+  EditIntents.forEach((intent) => {
+    intent.onclick = handleEditIntentClick;
+  });
 
-  const EditAction = document.getElementById("edit-action");
-  EditAction.onclick = handleEditActionClick;
+  const EditActions = document.querySelectorAll(".edit-action");
+  EditActions.forEach((action) => {
+    action.onclick = handleEditActionClick;
+  });
 
-  const RemoveResponse = document.getElementById("remove-response");
-  RemoveResponse.onclick = handleRemoveResponseClick;
+  const RemoveResponses = document.querySelectorAll(".remove-response");
+  RemoveResponses.forEach((response) => {
+    response.onclick = handleRemoveResponseClick;
+  });
 
-  const AddResponse = document.getElementById("add-response");
-  AddResponse.onclick = handleAddResponseClick;
+  const AddResponses = document.querySelectorAll(".add-response");
+  AddResponses.forEach((response) => {
+    response.onclick = handleAddResponseClick;
+  });
 
   const PossibleResponses = document.querySelectorAll(".possible-response");
   PossibleResponses.forEach((poss) => {
