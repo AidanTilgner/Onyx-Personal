@@ -387,7 +387,7 @@ export const unstable_getNLUData = async (
     if (!opens_form) {
       useableActions.push(action);
     }
-    console.log("Custom Entities: ", custom_entities);
+
     if (custom_entities?.has_custom_entities) {
       custom_entities_mappings[action] = custom_entities;
     }
