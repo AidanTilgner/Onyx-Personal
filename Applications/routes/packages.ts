@@ -3,6 +3,7 @@ import { AppsPackage, AppsPackageBody } from "../definitions/packages";
 import axios from "axios";
 import multer from "multer";
 import mappings from "../actions/mappings";
+import FormData from "form-data";
 
 const router = Router();
 
@@ -63,7 +64,20 @@ router.post("/", upload.any(), async (req, res) => {
   try {
     const { pkg } = req.body as AppsPackageBody;
     const [newPkg, next] = await handlePackage(JSON.parse(pkg));
-    const newBody = { pkg: JSON.stringify(newPkg), files: req.files };
+    const files = req.files as Express.Multer.File[];
+
+    const form = new FormData();
+    form.append("pkg", JSON.stringify(newPkg));
+    // append files to form
+    if (files) {
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i] as Express.Multer.File;
+        form.append(file.fieldname, file.buffer, {
+          filename: file.originalname,
+          contentType: file.mimetype,
+        });
+      }
+    }
 
     if (!next) {
       return res.send({
@@ -73,7 +87,7 @@ router.post("/", upload.any(), async (req, res) => {
       });
     }
 
-    const { data } = await axios.post(next + "/package-hook", newBody);
+    const { data } = await axios.post(next + "/package-hook", form);
 
     res.send({
       message: "Successfully handled package",

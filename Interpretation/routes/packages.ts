@@ -13,8 +13,7 @@ const router = Router();
 
 const mappings: { [key: string]: Function } = {
   get_nlu: getIntentAndAction,
-  get_nlu_for_speech_server: getIntentAndActionForSpeechServer,
-  get_nlu_for_speech_server_unstable: unstable_getNLUDataForSpeechServer,
+  get_nlu_for_speech_server: unstable_getNLUDataForSpeechServer,
 };
 
 const handlePackage = async (pkg: NLUPackage) => {
@@ -77,7 +76,20 @@ router.post("/", upload.any(), async (req, res) => {
   try {
     const { pkg } = req.body as NLUPackageBody;
     const [newPkg, next] = await handlePackage(JSON.parse(pkg));
-    const newBody = { pkg: JSON.stringify(newPkg), files: req.files };
+    const files = req.files as Express.Multer.File[];
+
+    const form = new FormData();
+    form.append("pkg", JSON.stringify(newPkg));
+    // append files to form
+    if (files) {
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i] as Express.Multer.File;
+        form.append(file.fieldname, file.buffer, {
+          filename: file.originalname,
+          contentType: file.mimetype,
+        });
+      }
+    }
 
     if (!next) {
       return res.send({
@@ -87,7 +99,7 @@ router.post("/", upload.any(), async (req, res) => {
       });
     }
 
-    const { data } = await axios.post(next + "/package-hook", newBody);
+    const { data } = await axios.post(next + "/package-hook", form);
 
     return res.send({
       message: "Successfully handled package",

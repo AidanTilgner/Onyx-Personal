@@ -171,7 +171,7 @@ async function sendAudio(blob) {
         use_files: [],
       },
       1: {
-        action: "get_nlu_for_speech_server_unstable",
+        action: "get_nlu_for_speech_server",
         deposit: 2,
         data: {
           deposited: null,
