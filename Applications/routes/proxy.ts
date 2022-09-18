@@ -67,6 +67,33 @@ router.get("/recent-actions", async (req, res) => {
   }
 });
 
+router.get("/actions/:action", async (req, res) => {
+  try {
+    const response = await actionServer.get(`/actions/${req.params.action}`);
+    return res.send(response.data);
+  } catch (err) {
+    console.log("Error: ", err);
+    return res.send({
+      error: err,
+    });
+  }
+});
+
+router.get("/actions/metadata/:action", async (req, res) => {
+  try {
+    const response = await actionServer.get(
+      `/actions/metadata/${req.params.action}`
+    );
+    globalLog("Got action metadata: ", response.data);
+    return res.send(response.data);
+  } catch (err) {
+    console.log("Error: ", err);
+    return res.send({
+      error: err,
+    });
+  }
+});
+
 export default router;
 
 const destinations: { [key: string]: string | undefined } = {

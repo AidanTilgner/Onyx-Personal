@@ -81,6 +81,8 @@
   @use "./lib/styles/partials/mixins" as *;
 
   .content-container {
+    margin-bottom: 156px;
+
     @include desktop {
       margin-left: 216px;
       background-color: #fdfdfd;

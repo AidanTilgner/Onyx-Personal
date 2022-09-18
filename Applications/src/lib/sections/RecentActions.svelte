@@ -30,11 +30,20 @@
 </div>
 
 <style lang="scss">
+  @use "../styles/partials/mixins" as *;
   .actions {
     width: 100%;
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    grid-gap: 14px;
+    grid-template-columns: repeat(1, 1fr);
+    grid-gap: 24px;
     margin-top: 24px;
+
+    @include tablet {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    @include desktop {
+      grid-template-columns: repeat(3, 1fr);
+    }
   }
 </style>

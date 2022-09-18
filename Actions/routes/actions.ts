@@ -105,12 +105,12 @@ router.get("/metadata/:action", (req, res) => {
   const metadata = getActionMetadata(action);
   if (!metadata) {
     return res.send({
-      message: "No metadata found for that action",
+      message: `No metadata found for the action "${action}"`,
       response: {},
     });
   }
   return res.send({
-    message: "Action found and metadata returned",
+    message: `Successfully got metadata for the action "${action}"`,
     response: metadata,
   });
 });
