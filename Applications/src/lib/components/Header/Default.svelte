@@ -24,7 +24,7 @@
     margin: 0;
     margin-top: 36px;
     color: $dark-blue;
-    text-align: center;
+    text-align: left;
 
     @include desktop {
       text-align: left;
@@ -40,7 +40,7 @@
     margin-bottom: 36px;
     font-weight: 300;
     color: $cool-blue;
-    text-align: center;
+    text-align: left;
 
     @include desktop {
       text-align: left;

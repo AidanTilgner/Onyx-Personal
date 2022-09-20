@@ -166,7 +166,10 @@ export const getAction = (int: string): string => {
   return action;
 };
 
-export const getResponse = (act: string, metaData?: any | null) => {
+export const getResponse = (
+  act: string,
+  entities?: { entity: string; option: string }[] | null
+) => {
   const [action, subaction = "default"] = act.split(".");
   const responses = action_to_response_json[action]?.[subaction]?.responses;
   if (!responses) {
@@ -306,23 +309,55 @@ export const condenseResponses = (session_id: string, responses: string[]) => {
   return response;
 };
 
+export const splitInputBySentence = (input: string) => {
+  // split by . or ? or ! or ;
+  const split = input.split(/\.|\?|\!|\;/);
+  const splitTrimmed = split.map((s) => s.trim()).filter((s) => s.length > 0);
+  return splitTrimmed;
+};
+
 export const unstable_getNLUData = async (
   session_id: string,
   input: string,
   language: string
 ) => {
-  const { intent, ...rest } = await manager.process(language || "en", input);
-  const classifications = rest.classifications as {
+  const splitInput = splitInputBySentence(input);
+  const intents: string[] = [];
+  const classifications: {
     intent: string;
     score: number;
-  }[];
-  const entities = rest.entities as {
-    entity: string;
-    option: string;
-  }[];
-  const intents = classifications
-    .filter((cl) => cl.score > 0.7)
-    .map((int) => int.intent); // * Hardcoded threshold for now // TODO: Make this dynamic
+  }[] = [];
+  const entities: { entity: string; option: string }[] = [];
+  const nluArray: any[] = [];
+
+  for (const inp of splitInput) {
+    const nlu = (await manager.process(language, inp)) as {
+      intent: string;
+      classifications: {
+        intent: string;
+        score: number;
+      }[];
+      entities: { entity: string; option: string }[];
+    };
+    const {
+      intent,
+      classifications: inpClassifications,
+      entities: inpEntities,
+    } = nlu;
+    intents.push(intent);
+    inpClassifications.forEach((cl) => {
+      if (cl.score > 0.5) {
+        console.log("Pushing Classification: ", cl);
+        classifications.push(cl);
+      }
+    });
+    // destructer entities into entities array
+    inpEntities.forEach((ent) => {
+      entities.push(ent);
+    });
+    nluArray.push(nlu);
+  }
+
   if (!intents.length) {
     intents.push(classifications[0].intent);
   }
@@ -334,6 +369,9 @@ export const unstable_getNLUData = async (
     return getAction(int);
   });
   const useableActions: string[] = [...completedActions];
+  const custom_entities_mappings: {
+    [action: string]: any;
+  } = {};
 
   for (let i = 0; i < initialActions.length; i++) {
     const action = initialActions[i];
@@ -345,13 +383,17 @@ export const unstable_getNLUData = async (
       action,
       entities
     );
-    const { custom_entities, open } = hasForm;
-    if (!open) {
+    const { custom_entities, opens_form } = hasForm;
+    if (!opens_form) {
       useableActions.push(action);
+    }
+
+    if (custom_entities?.has_custom_entities) {
+      custom_entities_mappings[action] = custom_entities;
     }
   }
   const responses = useableActions.map(
-    (act) => getResponse(act, rest).response
+    (act) => getResponse(act, entities).response
   );
   const response = condenseResponses(session_id, responses);
   return {
@@ -361,8 +403,11 @@ export const unstable_getNLUData = async (
     responses,
     entities,
     classifications,
+    custom_entities: custom_entities_mappings,
+    initial_input: input,
+    split_input: splitInput,
     initial_actions: initialActions,
-    metaData: rest,
+    metaData: nluArray,
   };
 };
 
@@ -371,60 +416,10 @@ export const unstable_getNLUDataForSpeechServer = async (
   input: { text: string },
   language: string = "en"
 ) => {
-  const { intent, ...rest } = await manager.process(
-    language || "en",
-    input.text
-  );
-  const classifications = rest.classifications as {
-    intent: string;
-    score: number;
-  }[];
-  const entities = rest.entities as {
-    entity: string;
-    option: string;
-  }[];
-  const intents = classifications
-    .filter((cl) => cl.score > 0.7)
-    .map((int) => int.intent); // * Hardcoded threshold for now // TODO: Make this dynamic
-  if (!intents.length) {
-    intents.push(classifications[0].intent);
+  try {
+    return unstable_getNLUData(session_id, input.text, language);
+  } catch (err) {
+    console.error(err);
+    return null;
   }
-  const { actions: completedActions } = checkCompletesFields(
-    session_id,
-    entities
-  );
-  const initialActions = intents.map((int) => {
-    return getAction(int);
-  });
-  const useableActions: string[] = [...completedActions];
-
-  for (let i = 0; i < initialActions.length; i++) {
-    const action = initialActions[i];
-    if (action === "no_action") {
-      continue;
-    }
-    const hasForm = await checkOpensFormAndOpenIfNecessary(
-      session_id,
-      action,
-      entities
-    );
-    const { custom_entities, open } = hasForm;
-    if (!open) {
-      useableActions.push(action);
-    }
-  }
-  const responses = useableActions.map(
-    (act) => getResponse(act, rest).response
-  );
-  const response = condenseResponses(session_id, responses);
-  return {
-    intents,
-    actions: useableActions,
-    nlu_response: response,
-    responses,
-    entities,
-    classifications,
-    initial_actions: initialActions,
-    metaData: rest,
-  };
 };

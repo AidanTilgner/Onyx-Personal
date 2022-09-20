@@ -24,3 +24,16 @@
     border: 1px solid #2256f2;
   }
 }
+
+// * Layout
+@mixin default-padding {
+  padding: 0 18px;
+
+  @include tablet {
+    padding: 0 24px;
+  }
+
+  @include desktop {
+    padding: 0 56px;
+  }
+}

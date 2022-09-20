@@ -32,8 +32,9 @@ export const initSocket = async () => {
       io.on("voice_response", (response) => {
         voice_response.set(response);
       });
-      io.on("console_message", (message) => {
-        console_messages.update((messages) => [...messages, message]);
+      io.on("console_message", (...args) => {
+        console.log("New console message", args);
+        console_messages.update((messages) => [...messages, args]);
       });
     });
     return true;

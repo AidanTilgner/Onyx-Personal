@@ -1,8 +1,5 @@
 <script>
   import { voice_response } from "../../stores/socket";
-  voice_response.subscribe((data) => {
-    console.log(data);
-  });
 
   const formatVoiceResponse = (data) => {
     if (!data) {
@@ -10,6 +7,14 @@
     }
     const { custom_message } = JSON.parse(data);
     return custom_message;
+  };
+
+  const formattedInitialInput = (data) => {
+    if (!data) {
+      return "";
+    }
+    const { initial_input } = JSON.parse(data);
+    return initial_input;
   };
 
   let openResponse = false;
@@ -27,6 +32,11 @@
 {#if openResponse}
   <div class="voice-response-container">
     <div class="voice-response">
+      <p class="initial-input">
+        "
+        {formattedInitialInput($voice_response)}
+        "
+      </p>
       <p>{formatVoiceResponse($voice_response)}</p>
       <i
         class="material-icons close-button"
@@ -102,7 +112,7 @@
     font-weight: 400;
     box-shadow: inset 0.2px 0.2px 4px rgba(0, 0, 0, 0.15);
     border: 1px solid #eaeaea;
-    z-index: 9;
+    z-index: 20;
     position: relative;
 
     @include desktop {
@@ -134,5 +144,10 @@
         bottom: -45px;
       }
     }
+  }
+
+  .initial-input {
+    font-weight: 500;
+    margin-bottom: 8px;
   }
 </style>

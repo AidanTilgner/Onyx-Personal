@@ -22,6 +22,13 @@
       <p>Home</p>
     </div>
     <div
+      on:click={() => navigateLink("/actions")}
+      class="nav-item {$currentPath === '/actions' && 'active'}"
+    >
+      <i class="material-symbols-outlined">bolt</i>
+      <p>Actions</p>
+    </div>
+    <!-- <div
       on:click={() => navigateLink("/graphics")}
       class="nav-item {$currentPath === '/graphics' && 'active'}"
     >
@@ -55,7 +62,7 @@
     >
       <i class="material-symbols-outlined">precision_manufacturing</i>
       <p>Robots</p>
-    </div>
+    </div> -->
   </div>
 </div>
 

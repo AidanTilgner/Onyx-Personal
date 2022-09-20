@@ -20,6 +20,7 @@
   import VoiceInput from "./lib/components/VoiceInput/VoiceInput.svelte";
   import Alert from "./lib/components/Alert/Alert.svelte";
   import Login from "./pages/Login.svelte";
+  import Actions from "./pages/Actions.svelte";
   export let url;
 
   const initialized = initSocket();
@@ -42,11 +43,14 @@
         session_id: Math.random().toString(36).substring(2, 15),
       })
     );
+
+    navigate($currentPath);
   });
 
   onDestroy(() => {
     unsub();
   });
+
   $: if (initialized) {
     const widgets = getExternalWidgets();
     setExternalWidgets(widgets);
@@ -59,19 +63,20 @@
     <Route path="/login" component={Login} />
     <Route path="*">
       <div class="content-container">
-        <SideBar />
-        <Console />
-        <VoiceInput />
         <Router {url}>
           <Route path="/" component={Home} />
-          <Route path="*" component={Home} />
           <Route path="/home" component={Home} />
           <Route path="/apps" component={Apps} />
           <Route path="/graphics" component={Graphics} />
           <Route path="/family" component={Family} />
           <Route path="/news" component={News} />
           <Route path="/robots" component={Robots} />
+          <Route path="/actions" component={Actions} />
+          <Route path="*" component={Home} />
         </Router>
+        <SideBar />
+        <Console />
+        <VoiceInput />
       </div>
     </Route>
   </Router>
@@ -81,8 +86,10 @@
   @use "./lib/styles/partials/mixins" as *;
 
   .content-container {
+    margin-bottom: 156px;
+
     @include desktop {
-      margin-left: 256px;
+      margin-left: 216px;
       background-color: #fdfdfd;
     }
   }

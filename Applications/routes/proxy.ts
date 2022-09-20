@@ -1,5 +1,6 @@
 import { Router } from "express";
 import axios from "axios";
+import { actionServer } from "../utils/axios";
 import { config } from "dotenv";
 import multer from "multer";
 import FormData from "form-data";
@@ -40,6 +41,57 @@ router.post("/package", upload.any(), (req, res) => {
       globalLog("Error posting package: ", err);
       return res.status(500).send(err);
     });
+});
+
+router.get("/actions", async (req, res) => {
+  try {
+    const response = await actionServer.get("/actions");
+    return res.send(response.data);
+  } catch (err) {
+    console.log("Error: ", err);
+    return res.send({
+      error: err,
+    });
+  }
+});
+
+router.get("/recent-actions", async (req, res) => {
+  try {
+    const response = await actionServer.get("/actions/recent");
+    return res.send(response.data);
+  } catch (err) {
+    console.log("Error: ", err);
+    return res.send({
+      error: err,
+    });
+  }
+});
+
+router.get("/actions/:action", async (req, res) => {
+  try {
+    const response = await actionServer.get(`/actions/${req.params.action}`);
+    return res.send(response.data);
+  } catch (err) {
+    console.log("Error: ", err);
+    return res.send({
+      error: err,
+    });
+  }
+});
+
+router.get("/actions/metadata/:action", async (req, res) => {
+  try {
+    const response = await actionServer.get(
+      `/actions/metadata/${req.params.action}`
+    );
+    globalLog("Got action metadata: ", response.data);
+    return res.send(response.data);
+  } catch (err) {
+    console.log("Error: ", err);
+    return res.send({
+      error: err,
+    });
+  }
 });
 
 export default router;

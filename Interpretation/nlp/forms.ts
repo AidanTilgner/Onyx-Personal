@@ -46,8 +46,9 @@ export const getActionExpectedEntities = async (
     if (!expected_entities) {
       return {
         found: [],
-        not_found: [],
+        missing: [],
         has_custom_entities: false,
+        expected_entities: [],
       };
     }
     const found = entities
@@ -63,15 +64,19 @@ export const getActionExpectedEntities = async (
     });
 
     return {
-      found,
-      missing,
-      has_custom_entities: missing.some((m) => m.custom_query),
+      found: [...found],
+      missing: [...missing],
+      has_custom_entities: !!missing.length || !!found.length,
       expected_entities: expected_entities,
     };
   } catch (err) {
-    console.log("Error getting action expected entities: ", err);
+    console.log("Error getting action expected entities");
     return {
       error: err,
+      has_custom_entities: false,
+      found: [],
+      missing: [],
+      expected_entities: [],
     };
   }
 };
@@ -83,13 +88,38 @@ export const checkOpensFormAndOpenIfNecessary = async (
     entity: string;
     option: string;
   }[]
-) => {
+): Promise<{
+  opens_form: boolean;
+  form?: {
+    name: string;
+    fields: Question[];
+    action: string;
+    complete: boolean;
+  };
+  error?: any;
+  custom_entities?: {
+    found: {
+      type: string;
+      custom_query: string;
+      option: string;
+    }[];
+    missing: {
+      type: string;
+      custom_query: string;
+    }[];
+    expected_entities: {
+      type: string;
+      custom_query: string;
+    }[];
+    has_custom_entities: boolean;
+  };
+}> => {
   const currentForm = openQuestions[session_id]?.forms.find(
     (form) => form.action === action
   );
   if (currentForm) {
     return {
-      open: true,
+      opens_form: true,
       form: currentForm,
     };
   }
@@ -97,7 +127,7 @@ export const checkOpensFormAndOpenIfNecessary = async (
   const response = await getActionExpectedEntities(action, entities);
   if (response.error) {
     return {
-      open: false,
+      opens_form: false,
       error: response.error,
     };
   }
@@ -124,14 +154,25 @@ export const checkOpensFormAndOpenIfNecessary = async (
     }
     openQuestions[session_id].forms.push(form);
     return {
-      open: true,
+      opens_form: true,
       form: form,
+      custom_entities: {
+        found: found,
+        missing: missing,
+        expected_entities: expected_entities,
+        has_custom_entities: has_custom_entities,
+      },
     };
   }
 
   return {
-    open: false,
-    custom_entities: found,
+    opens_form: false,
+    custom_entities: {
+      found: found,
+      missing: missing,
+      expected_entities: expected_entities,
+      has_custom_entities: has_custom_entities,
+    },
   };
 };
 

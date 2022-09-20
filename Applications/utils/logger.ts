@@ -1,10 +1,7 @@
-import { emitMessage } from "./socket-io";
+import { emitArgs } from "./socket-io";
 
-export const globalLog = (prepend: string, out?: any, ...args: any[]) => {
-  console.log(`${prepend}: ${JSON.stringify(out) || ""}`, ...args);
-  emitMessage(
-    "console_message",
-    `${prepend}: ${JSON.stringify(out) || ""}`,
-    ...args
-  );
+export const globalLog = (...args: any[]) => {
+  console.log("Global log recieved:", args);
+  console.log(...args);
+  emitArgs("console_message", ...args);
 };

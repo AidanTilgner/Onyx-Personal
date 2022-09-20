@@ -66,7 +66,7 @@
           >Tip: Check the other list views before changing actions or
           intents</span
         >
-        <div class="stage">
+        <div class="stage" id="output-stage">
           <div class="input-group">
             <input
               type="text"
@@ -93,48 +93,6 @@
                 >
               </div>
             </div>
-            <div
-              class="output-property"
-              id="testing-action-container"
-              data-state="action"
-            >
-              <span id="testing-action"></span>
-              <div class="icons">
-                <i
-                  class="material-symbols-outlined primary"
-                  title="Edit action for this intent"
-                  id="edit-action"
-                  >edit</i
-                >
-              </div>
-            </div>
-            <div
-              class="output-property"
-              id="testing-response-container"
-              data-state="nlu_response"
-            >
-              <span id="testing-response"></span>
-              <div class="icons">
-                <i
-                  class="material-symbols-outlined danger"
-                  title="Remove this response to this text"
-                  id="remove-response"
-                  >delete</i
-                >
-                <i
-                  class="material-symbols-outlined primary"
-                  title="Add a possible response to this text"
-                  id="add-response"
-                  >add</i
-                >
-              </div>
-            </div>
-            <div
-              class="output-list"
-              data-state="responses"
-              id="testing-responses"
-              title="Possible responses to this text"
-            ></div>
           </div>
         </div>
       </section>

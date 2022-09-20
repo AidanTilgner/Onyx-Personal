@@ -1,6 +1,11 @@
 import { Router } from "express";
 import mappings from "../actions";
-import { getActionMetadata } from "../actions/utils";
+import {
+  getActionMetadata,
+  addRecentAction,
+  checkActionExists,
+  getRecentActions,
+} from "../actions/utils";
 
 const router = Router();
 
@@ -8,14 +13,19 @@ router.post("/", async (req, res) => {
   try {
     const {
       body: { action },
-    } = req;
-    if (!mappings.hasOwnProperty(action)) {
+    } = req as {
+      body: { action: string };
+    };
+    if (!checkActionExists(action)) {
       return res.send({
         error: `Action "${action}" not found`,
       });
     }
     const [act, subact = "default"] = action.split(".");
-    const actionResponse = await mappings[act][subact](req);
+    const actionResponse: Function = await mappings[act][subact](req.body);
+    if (actionResponse) {
+      addRecentAction(action);
+    }
     return res.send({
       message: "Action executed successfully",
       response: actionResponse,
@@ -34,13 +44,16 @@ router.post("/:action", async (req, res) => {
         action: string;
       };
     };
-    if (!mappings.hasOwnProperty(action)) {
+    if (!checkActionExists(action)) {
       return res.send({
         error: `Action "${action}" not found`,
       });
     }
     const [act, subact = "default"] = action.split(".");
-    const actionResponse: any = await mappings[act][subact](req);
+    const actionResponse: any = await mappings[act][subact](req.body);
+    if (actionResponse) {
+      addRecentAction(action);
+    }
     return res.send({
       message: "Action executed successfully",
       response: actionResponse,
@@ -58,6 +71,13 @@ router.get("/", (req, res) => {
   res.send({
     message: "Successfully got actions",
     actions: mappingsCopy,
+  });
+});
+
+router.get("/recent", (req, res) => {
+  res.send({
+    message: "Successfully got recent actions",
+    actions: getRecentActions(),
   });
 });
 
@@ -81,16 +101,15 @@ router.get("/metadata/:action", (req, res) => {
   const {
     params: { action },
   } = req;
-  const [act, subact = "default"] = action.split(".");
   const metadata = getActionMetadata(action);
   if (!metadata) {
     return res.send({
-      message: "No metadata found for that action",
+      message: `No metadata found for the action "${action}"`,
       response: {},
     });
   }
   return res.send({
-    message: "Action found and metadata returned",
+    message: `Successfully got metadata for the action "${action}"`,
     response: metadata,
   });
 });

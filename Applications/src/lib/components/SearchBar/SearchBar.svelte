@@ -13,13 +13,20 @@
 </div>
 
 <style lang="scss">
+  @use "../../styles/partials/mixins" as *;
+
   .searchbar {
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: flex-start;
     position: relative;
-    width: 50%;
+    width: 100%;
+    z-index: inherit;
+
+    @include tablet {
+      width: 50%;
+    }
     &__input {
       width: 100%;
       padding: 14px 24px;

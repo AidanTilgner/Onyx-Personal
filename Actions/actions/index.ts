@@ -18,6 +18,8 @@ const parseAndUseNLU = async (nlu: {
     score: string;
   }[];
   initial_actions: string[];
+  initial_input: string;
+  split_input: string[];
   metaData: any;
 }) => {
   try {
@@ -30,14 +32,29 @@ const parseAndUseNLU = async (nlu: {
       classifications,
       initial_actions,
       metaData,
+      initial_input,
+      split_input,
     } = nlu;
 
     const toSend: {
       custom_message: string;
       actions: string[];
+      data: any;
     } = {
       custom_message: nlu_response,
       actions: [],
+      data: {
+        intents,
+        actions,
+        nlu_response,
+        entities,
+        responses,
+        classifications,
+        initial_actions,
+        metaData,
+        initial_input,
+        split_input,
+      },
     };
 
     for (let i = 0; i < actions.length; i++) {
@@ -57,11 +74,31 @@ const parseAndUseNLU = async (nlu: {
       }
       if (nlu_response && response !== "custom_message") {
         // * Then do this asynchronusly
-        performAction(entitiesObject);
+        performAction(entitiesObject, {
+          intent,
+          action,
+          response,
+          nlu_response,
+          classifications,
+          initial_actions,
+          initial_input,
+          split_input,
+          metaData,
+        });
         toSend.actions.push(action);
-        toSend.custom_message = nlu_response;
+        continue;
       }
-      const { custom_message } = await performAction(entitiesObject);
+      const { custom_message } = await performAction(entitiesObject, {
+        intent,
+        action,
+        response,
+        nlu_response,
+        classifications,
+        initial_actions,
+        initial_input,
+        split_input,
+        metaData,
+      });
 
       if (custom_message) {
         toSend.custom_message += toSend.custom_message.length
@@ -83,7 +120,7 @@ const parseAndUseNLU = async (nlu: {
 
 interface Mappings {
   [key: string]: {
-    [key: string]: (data: any) => any;
+    [key: string]: (...args: any[]) => any;
   };
 }
 
