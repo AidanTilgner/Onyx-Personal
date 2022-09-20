@@ -1,20 +1,62 @@
 <script>
   import { console_messages } from "../../stores/socket";
+  import { dispatch } from "../../helpers/functions/commands";
+  import { onMount } from "svelte";
+
   let open = false;
   let messagesArray = [];
   console_messages.subscribe((data) => {
     messagesArray = [...data];
   });
-  $: console.log("messages", messagesArray);
+
+  let consoleInput = "";
+  let prepend = "->";
+
+  const handleConsoleSubmit = () => {
+    const [command, ...args] = consoleInput.split(" ");
+    dispatch(command, ...args);
+  };
+
+  let ref = null;
+
+  onMount(() => {
+    ref = document.getElementById("console-input");
+    if (ref) {
+      ref.focus();
+    }
+  });
 </script>
 
 <div class="console-container">
   {#if open}
-    <div class="console">
+    <div
+      class="console"
+      on:click={() => {
+        ref = document.getElementById("console-input");
+        ref.focus();
+      }}
+    >
       <div class="console-messages">
         {#each messagesArray as message}
-          <p class="console-message">{message}</p>
+          <p class="console-message">{JSON.stringify(message)}</p>
         {/each}
+      </div>
+      <div class="terminal-input">
+        <span class="terminal-input__prepend">{prepend}</span>
+        <input
+          tabindex="0"
+          type="text"
+          class="terminal-input__input"
+          bind:value={consoleInput}
+          on:change={(e) => (consoleInput = e.target.value)}
+          on:keypress={(e) => {
+            if (e.key === "Enter") {
+              handleConsoleSubmit();
+              consoleInput = "";
+            }
+          }}
+          id="console-input"
+        />
       </div>
       <i
         on:click={() => {
@@ -107,6 +149,40 @@
 
     &:hover {
       background-color: #f9f9f9;
+    }
+  }
+
+  .terminal-input {
+    position: relative;
+    display: flex;
+    align-items: center;
+    margin-top: 14px;
+    height: 32px;
+    font-family: $primary-font;
+
+    &__input {
+      width: calc(100% - 8px);
+      font-family: $primary-font;
+      border: none;
+      border-bottom: 1px solid #eaeaea;
+      padding-inline: 24px;
+      height: 100%;
+      color: $cool-blue;
+      font-weight: 500;
+
+      &:focus {
+        outline: none;
+      }
+    }
+
+    &__prepend {
+      position: absolute;
+      // left middle
+      left: 0;
+      top: 50%;
+      transform: translate(0, -50%);
+      color: $cool-blue;
+      font-size: 14px;
     }
   }
 </style>

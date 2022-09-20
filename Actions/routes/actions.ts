@@ -101,7 +101,6 @@ router.get("/metadata/:action", (req, res) => {
   const {
     params: { action },
   } = req;
-  const [act, subact = "default"] = action.split(".");
   const metadata = getActionMetadata(action);
   if (!metadata) {
     return res.send({

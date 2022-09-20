@@ -35,3 +35,8 @@ export const initIO = (server: http.Server) => {
 export const emitMessage = (key: string, message: string, ...args: any[]) => {
   io.emit(key, message, ...args);
 };
+
+export const emitArgs = (key: string, ...args: any[]) => {
+  console.log("Received args:", args);
+  return io.emit(key, ...args);
+};

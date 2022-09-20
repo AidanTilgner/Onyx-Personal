@@ -58,7 +58,9 @@ const handlePackage = async (pkg: AppsPackage) => {
   }
 };
 
-const upload = multer({ dest: "tmp/" });
+const upload = multer({
+  storage: multer.memoryStorage(),
+});
 
 router.post("/", upload.any(), async (req, res) => {
   try {
