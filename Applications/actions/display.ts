@@ -44,6 +44,7 @@ export const voice_response = ({
   const toSend = {
     custom_message: custom_message,
     data: data ? data : null,
+    initial_input: data.initial_input,
   };
   emitMessage("voice_response", JSON.stringify(toSend));
   globalLog("Voice Data", { ...toSend });

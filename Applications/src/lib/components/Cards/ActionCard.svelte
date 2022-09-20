@@ -11,22 +11,28 @@
 
   const formattedAction = () => {
     const [actionType, actionValue] = action.split(".");
+    let formatted = "";
     if (actionValue === "default") {
-      // Replace _ and - with spaces
-      // Capitalize first letter of each word
-      return actionType
+      formatted += actionType
+        .replace(/[_-]/g, " ")
+        .replace(
+          /\w\S*/g,
+          (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()
+        );
+    } else {
+      formatted += actionValue
         .replace(/[_-]/g, " ")
         .replace(
           /\w\S*/g,
           (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()
         );
     }
-    return actionValue
-      .replace(/[_-]/g, " ")
-      .replace(
-        /\w\S*/g,
-        (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()
-      );
+
+    if (formatted.length > 12) {
+      formatted = formatted.slice(0, 12) + "...";
+    }
+
+    return formatted;
   };
 
   const prefetchActionMetaData = async () => {
@@ -58,9 +64,10 @@
       handleClick(e);
     }
   }}
+  title={action}
 >
   <div class="body">
-    {formattedAction()}
+    <span>{formattedAction()}</span>
     <Arrow title="Dispatch action" />
   </div>
 </div>
@@ -95,6 +102,10 @@
     justify-content: space-between;
     font-weight: 600;
     color: $cool-blue;
+
+    span {
+      margin-right: 8px;
+    }
   }
 
   @keyframes clickedCard {

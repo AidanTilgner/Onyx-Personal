@@ -9,6 +9,14 @@
     return custom_message;
   };
 
+  const formattedInitialInput = (data) => {
+    if (!data) {
+      return "";
+    }
+    const { initial_input } = JSON.parse(data);
+    return initial_input;
+  };
+
   let openResponse = false;
 
   voice_response.subscribe((res) => {
@@ -24,6 +32,11 @@
 {#if openResponse}
   <div class="voice-response-container">
     <div class="voice-response">
+      <p class="initial-input">
+        "
+        {formattedInitialInput($voice_response)}
+        "
+      </p>
       <p>{formatVoiceResponse($voice_response)}</p>
       <i
         class="material-icons close-button"
@@ -131,5 +144,10 @@
         bottom: -45px;
       }
     }
+  }
+
+  .initial-input {
+    font-weight: 500;
+    margin-bottom: 8px;
   }
 </style>

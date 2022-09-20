@@ -20,6 +20,7 @@
   import VoiceInput from "./lib/components/VoiceInput/VoiceInput.svelte";
   import Alert from "./lib/components/Alert/Alert.svelte";
   import Login from "./pages/Login.svelte";
+  import Actions from "./pages/Actions.svelte";
   export let url;
 
   const initialized = initSocket();
@@ -42,11 +43,14 @@
         session_id: Math.random().toString(36).substring(2, 15),
       })
     );
+
+    navigate($currentPath);
   });
 
   onDestroy(() => {
     unsub();
   });
+
   $: if (initialized) {
     const widgets = getExternalWidgets();
     setExternalWidgets(widgets);
@@ -61,13 +65,14 @@
       <div class="content-container">
         <Router {url}>
           <Route path="/" component={Home} />
-          <Route path="*" component={Home} />
           <Route path="/home" component={Home} />
           <Route path="/apps" component={Apps} />
           <Route path="/graphics" component={Graphics} />
           <Route path="/family" component={Family} />
           <Route path="/news" component={News} />
           <Route path="/robots" component={Robots} />
+          <Route path="/actions" component={Actions} />
+          <Route path="*" component={Home} />
         </Router>
         <SideBar />
         <Console />

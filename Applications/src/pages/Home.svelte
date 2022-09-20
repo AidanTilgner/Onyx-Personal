@@ -6,9 +6,10 @@
   import { navigate } from "svelte-routing";
   import RecentActions from "../lib/sections/RecentActions.svelte";
 
-  if (currentPath === "/") {
+  if ($currentPath === "/") {
     navigate("/home");
   }
+
   let messagesArray = [];
   messages.subscribe((data) => {
     messagesArray = [...data];
