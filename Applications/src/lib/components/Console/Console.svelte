@@ -2,6 +2,7 @@
   import { console_messages } from "../../stores/socket";
   import { dispatch } from "../../helpers/functions/commands";
   import { onMount } from "svelte";
+  import { history } from "../../stores/commands";
 
   let open = false;
   let messagesArray = [];
@@ -19,23 +20,23 @@
 
   let ref = null;
 
-  onMount(() => {
-    ref = document.getElementById("console-input");
-    if (ref) {
-      ref.focus();
+  onMount(() => {});
+
+  // listen for ctrl + shift + ` to open console
+  document.addEventListener("keydown", (e) => {
+    if (e.ctrlKey && e.shiftKey && e.key === ">") {
+      open = !open;
     }
   });
+
+  $: open && ref && ref.focus();
+
+  $: historyIndex = $history.length;
 </script>
 
 <div class="console-container">
   {#if open}
-    <div
-      class="console"
-      on:click={() => {
-        ref = document.getElementById("console-input");
-        ref.focus();
-      }}
-    >
+    <div class="console">
       <div class="console-messages">
         {#each messagesArray as message}
           <p class="console-message">{JSON.stringify(message)}</p>
@@ -55,7 +56,33 @@
               consoleInput = "";
             }
           }}
+          on:keydown={(e) => {
+            if (e.key === "ArrowUp") {
+              if (historyIndex === 0) {
+                return;
+              }
+              historyIndex -= 1;
+              consoleInput = $history[historyIndex];
+              // bring cursor to the end of the input
+              setTimeout(() => {
+                ref.selectionStart = ref.selectionEnd = ref.value.length;
+              }, 0);
+            }
+
+            if (e.key === "ArrowDown") {
+              if (historyIndex === $history.length) {
+                return;
+              }
+              historyIndex += 1;
+              consoleInput = $history[historyIndex];
+              // bring cursor to the end of the input
+              setTimeout(() => {
+                ref.selectionStart = ref.selectionEnd = ref.value.length;
+              }, 0);
+            }
+          }}
           id="console-input"
+          bind:this={ref}
         />
       </div>
       <i
@@ -69,7 +96,7 @@
   {:else}
     <i
       class="material-symbols-outlined open-button"
-      title="Open Console"
+      title="Open console (ctrl + shift + >)"
       on:click={() => {
         open = true;
       }}>terminal</i
@@ -96,10 +123,10 @@
     right: 0;
     height: 200px;
     box-shadow: 4px -4px 24px 0 rgba(0, 0, 0, 0.1);
-    // border: 2px solid rgba($color: $cool-blue, $alpha: 0.25);
     overflow-x: scroll;
     padding: 24px 24px;
     box-sizing: border-box;
+    background-color: #fff;
 
     .close-button {
       position: fixed;

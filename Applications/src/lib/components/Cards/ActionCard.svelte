@@ -1,5 +1,8 @@
 <script>
-  import Arrow from "../Buttons/Arrow.svelte";
+  import Icon from "../Buttons/Icon.svelte";
+  import Modal from "../Modals/Default.svelte";
+  import Message from "../Modals/Message.svelte";
+
   export let width = "100%",
     action = "",
     custom_style = "",
@@ -39,18 +42,61 @@
     try {
       const response = await fetch(`/api/proxy/actions/metadata/${action}`)
         .then((res) => res.json())
-        .catch((err) => console.log(err));
-      console.log("Res: ", response);
+        .catch((err) => console.error(err));
       return response;
     } catch (err) {
-      console.log(err);
+      console.error(err);
     }
   };
 
+  let modalOpen = false;
+  let actionMetaData = null;
+
   const handleClick = async (e) => {
-    console.log("Clicking action");
-    await prefetchActionMetaData();
+    const res = await prefetchActionMetaData();
+    modalOpen = true;
+    if (res.response?.expected_entities?.length > 0) {
+      actionMetaData = res.response;
+    }
     onClick(e);
+  };
+
+  const validateAction = () => {
+    if (actionMetaData) {
+      return actionMetaData.expected_entities.every((entity) => {
+        return actionMetaData.completed_entities[entity.type];
+      });
+    }
+    return true;
+  };
+
+  let actionResponse = null;
+
+  const dispatchAction = async () => {
+    const validated = validateAction();
+
+    if (!validated) {
+      alert("Please fill out all required fields");
+      return;
+    }
+
+    const res = await fetch(`/api/proxy/actions/${action}`, {
+      method: "POST",
+      body: JSON.stringify({ entities: actionMetaData?.custom_entities }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((res) => res.json())
+      .catch((err) => console.error(err));
+
+    if (!res.response) {
+      actionResponse = res;
+    }
+
+    if (res.response) {
+      actionResponse = res.response;
+    }
   };
 </script>
 
@@ -67,10 +113,84 @@
   title={action}
 >
   <div class="body">
-    <span>{formattedAction()}</span>
-    <Arrow title="Dispatch action" />
+    <div class="body__text">
+      <p>{formattedAction()}</p>
+    </div>
+    <Icon title="Dispatch action" button="bolt" />
   </div>
 </div>
+{#if modalOpen}
+  <Modal
+    title={action}
+    buttons={[
+      {
+        text: "Close",
+        onClick: () => {
+          modalOpen = false;
+        },
+        type: "outline",
+      },
+      {
+        text: "Dispatch",
+        onClick: () => {
+          modalOpen = false;
+          dispatchAction();
+        },
+        type: "primary",
+      },
+    ]}
+  >
+    <div class="modal__body">
+      {#if actionMetaData}
+        {#each actionMetaData.expected_entities as entity}
+          <div class="action-input">
+            <label for={entity.type}>{entity.custom_query}</label>
+            <input
+              type="text"
+              id={entity.type}
+              placeholder={entity.type}
+              on:change={(e) => {
+                actionMetaData = {
+                  ...actionMetaData,
+                  completed_entities: {
+                    ...actionMetaData.completed_entities,
+                    [entity.type]: e.target.value,
+                  },
+                };
+              }}
+            />
+          </div>
+        {/each}
+      {:else}
+        <p>Are you sure?</p>
+      {/if}
+    </div>
+  </Modal>
+{/if}
+{#if actionResponse}
+  <Message
+    buttons={[
+      {
+        text: "Close",
+        onClick: () => {
+          actionResponse = null;
+        },
+        type: "primary",
+      },
+    ]}
+  >
+    <div class="action-response">
+      {#each Object.entries(actionResponse) as [key, value]}
+        <div class="action-response__item">
+          <p class="action-response__item__key">{key}</p>
+          <p class="action-response__item__value">
+            {typeof value === "object" ? JSON.stringify(value) : value}
+          </p>
+        </div>
+      {/each}
+    </div>
+  </Message>
+{/if}
 
 <style lang="scss">
   @use "../../styles/partials/mixins" as *;
@@ -84,9 +204,12 @@
     box-sizing: border-box;
     // border: 1px solid $cool-blue;
     cursor: pointer;
+    transition: all 0.2s ease;
+    // width: 100%;
 
     &:hover {
-      box-shadow: 0 0 10px rgba($color: #000000, $alpha: 0.2);
+      box-shadow: 0 0 10px rgba($color: #000000, $alpha: 0.15);
+      border-radius: 5px;
     }
 
     &:active {
@@ -103,8 +226,17 @@
     font-weight: 600;
     color: $cool-blue;
 
-    span {
+    &__text {
+      display: flex;
+      align-items: center;
       margin-right: 8px;
+      width: 50%;
+
+      p {
+        margin: 0;
+        padding: 0;
+        white-space: nowrap;
+      }
     }
   }
 
@@ -117,6 +249,79 @@
     }
     100% {
       transform: scale(1);
+    }
+  }
+
+  .modal__body {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    width: 100%;
+
+    .action-input {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: flex-start;
+      width: 100%;
+      margin-bottom: 14px;
+
+      label {
+        font-size: 18px;
+        font-weight: 500;
+        margin-bottom: 14px;
+      }
+
+      input {
+        padding: 10px;
+        width: 100%;
+        box-sizing: border-box;
+        border: 1px solid $cool-blue;
+        border-radius: 5px;
+        outline: none;
+        font-size: 14px;
+        font-weight: 400;
+        color: $cool-blue;
+        font-family: $primary-font;
+      }
+    }
+  }
+
+  .action-response {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    width: 100%;
+
+    &__item {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: flex-start;
+      width: 100%;
+      margin-bottom: 20px;
+
+      &__key {
+        font-size: 18px;
+        font-weight: 500;
+        margin: 0;
+        margin-bottom: 14px;
+        text-decoration: underline;
+      }
+
+      &__value {
+        font-size: 18px;
+        font-weight: 400;
+        margin: 0;
+        margin-bottom: 14px;
+        // overflow should be ellipsis
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100%;
+        text-align: left;
+      }
     }
   }
 </style>

@@ -2,7 +2,7 @@
   export let title,
     subtitle,
     buttons = [];
-  import Button from "../Buttons/Buttons.svelte";
+  import Buttons from "../Buttons/Buttons.svelte";
 </script>
 
 <div class="header">
@@ -16,7 +16,13 @@
   </div>
   <div>
     {#each buttons as button}
-      <Button type={button.type} {button} />
+      <Buttons
+        type={button.type}
+        button={{
+          text: button.text,
+          onClick: button.onClick,
+        }}
+      />
     {/each}
   </div>
 </div>

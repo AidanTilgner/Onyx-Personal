@@ -27,7 +27,7 @@ export const initIO = (server: http.Server) => {
       "Welcome to the Onyx Applications Server. Socket.io is successfully initilized and connected."
     );
     socket.on("disconnect", () => {
-      console.log("A user disconnected");
+      console.error("A user disconnected");
     });
   });
 };

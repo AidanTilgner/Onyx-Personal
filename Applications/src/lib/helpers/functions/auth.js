@@ -17,7 +17,6 @@ export const checkAuth = async () => {
       token: localStorage.getItem("app_key"),
     })
     .then((res) => {
-      console.log("Auth res: ", res);
       if (res.data.authorized) {
         currentAlert.set({
           message: "You have been logged in successfully",
@@ -36,7 +35,7 @@ export const checkAuth = async () => {
       return false;
     })
     .catch((err) => {
-      console.log(err);
+      console.error(err);
       currentAlert.set({
         title: "Error",
         message: "Something went wrong with auth",

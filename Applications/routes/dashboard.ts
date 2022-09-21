@@ -9,7 +9,7 @@ router.post("/display-message", async (req, res) => {
     emitMessage("message", message);
     res.sendStatus(200);
   } catch (err) {
-    console.log(err);
+    console.error(err);
   }
 });
 

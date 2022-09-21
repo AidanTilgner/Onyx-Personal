@@ -27,7 +27,7 @@ router.post("/", async (req, res) => {
       addRecentAction(action);
     }
     return res.send({
-      message: "Action executed successfully",
+      message: `Action "${action}" executed successfully`,
       response: actionResponse,
     });
   } catch (err) {
@@ -55,7 +55,7 @@ router.post("/:action", async (req, res) => {
       addRecentAction(action);
     }
     return res.send({
-      message: "Action executed successfully",
+      message: `Action "${action}" executed successfully`,
       response: actionResponse,
     });
   } catch (err) {
