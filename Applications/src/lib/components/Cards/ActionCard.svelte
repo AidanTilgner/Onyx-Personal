@@ -64,7 +64,7 @@
   const validateAction = () => {
     if (actionMetaData) {
       return actionMetaData.expected_entities.every((entity) => {
-        return actionMetaData.completed_entities[entity];
+        return actionMetaData.completed_entities[entity.type];
       });
     }
     return true;
@@ -76,6 +76,7 @@
     const validated = validateAction();
 
     if (!validated) {
+      alert("Please fill out all required fields");
       return;
     }
 
@@ -149,7 +150,13 @@
               id={entity.type}
               placeholder={entity.type}
               on:change={(e) => {
-                actionMetaData.completed_entities[entity.type] = e.target.value;
+                actionMetaData = {
+                  ...actionMetaData,
+                  completed_entities: {
+                    ...actionMetaData.completed_entities,
+                    [entity.type]: e.target.value,
+                  },
+                };
               }}
             />
           </div>
@@ -263,6 +270,7 @@
       label {
         font-size: 18px;
         font-weight: 500;
+        margin-bottom: 14px;
       }
 
       input {

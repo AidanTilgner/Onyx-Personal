@@ -2,6 +2,7 @@
   import { console_messages } from "../../stores/socket";
   import { dispatch } from "../../helpers/functions/commands";
   import { onMount } from "svelte";
+  import { history } from "../../stores/commands";
 
   let open = false;
   let messagesArray = [];
@@ -29,6 +30,8 @@
   });
 
   $: open && ref && ref.focus();
+
+  $: historyIndex = $history.length;
 </script>
 
 <div class="console-container">
@@ -51,6 +54,31 @@
             if (e.key === "Enter") {
               handleConsoleSubmit();
               consoleInput = "";
+            }
+          }}
+          on:keydown={(e) => {
+            if (e.key === "ArrowUp") {
+              if (historyIndex === 0) {
+                return;
+              }
+              historyIndex -= 1;
+              consoleInput = $history[historyIndex];
+              // bring cursor to the end of the input
+              setTimeout(() => {
+                ref.selectionStart = ref.selectionEnd = ref.value.length;
+              }, 0);
+            }
+
+            if (e.key === "ArrowDown") {
+              if (historyIndex === $history.length) {
+                return;
+              }
+              historyIndex += 1;
+              consoleInput = $history[historyIndex];
+              // bring cursor to the end of the input
+              setTimeout(() => {
+                ref.selectionStart = ref.selectionEnd = ref.value.length;
+              }, 0);
             }
           }}
           id="console-input"
