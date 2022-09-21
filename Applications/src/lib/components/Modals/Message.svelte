@@ -32,6 +32,17 @@
 <style lang="scss">
   @use "../../styles/partials/mixins" as *;
 
+  @keyframes open-message {
+    0% {
+      transform: translateX(25%);
+      opacity: 0;
+    }
+    100% {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+
   .message {
     position: fixed;
     left: 24px;
@@ -47,14 +58,16 @@
     border: 1px solid rgba(255, 255, 255, 0.3);
     box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
     z-index: 500;
+    animation: open-message 0.3s ease-in;
 
     @include tablet {
       right: 56px;
-      bottom: 20vh;
+      bottom: 36px;
       width: fit-content;
       max-width: 50vw;
       height: fit-content;
       max-height: 80vh;
+      left: initial;
     }
 
     &__header {
