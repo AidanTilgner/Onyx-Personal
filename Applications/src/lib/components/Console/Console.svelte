@@ -68,7 +68,7 @@
   {:else}
     <i
       class="material-symbols-outlined open-button"
-      title="Open Console"
+      title="Open console (ctrl + shift + >)"
       on:click={() => {
         open = true;
       }}>terminal</i
@@ -95,10 +95,10 @@
     right: 0;
     height: 200px;
     box-shadow: 4px -4px 24px 0 rgba(0, 0, 0, 0.1);
-    // border: 2px solid rgba($color: $cool-blue, $alpha: 0.25);
     overflow-x: scroll;
     padding: 24px 24px;
     box-sizing: border-box;
+    background-color: #fff;
 
     .close-button {
       position: fixed;

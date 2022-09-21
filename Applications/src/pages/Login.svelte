@@ -8,7 +8,6 @@
   let app_key = "";
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Sending body", app_key);
     axios
       .post("/api/auth/check", {
         token: app_key,
@@ -24,7 +23,6 @@
         }
         localStorage.setItem("app_key", app_key);
         window.location.href = "/";
-        console.log(res);
       })
       .catch((err) => {
         currentAlert.set({
@@ -32,7 +30,7 @@
           message: "There was an issue with attempted login",
           show: true,
         });
-        console.log(err);
+        console.error(err);
       });
   };
 </script>

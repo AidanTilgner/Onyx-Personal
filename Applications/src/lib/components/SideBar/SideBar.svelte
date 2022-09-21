@@ -12,8 +12,6 @@
   };
 
   let visible = false;
-
-  $: console.log("Showing: ", !isMobile() || visible);
 </script>
 
 {#if !isMobile() || visible}

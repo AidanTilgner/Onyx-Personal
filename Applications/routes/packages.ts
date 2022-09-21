@@ -44,7 +44,7 @@ const handlePackage = async (pkg: AppsPackage) => {
       null,
     ];
   } catch (err: any) {
-    console.log("Error handling package: ", err);
+    console.error("Error handling package: ", err);
     pkg.steps[pkg.current_step].errors.push(err);
     pkg.current_step = pkg.current_step + 1;
     if (pkg.steps[pkg.current_step].next) {
@@ -96,7 +96,7 @@ router.post("/", upload.any(), async (req, res) => {
       result: data,
     });
   } catch (err) {
-    console.log("Error in package hook: ", err);
+    console.error("Error in package hook: ", err);
     // TODO: This should just add an error to the body
     return {
       error: "There was an error processing the package",

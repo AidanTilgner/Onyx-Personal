@@ -48,7 +48,7 @@ router.get("/actions", async (req, res) => {
     const response = await actionServer.get("/actions");
     return res.send(response.data);
   } catch (err) {
-    console.log("Error: ", err);
+    console.error("Error: ", err);
     return res.send({
       error: err,
     });
@@ -60,7 +60,7 @@ router.get("/recent-actions", async (req, res) => {
     const response = await actionServer.get("/actions/recent");
     return res.send(response.data);
   } catch (err) {
-    console.log("Error: ", err);
+    console.error("Error: ", err);
     return res.send({
       error: err,
     });
@@ -72,7 +72,19 @@ router.get("/actions/:action", async (req, res) => {
     const response = await actionServer.get(`/actions/${req.params.action}`);
     return res.send(response.data);
   } catch (err) {
-    console.log("Error: ", err);
+    console.error("Error: ", err);
+    return res.send({
+      error: err,
+    });
+  }
+});
+
+router.post("/actions/:action", async (req, res) => {
+  try {
+    const response = await actionServer.post(`/actions/${req.params.action}`);
+    return res.send(response.data);
+  } catch (err) {
+    console.error("Error: ", err);
     return res.send({
       error: err,
     });
@@ -87,7 +99,7 @@ router.get("/actions/metadata/:action", async (req, res) => {
     globalLog("Got action metadata: ", response.data);
     return res.send(response.data);
   } catch (err) {
-    console.log("Error: ", err);
+    console.error("Error: ", err);
     return res.send({
       error: err,
     });

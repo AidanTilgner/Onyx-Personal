@@ -12,8 +12,10 @@
     actions = res.actions;
   });
 
+  const ignoreActions = new Set(["exception", "parse_and_use_nlu"]);
+
   $: actionNames = Object.keys(actions).filter((name) => {
-    return name !== "exception";
+    return !ignoreActions.has(name);
   });
 
   const formatName = (name) => {
@@ -95,6 +97,9 @@
       border-bottom: 1px solid #eaeaea;
       padding-bottom: 10px;
       width: 100%;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
     }
   }
 </style>

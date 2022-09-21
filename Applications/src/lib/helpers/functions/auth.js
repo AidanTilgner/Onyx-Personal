@@ -35,7 +35,7 @@ export const checkAuth = async () => {
       return false;
     })
     .catch((err) => {
-      console.log(err);
+      console.error(err);
       currentAlert.set({
         title: "Error",
         message: "Something went wrong with auth",
