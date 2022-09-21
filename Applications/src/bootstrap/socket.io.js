@@ -33,7 +33,6 @@ export const initSocket = async () => {
         voice_response.set(response);
       });
       io.on("console_message", (...args) => {
-        console.log("New console message", args);
         console_messages.update((messages) => [...messages, args]);
       });
     });

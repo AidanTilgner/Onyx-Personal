@@ -1,5 +1,7 @@
 <script>
-  import Arrow from "../Buttons/Arrow.svelte";
+  import Icon from "../Buttons/Icon.svelte";
+  import Modal from "../Modals/Default.svelte";
+
   export let width = "100%",
     action = "",
     custom_style = "",
@@ -35,12 +37,13 @@
     return formatted;
   };
 
+  let modalOpen = false;
+
   const prefetchActionMetaData = async () => {
     try {
       const response = await fetch(`/api/proxy/actions/metadata/${action}`)
         .then((res) => res.json())
         .catch((err) => console.log(err));
-      console.log("Res: ", response);
       return response;
     } catch (err) {
       console.log(err);
@@ -48,8 +51,8 @@
   };
 
   const handleClick = async (e) => {
-    console.log("Clicking action");
-    await prefetchActionMetaData();
+    const res = await prefetchActionMetaData();
+    modalOpen = true;
     onClick(e);
   };
 </script>
@@ -67,10 +70,37 @@
   title={action}
 >
   <div class="body">
-    <span>{formattedAction()}</span>
-    <Arrow title="Dispatch action" />
+    <div class="body__text">
+      <p>{formattedAction()}</p>
+    </div>
+    <Icon title="Dispatch action" button="bolt" />
   </div>
 </div>
+{#if modalOpen}
+  <Modal
+    title={action}
+    buttons={[
+      {
+        text: "Close",
+        onClick: () => {
+          modalOpen = false;
+        },
+        type: "outline",
+      },
+      {
+        text: "Dispatch",
+        onClick: () => {
+          modalOpen = false;
+        },
+        type: "primary",
+      },
+    ]}
+  >
+    <div class="modal__body">
+      <p>{action}</p>
+    </div>
+  </Modal>
+{/if}
 
 <style lang="scss">
   @use "../../styles/partials/mixins" as *;
@@ -84,9 +114,12 @@
     box-sizing: border-box;
     // border: 1px solid $cool-blue;
     cursor: pointer;
+    transition: all 0.2s ease;
+    // width: 100%;
 
     &:hover {
       box-shadow: 0 0 10px rgba($color: #000000, $alpha: 0.2);
+      border-radius: 5px;
     }
 
     &:active {
@@ -103,8 +136,21 @@
     font-weight: 600;
     color: $cool-blue;
 
-    span {
+    &__text {
+      display: flex;
+      align-items: center;
       margin-right: 8px;
+      width: 50%;
+
+      i {
+        margin-right: 8px;
+      }
+
+      p {
+        margin: 0;
+        padding: 0;
+        white-space: nowrap;
+      }
     }
   }
 

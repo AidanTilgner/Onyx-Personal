@@ -10,7 +10,6 @@
   onMount(async () => {
     const res = await fetch("/api/proxy/actions").then((res) => res.json());
     actions = res.actions;
-    console.log("Actions: ", actions);
   });
 
   $: actionNames = Object.keys(actions).filter((name) => {

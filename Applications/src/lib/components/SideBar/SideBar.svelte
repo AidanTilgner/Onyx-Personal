@@ -6,29 +6,44 @@
   const navigateLink = (link) => {
     navigate(link);
   };
+
+  $: isMobile = () => {
+    return window.innerWidth <= 768;
+  };
+
+  let visible = false;
+
+  $: console.log("Showing: ", !isMobile() || visible);
 </script>
 
-<div class="sidebar">
-  <div class="logo-container">
-    <Icon name="onyx-logo" width="152" />
-  </div>
-  <div class="nav-items">
-    <div
-      on:click={() => navigateLink("/home")}
-      class="nav-item {($currentPath === '/home' || $currentPath === '/') &&
-        'active'}"
-    >
-      <i class="material-symbols-outlined">dashboard</i>
-      <p>Home</p>
+{#if !isMobile() || visible}
+  <div class="sidebar">
+    <div class="logo-container">
+      <Icon name="onyx-logo" width="152" />
     </div>
-    <div
-      on:click={() => navigateLink("/actions")}
-      class="nav-item {$currentPath === '/actions' && 'active'}"
-    >
-      <i class="material-symbols-outlined">bolt</i>
-      <p>Actions</p>
-    </div>
-    <!-- <div
+    <div class="nav-items">
+      <div
+        on:click={() => {
+          navigateLink("/home");
+          if (isMobile()) visible = false;
+        }}
+        class="nav-item {($currentPath === '/home' || $currentPath === '/') &&
+          'active'}"
+      >
+        <i class="material-symbols-outlined">dashboard</i>
+        <p>Home</p>
+      </div>
+      <div
+        on:click={() => {
+          navigateLink("/actions");
+          if (isMobile()) visible = false;
+        }}
+        class="nav-item {$currentPath === '/actions' && 'active'}"
+      >
+        <i class="material-symbols-outlined">bolt</i>
+        <p>Actions</p>
+      </div>
+      <!-- <div
       on:click={() => navigateLink("/graphics")}
       class="nav-item {$currentPath === '/graphics' && 'active'}"
     >
@@ -63,14 +78,67 @@
       <i class="material-symbols-outlined">precision_manufacturing</i>
       <p>Robots</p>
     </div> -->
+    </div>
   </div>
+{/if}
+
+<div
+  class="burger"
+  on:click={() => {
+    visible = !visible;
+  }}
+>
+  {#if !visible}
+    <Icon name="menu" width="24px" height="24px" />
+  {:else}
+    <Icon name="close" width="24px" height="24px" color="#fc3a0a" />
+  {/if}
 </div>
 
 <style lang="scss">
   @use "../../styles/partials/mixins" as *;
   @use "../../styles/partials/variables" as *;
+
+  .burger {
+    position: fixed;
+    top: 50vh;
+    right: 14px;
+    padding: 14px;
+    background-color: #fff;
+    border-radius: 50%;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+
+    @include tablet {
+      top: 20px;
+      right: 20px;
+    }
+
+    @include desktop {
+      display: none;
+    }
+  }
+
   .sidebar {
-    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #fff;
+
+    @include tablet {
+      width: 300px;
+      height: 100vh;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
     @include desktop {
       display: block;
       width: 224px;

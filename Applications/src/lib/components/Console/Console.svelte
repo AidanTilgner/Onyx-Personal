@@ -19,23 +19,21 @@
 
   let ref = null;
 
-  onMount(() => {
-    ref = document.getElementById("console-input");
-    if (ref) {
-      ref.focus();
+  onMount(() => {});
+
+  // listen for ctrl + shift + ` to open console
+  document.addEventListener("keydown", (e) => {
+    if (e.ctrlKey && e.shiftKey && e.key === ">") {
+      open = !open;
     }
   });
+
+  $: open && ref && ref.focus();
 </script>
 
 <div class="console-container">
   {#if open}
-    <div
-      class="console"
-      on:click={() => {
-        ref = document.getElementById("console-input");
-        ref.focus();
-      }}
-    >
+    <div class="console">
       <div class="console-messages">
         {#each messagesArray as message}
           <p class="console-message">{JSON.stringify(message)}</p>
@@ -56,6 +54,7 @@
             }
           }}
           id="console-input"
+          bind:this={ref}
         />
       </div>
       <i
