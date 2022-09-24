@@ -1,22 +1,3 @@
-import { console_messages } from "../../stores/socket";
-import { history } from "../../stores/commands";
-
-export const dispatch = (command, ...args) => {
-  if (!commandMappings[command]) {
-    console_messages.update((messages) => [
-      ...messages,
-      `Command "${command}" not found`,
-    ]);
-    return;
-  }
-  history.update((history) => [...history, `${command} ${args.join(" ")}`]);
-  return commandMappings[command](command, ...args);
-};
-
-const clearConsole = () => {
-  console_messages.set([]);
-};
-
 const dispatchCommand = (command, ...args) => {
   switch (args[0]) {
     case "action":
@@ -25,6 +6,8 @@ const dispatchCommand = (command, ...args) => {
       return;
   }
 };
+
+export default dispatchCommand;
 
 const dispatchAction = async (command, ...args) => {
   try {
@@ -48,18 +31,8 @@ const dispatchAction = async (command, ...args) => {
       .catch((err) => {
         console.error(err);
       });
-    console_messages.update((messages) => [
-      ...messages,
-      response.message,
-      response.response,
-    ]);
-    return response;
+    return [response.message, response.response];
   } catch (err) {
     console.error(err);
   }
-};
-
-const commandMappings = {
-  dispatch: dispatchCommand,
-  clear: clearConsole,
 };

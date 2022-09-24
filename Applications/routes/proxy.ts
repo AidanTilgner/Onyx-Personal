@@ -1,6 +1,6 @@
 import { Router } from "express";
 import axios from "axios";
-import { actionServer } from "../utils/axios";
+import { actionServer, interpretationServer } from "../utils/axios";
 import { config } from "dotenv";
 import multer from "multer";
 import FormData from "form-data";
@@ -103,6 +103,15 @@ router.get("/actions/metadata/:action", async (req, res) => {
     return res.send({
       error: err,
     });
+  }
+});
+
+router.post("/nlu", async (req, res) => {
+  try {
+    const response = await interpretationServer.post("/nlu", req.body);
+    return res.send(response.data);
+  } catch (err) {
+    console.error("Error: ", err);
   }
 });
 
