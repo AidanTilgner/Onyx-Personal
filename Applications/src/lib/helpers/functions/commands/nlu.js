@@ -43,10 +43,7 @@ const testNlu = async () => {
     if (error) {
       return [error];
     }
-    if (!nlu_response.length) {
-      return ["No NLU response"];
-    }
-    return [`NLU Response: ${nlu_response}`];
+    return ["NLU server is running"];
   } catch (err) {
     console.error(err);
     return ["NLU Server is not running."];

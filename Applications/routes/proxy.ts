@@ -115,6 +115,21 @@ router.post("/nlu", async (req, res) => {
   }
 });
 
+router.post("/nlu/test", async (req, res) => {
+  try {
+    // test that the nlu server is running with a timeout of 5 seconds
+    const response = await interpretationServer.post("/nlu", req.body, {
+      timeout: 5000,
+    });
+    return res.send(response.data);
+  } catch (err) {
+    console.error("Error: ", err);
+    res.send({
+      error: err,
+    });
+  }
+});
+
 export default router;
 
 const destinations: { [key: string]: string | undefined } = {
