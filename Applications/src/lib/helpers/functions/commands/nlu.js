@@ -6,6 +6,8 @@ const nluCommand = async (command, ...args) => {
     switch (type) {
       case "say":
         return sayCommand(command, ...rest);
+      case "test":
+        return testNlu();
       default:
         return [`"${type}" not recognized as a valid NLU command`];
     }
@@ -15,6 +17,41 @@ const nluCommand = async (command, ...args) => {
 };
 
 export default nluCommand;
+
+const testNlu = async () => {
+  try {
+    // test that nlu server is running by pinging it with a request
+    // set a timeout of 5 seconds which will throw an error if the server doesn't respond
+    const response = await fetch(`/api/proxy/nlu/test`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        text: "test",
+      }),
+    })
+      .then((res) => res.json())
+      .catch((err) => {
+        console.error(err);
+        return err;
+      });
+    const {
+      nlu: { nlu_response, responses },
+      error,
+    } = response;
+    if (error) {
+      return [error];
+    }
+    if (!nlu_response.length) {
+      return ["No NLU response"];
+    }
+    return [`NLU Response: ${nlu_response}`];
+  } catch (err) {
+    console.error(err);
+    return ["NLU Server is not running."];
+  }
+};
 
 const sayCommand = async (command, ...args) => {
   try {

@@ -34,17 +34,21 @@
   <hr />
   <Subtitle title="Actions" />
   <div class="actions-list">
-    {#each actionNames as actionName}
-      <div class="action-group">
-        <h3>{formatName(actionName)}</h3>
-        {#each actions[actionName] as action}
-          <ActionCard
-            action={`${actionName}.${action}`}
-            custom_style="margin-bottom: 14px;"
-          />
-        {/each}
-      </div>
-    {/each}
+    {#if actions?.length}
+      {#each actionNames as actionName}
+        <div class="action-group">
+          <h3>{formatName(actionName)}</h3>
+          {#each actions[actionName] as action}
+            <ActionCard
+              action={`${actionName}.${action}`}
+              custom_style="margin-bottom: 14px;"
+            />
+          {/each}
+        </div>
+      {/each}
+    {:else}
+      <div class="empty">No actions</div>
+    {/if}
   </div>
 </main>
 

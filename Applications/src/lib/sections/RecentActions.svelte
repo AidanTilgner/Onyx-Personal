@@ -24,9 +24,13 @@
   ]}
 />
 <div class="actions">
-  {#each actions as action}
-    <ActionCard {action} />
-  {/each}
+  {#if actions?.length}
+    {#each actions as action}
+      <ActionCard {action} />
+    {/each}
+  {:else}
+    <div class="empty">No recent actions</div>
+  {/if}
 </div>
 
 <style lang="scss">
