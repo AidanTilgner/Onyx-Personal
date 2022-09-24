@@ -129,8 +129,8 @@
     background-color: #fff;
 
     .close-button {
-      position: fixed;
-      bottom: 24px;
+      position: absolute;
+      top: 24px;
       right: 24px;
       padding: 8px;
       font-size: 18px;

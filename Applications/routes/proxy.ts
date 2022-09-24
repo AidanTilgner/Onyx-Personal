@@ -1,6 +1,6 @@
 import { Router } from "express";
 import axios from "axios";
-import { actionServer } from "../utils/axios";
+import { actionServer, interpretationServer } from "../utils/axios";
 import { config } from "dotenv";
 import multer from "multer";
 import FormData from "form-data";
@@ -101,6 +101,30 @@ router.get("/actions/metadata/:action", async (req, res) => {
   } catch (err) {
     console.error("Error: ", err);
     return res.send({
+      error: err,
+    });
+  }
+});
+
+router.post("/nlu", async (req, res) => {
+  try {
+    const response = await interpretationServer.post("/nlu", req.body);
+    return res.send(response.data);
+  } catch (err) {
+    console.error("Error: ", err);
+  }
+});
+
+router.post("/nlu/test", async (req, res) => {
+  try {
+    // test that the nlu server is running with a timeout of 5 seconds
+    const response = await interpretationServer.post("/nlu", req.body, {
+      timeout: 5000,
+    });
+    return res.send(response.data);
+  } catch (err) {
+    console.error("Error: ", err);
+    res.send({
       error: err,
     });
   }
