@@ -12,14 +12,11 @@ export default dispatchCommand;
 const dispatchAction = async (command, ...args) => {
   try {
     const [command, action, ...rest] = args;
-    console.log("Entities", rest);
     const formattedEntities = {};
     rest.forEach((entity) => {
-      console.log("Entity", entity);
       const [key, value] = entity.split(":");
       formattedEntities[key] = value;
     });
-    console.log("Sending body", formattedEntities);
     const response = await fetch(`/api/proxy/actions/${action}`, {
       method: "POST",
       headers: {

@@ -1,6 +1,5 @@
 const nluCommand = async (command, ...args) => {
   try {
-    console.log("NLU Command", command, args);
     const [type, ...rest] = args;
 
     switch (type) {
