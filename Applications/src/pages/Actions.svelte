@@ -34,7 +34,7 @@
   <hr />
   <Subtitle title="Actions" />
   <div class="actions-list">
-    {#if actions?.length}
+    {#if actionNames?.length}
       {#each actionNames as actionName}
         <div class="action-group">
           <h3>{formatName(actionName)}</h3>
