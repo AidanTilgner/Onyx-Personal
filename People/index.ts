@@ -4,11 +4,14 @@ import cors from "cors";
 import { config } from "dotenv";
 import { createServer } from "http";
 import { initIO } from "./utils/socket-io";
+import { initDB } from "./utils/surrealdb";
+import UsersRouter from "./routes/users";
 
 const app = express();
 const server = createServer(app);
 
 config();
+initDB();
 initIO(server);
 
 app.use(
@@ -19,6 +22,8 @@ app.use(
 );
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+app.use("/api/users", UsersRouter);
 
 app.use(express.static(path.join(__dirname, "public")));
 
