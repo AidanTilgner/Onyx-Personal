@@ -6,6 +6,7 @@ import { createServer } from "http";
 import { initIO } from "utils/socket-io";
 import { initDB } from "utils/surrealdb";
 import UsersRouter from "routes/users";
+import AuthRouter from "routes/auth";
 
 const app = express();
 const server = createServer(app);
@@ -23,6 +24,7 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+app.use("/api/auth", AuthRouter);
 app.use("/api/users", UsersRouter);
 
 app.use(express.static(path.join(__dirname, "public")));

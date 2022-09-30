@@ -1,24 +1,41 @@
-import db, { query } from "utils/surrealdb";
+import db from "utils/surrealdb";
 import { generateRandomPassword, hashPassword } from "utils/crypto";
+import { User } from "interfaces/users";
 
 export const addUser = async (username: string) => {
   try {
     if (!username) {
-      throw new Error("Username not provided");
+      return {
+        error: "Username is required",
+        message: "Username is required",
+      };
     }
-    const result = await db.query(
+    if (await checkUserExists(username)) {
+      return {
+        error: "Username already exists",
+        message: "Username already exists",
+      };
+    }
+    const randomPassword = generateRandomPassword();
+    const [result] = await db.query(
       "CREATE user SET username = $username, password = $password",
       {
         username: username,
-        password: await hashPassword(generateRandomPassword()),
+        password: await hashPassword(randomPassword),
       }
     );
-    if (!result) {
-      throw new Error("No result returned");
+    if (!result.result) {
+      return {
+        error: "There was an error adding the user",
+        message: "There was an error adding the user",
+      };
     }
 
+    const user = result.result[0] as User;
+
     return {
-      ...result,
+      result: user,
+      generated_password: randomPassword,
       message: "User added successfully",
     };
   } catch (err) {
@@ -30,19 +47,62 @@ export const addUser = async (username: string) => {
   }
 };
 
-export const getUser = async (username: string) => {
+export const checkUserExists = async (username: string) => {
   try {
     if (!username) {
       throw new Error("Username not provided");
     }
-    const result = await db.query(
+    const [result] = await db.query(
+      "SELECT username FROM user WHERE username = $username",
+      {
+        username: username,
+      }
+    );
+
+    if (!result.result) {
+      return false;
+    }
+
+    const users = result.result as Array<User>;
+
+    if (users.length > 0) {
+      return true;
+    }
+
+    return false;
+  } catch (err) {
+    console.error(err);
+    return null;
+  }
+};
+
+export const getUser = async (username: string) => {
+  try {
+    if (!username) {
+      return {
+        error: "Username is required",
+        message: "Username is required",
+      };
+    }
+
+    const [result] = await db.query(
       "SELECT * FROM user WHERE username = $username",
       {
         username: username,
       }
     );
+
+    if ((result.result as any[])?.length === 0) {
+      return {
+        error: "User not found",
+        message: "User not found",
+      };
+    }
+
+    const user = result.result[0] as User;
+
     return {
-      ...result,
+      result: user,
       message: "User fetched successfully",
     };
   } catch (err) {
@@ -50,6 +110,35 @@ export const getUser = async (username: string) => {
     return {
       error: err,
       message: "There was an error fetching the user",
+    };
+  }
+};
+
+export const deleteUser = async (username: string) => {
+  try {
+    if (!username) {
+      return {
+        error: "Username is required",
+        message: "Username is required",
+      };
+    }
+
+    const [result] = await db.query(
+      "DELETE FROM user WHERE username = $username",
+      {
+        username: username,
+      }
+    );
+
+    return {
+      result: result.result,
+      message: "User deleted successfully",
+    };
+  } catch (err) {
+    console.error(err);
+    return {
+      error: err,
+      message: "There was an error deleting the user",
     };
   }
 };
