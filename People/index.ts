@@ -3,9 +3,9 @@ import path from "path";
 import cors from "cors";
 import { config } from "dotenv";
 import { createServer } from "http";
-import { initIO } from "./utils/socket-io";
-import { initDB } from "./utils/surrealdb";
-import UsersRouter from "./routes/users";
+import { initIO } from "utils/socket-io";
+import { initDB } from "utils/surrealdb";
+import UsersRouter from "routes/users";
 
 const app = express();
 const server = createServer(app);

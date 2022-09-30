@@ -48,4 +48,20 @@ export async function initDB() {
   }
 }
 
+export const closeDB = async () => {
+  try {
+    db.close();
+    console.log("Database connection closed");
+  } catch (err) {
+    console.error(err);
+  }
+};
+
 export default db;
+
+export const query = db.query;
+export const create = db.create;
+export const change = db.change;
+export const update = db.update;
+export const modify = db.modify;
+export const remove = db.delete;
