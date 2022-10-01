@@ -1,7 +1,9 @@
 import { Router } from "express";
 import { addUser, deleteUser, getUser } from "database/queries/users";
-import { generateToken } from "utils/jwt";
+import { generateRefreshToken, generateToken } from "utils/jwt";
 import { comparePassword } from "utils/crypto";
+import { addRefreshToken } from "database/queries/tokens";
+import { refreshUser, signInUser } from "controllers/users";
 
 const router = Router();
 
@@ -50,31 +52,27 @@ router.delete("/", async (req, res) => {
 router.post("/signin", async (req, res) => {
   try {
     const { username, password } = req.body;
-    const { result, error, message } = await getUser(username);
-    if (error) {
-      return res.send({
-        error,
-        message,
-      });
-    }
-    const { password: hashedPassword } = result;
-    const isPasswordCorrect = await comparePassword(password, hashedPassword);
-    if (!isPasswordCorrect) {
-      return res.send({
-        error: "Invalid password",
-        message: "Invalid password",
-      });
-    }
-    const token = generateToken({ username });
-    res.send({
-      token: token,
-      message: "User signed in successfully",
-    });
+    const toSend = await signInUser(username, password);
+    res.send(toSend);
   } catch (err) {
     console.error(err);
     return res.send({
       error: err,
       message: "There was an error signing in the user",
+    });
+  }
+});
+
+router.post("/refresh", async (req, res) => {
+  try {
+    const { username, refresh_token } = req.body;
+    const toSend = await refreshUser(username, refresh_token);
+    res.send(toSend);
+  } catch (err) {
+    console.error(err);
+    return res.send({
+      error: err,
+      message: "There was an error refreshing the token",
     });
   }
 });

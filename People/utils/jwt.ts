@@ -21,7 +21,7 @@ export const generateToken = (
   });
 };
 
-export const generateResetToken = (
+export const generateRefreshToken = (
   token: {
     [key: string]: any;
   },
@@ -41,6 +41,6 @@ export const verifyToken = (token: string) => {
   return jwt.verify(token, JWT_SECRET);
 };
 
-export const verifyResetToken = (token: string) => {
+export const verifyRefreshToken = (token: string) => {
   return jwt.verify(token, JWT_RESET);
 };
