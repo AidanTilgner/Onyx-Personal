@@ -4,7 +4,11 @@ import {
   generateToken,
   verifyRefreshToken,
 } from "@utils/jwt";
-import { addRefreshToken, getRefreshToken } from "database/queries/tokens";
+import {
+  addRefreshToken,
+  getRefreshToken,
+  deleteRefreshToken,
+} from "database/queries/tokens";
 import { getUser } from "database/queries/users";
 
 export const signInUser = async (username: string, password: string) => {
@@ -37,6 +41,7 @@ export const signInUser = async (username: string, password: string) => {
       };
     }
 
+    await deleteRefreshToken(username);
     const access_token = generateToken({ username });
     const refresh_token = generateRefreshToken(
       { access_token },

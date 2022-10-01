@@ -58,3 +58,31 @@ export const getRefreshToken = async (key: string) => {
     };
   }
 };
+
+export const deleteRefreshToken = async (key: string) => {
+  try {
+    const [result] = await db.query(
+      "DELETE FROM reset_token WHERE key = $key",
+      {
+        key: key,
+      }
+    );
+
+    if (!result.result) {
+      return {
+        error: "There was an error deleting the reset token",
+        message: "There was an error deleting the reset token",
+      };
+    }
+    return {
+      result: result.result,
+      message: "Reset token deleted successfully",
+    };
+  } catch (err) {
+    console.error(err);
+    return {
+      error: err,
+      message: "There was an error deleting the reset token",
+    };
+  }
+};
