@@ -5,6 +5,7 @@ import { config } from "dotenv";
 import { createServer } from "http";
 import { initIO } from "utils/socket-io";
 import { initDB } from "utils/surrealdb";
+import { initDefaultUser } from "utils/auth";
 import UsersRouter from "routes/users";
 import AuthRouter from "routes/auth";
 
@@ -12,7 +13,9 @@ const app = express();
 const server = createServer(app);
 
 config();
-initDB();
+initDB().then((res) => {
+  initDefaultUser();
+});
 initIO(server);
 
 app.use(

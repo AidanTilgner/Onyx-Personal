@@ -1,5 +1,8 @@
 import { Role, AllowedRoles } from "interfaces/roles";
-import { getUser } from "database/queries/users";
+import { getUser, addUser } from "database/queries/users";
+import { writeFileSync } from "fs";
+import { config } from "dotenv";
+config({ path: "../.env" });
 
 export const roles: {
   [key in AllowedRoles]: Role;
@@ -47,5 +50,41 @@ export const tokenHasRole = async (
   } catch (err) {
     console.error(err);
     return false;
+  }
+};
+
+export const initDefaultUser = async () => {
+  try {
+    const { DEFAULT_USERNAME } = process.env;
+    const { user: existing_user, error: existing_error } = await getUser(
+      DEFAULT_USERNAME
+    );
+    if (existing_error) {
+      console.log(
+        "There was an error checking if the default user exists",
+        existing_error
+      );
+    }
+    if (existing_user) {
+      console.log("Default user already exists");
+      return;
+    }
+    console.log("Adding user...");
+    const { user, error, generated_password } = await addUser(
+      DEFAULT_USERNAME,
+      "hyperuser"
+    );
+    if (error) {
+      console.error(error);
+      return;
+    }
+    console.log("Added user", user);
+
+    writeFileSync(
+      ".secrets",
+      `default_username=${user.username}\ndefault_password=${generated_password}`
+    );
+  } catch (err) {
+    console.error(err);
   }
 };

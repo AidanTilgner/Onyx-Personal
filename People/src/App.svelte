@@ -6,6 +6,8 @@
   import { globalHistory } from "svelte-routing/src/history";
   import { initSocket } from "@src/bootstrap/socket.io";
   import { messages } from "@lib/stores/socket";
+  import "carbon-components-svelte/css/all.css";
+  import Login from "./pages/Login/Main.svelte";
 
   initSocket();
 
@@ -25,6 +27,7 @@
 
 <main>
   <Router {url}>
+    <Route path="/login" component={Login} />
     <Route path="*">
       <div class="content-container">
         <p>Hello world</p>

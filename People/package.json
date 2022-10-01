@@ -50,6 +50,7 @@
     "@tsconfig/svelte": "^2.0.1",
     "@types/bcrypt": "^5.0.0",
     "@types/jsonwebtoken": "^8.5.9",
+    "carbon-components-svelte": "^0.70.9",
     "nodemon": "^2.0.19",
     "svelte-check": "^2.0.0",
     "svelte-preprocess": "^4.0.0",

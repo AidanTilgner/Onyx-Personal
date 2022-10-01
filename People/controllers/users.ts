@@ -13,9 +13,10 @@ import {
   getUser as getDBUser,
   addUser as addDBUser,
 } from "database/queries/users";
+import { AllowedRoles } from "interfaces/roles";
 import { User } from "interfaces/users";
 
-export const addUser = async (username: string, role: string) => {
+export const addUser = async (username: string, role: AllowedRoles) => {
   try {
     const { user, error } = await addDBUser(username, role);
     if (error) {

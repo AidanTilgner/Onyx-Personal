@@ -1,6 +1,6 @@
 import { verifyToken } from "utils/jwt";
 import type { Request, Response, NextFunction } from "express";
-import { tokenHasRole } from "@utils/roles";
+import { tokenHasRole } from "@utils/auth";
 
 export const authenticateToken = async (
   req: Request,

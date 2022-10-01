@@ -1,11 +1,16 @@
 import db from "utils/surrealdb";
 import { generateRandomPassword, hashPassword } from "utils/crypto";
 import { User } from "interfaces/users";
+import { AllowedRoles } from "interfaces/roles";
 
 export const addUser = async (
   username: string,
-  role: string
-): Promise<{ user?: User; error?: string } | null> => {
+  role: AllowedRoles
+): Promise<{
+  user?: User;
+  generated_password?: string;
+  error?: string;
+} | null> => {
   try {
     if (!username) {
       return {
@@ -37,7 +42,7 @@ export const addUser = async (
 
     const user = result.result[0] as User;
 
-    return { user };
+    return { user, generated_password: randomPassword };
   } catch (err) {
     console.error(err);
     return {
@@ -80,7 +85,9 @@ export const getUser = async (
 ): Promise<{ user?: User; error?: string } | null> => {
   try {
     if (!username) {
-      return null;
+      return {
+        error: "Username is required",
+      };
     }
 
     const [result] = await db.query(
@@ -91,7 +98,9 @@ export const getUser = async (
     );
 
     if ((result.result as any[])?.length === 0) {
-      return null;
+      return {
+        error: "User not found",
+      };
     }
 
     const user = result.result[0] as User;
