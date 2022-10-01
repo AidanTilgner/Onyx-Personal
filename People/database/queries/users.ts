@@ -2,52 +2,51 @@ import db from "utils/surrealdb";
 import { generateRandomPassword, hashPassword } from "utils/crypto";
 import { User } from "interfaces/users";
 
-export const addUser = async (username: string) => {
+export const addUser = async (
+  username: string,
+  role: string
+): Promise<{ user?: User; error?: string } | null> => {
   try {
     if (!username) {
       return {
         error: "Username is required",
-        message: "Username is required",
       };
+    }
+    if (!role) {
+      role = "user";
     }
     if (await checkUserExists(username)) {
       return {
-        error: "Username already exists",
-        message: "Username already exists",
+        error: "User already exists",
       };
     }
     const randomPassword = generateRandomPassword();
     const [result] = await db.query(
-      "CREATE users SET username = $username, password = $password",
+      "CREATE users SET username = $username, password = $password, role = $role",
       {
         username: username,
         password: await hashPassword(randomPassword),
+        role: role,
       }
     );
     if (!result.result) {
       return {
         error: "There was an error adding the user",
-        message: "There was an error adding the user",
       };
     }
 
     const user = result.result[0] as User;
 
-    return {
-      result: user,
-      generated_password: randomPassword,
-      message: "User added successfully",
-    };
+    return { user };
   } catch (err) {
     console.error(err);
     return {
       error: err,
-      message: "There was an error adding the user",
     };
   }
 };
 
-export const checkUserExists = async (username: string) => {
+export const checkUserExists = async (username: string): Promise<boolean> => {
   try {
     if (!username) {
       throw new Error("Username not provided");
@@ -76,13 +75,12 @@ export const checkUserExists = async (username: string) => {
   }
 };
 
-export const getUser = async (username: string) => {
+export const getUser = async (
+  username: string
+): Promise<{ user?: User; error?: string } | null> => {
   try {
     if (!username) {
-      return {
-        error: "Username is required",
-        message: "Username is required",
-      };
+      return null;
     }
 
     const [result] = await db.query(
@@ -93,23 +91,16 @@ export const getUser = async (username: string) => {
     );
 
     if ((result.result as any[])?.length === 0) {
-      return {
-        error: "User not found",
-        message: "User not found",
-      };
+      return null;
     }
 
     const user = result.result[0] as User;
 
-    return {
-      result: user,
-      message: "User fetched successfully",
-    };
+    return { user };
   } catch (err) {
     console.error(err);
     return {
       error: err,
-      message: "There was an error fetching the user",
     };
   }
 };
@@ -139,6 +130,42 @@ export const deleteUser = async (username: string) => {
     return {
       error: err,
       message: "There was an error deleting the user",
+    };
+  }
+};
+
+export const updateRole = async (username: string, role: string) => {
+  try {
+    if (!username) {
+      return {
+        error: "Username is required",
+        message: "Username is required",
+      };
+    }
+    if (!role) {
+      return {
+        error: "Role is required",
+        message: "Role is required",
+      };
+    }
+
+    const [result] = await db.query(
+      "UPDATE users SET role = $role WHERE username = $username",
+      {
+        username: username,
+        role: role,
+      }
+    );
+
+    return {
+      result: result.result,
+      message: "Role updated successfully",
+    };
+  } catch (err) {
+    console.error(err);
+    return {
+      error: err,
+      message: "There was an error updating the role",
     };
   }
 };

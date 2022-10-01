@@ -9,17 +9,64 @@ import {
   getRefreshToken,
   deleteRefreshToken,
 } from "database/queries/tokens";
-import { getUser } from "database/queries/users";
+import {
+  getUser as getDBUser,
+  addUser as addDBUser,
+} from "database/queries/users";
+import { User } from "interfaces/users";
+
+export const addUser = async (username: string, role: string) => {
+  try {
+    const { user, error } = await addDBUser(username, role);
+    if (error) {
+      return {
+        error: error,
+        message: "There was an error adding the user",
+      };
+    }
+    return {
+      result: user,
+      message: "User added successfully",
+    };
+  } catch (err) {
+    console.error(err);
+    return {
+      error: err,
+      message: "There was an error adding the user",
+    };
+  }
+};
+
+export const getUser = async (username: string) => {
+  try {
+    const { user, error } = await getDBUser(username);
+    if (error) {
+      return {
+        error: error,
+        message: "There was an error fetching the user",
+      };
+    }
+    return {
+      result: user,
+      message: "User fetched successfully",
+    };
+  } catch (err) {
+    console.error(err);
+    return {
+      error: err,
+      message: "There was an error fetching the user",
+    };
+  }
+};
 
 export const signInUser = async (username: string, password: string) => {
   try {
     // Find user
-    const { result: user, error, message } = await getUser(username);
+    const { user, error } = await getDBUser(username);
 
     if (error) {
       return {
         error,
-        message,
       };
     }
 
@@ -41,8 +88,8 @@ export const signInUser = async (username: string, password: string) => {
       };
     }
 
+    const access_token = generateToken(user);
     await deleteRefreshToken(username);
-    const access_token = generateToken({ username });
     const refresh_token = generateRefreshToken(
       { access_token },
       { expiresIn: "1y" }
@@ -66,7 +113,6 @@ export const signInUser = async (username: string, password: string) => {
 export const refreshUser = async (username: string, refresh_token: string) => {
   try {
     const validated = verifyRefreshToken(refresh_token);
-    console.log("VALIDATED", validated);
 
     if (!validated) {
       return {
@@ -82,7 +128,6 @@ export const refreshUser = async (username: string, refresh_token: string) => {
       error,
       message,
     } = response;
-    console.log("TOKEN", response);
 
     if (error) {
       return {
@@ -99,29 +144,25 @@ export const refreshUser = async (username: string, refresh_token: string) => {
       };
     }
 
-    // const {
-    //   result: user,
-    //   error: user_error,
-    //   message: user_message,
-    // } = await getUser(username);
+    const { user, error: user_error } = await getDBUser(username);
 
-    // if (user_error) {
-    //   return {
-    //     error: user_error,
-    //     message: user_message,
-    //   };
-    // }
+    if (user_error) {
+      return {
+        error: user_error,
+        message: "There was an error fetching the user",
+      };
+    }
 
-    // if (!user) {
-    //   return {
-    //     error: "User not found",
-    //     message: "User not found",
-    //   };
-    // }
-    // ^ For if you want to generate a more complex token
+    if (!user) {
+      return {
+        error: "User not found",
+        message: "User not found",
+      };
+    }
 
-    const new_access_token = generateToken({ username });
-    console.log("NEW ACCESS TOKEN", new_access_token);
+    delete user.password;
+
+    const new_access_token = generateToken(user);
 
     return {
       message: "User authenticated successfully",
@@ -133,6 +174,37 @@ export const refreshUser = async (username: string, refresh_token: string) => {
     return {
       error: err,
       message: "There was an error refreshing the token",
+    };
+  }
+};
+
+export const getMe = async (decoded: User) => {
+  try {
+    const { username } = decoded;
+    const { user, error } = await getDBUser(username);
+
+    if (error) {
+      return {
+        error,
+      };
+    }
+
+    if (!user) {
+      return {
+        error: "User not found",
+        message: "User not found",
+      };
+    }
+
+    return {
+      result: user,
+      message: "User fetched successfully",
+    };
+  } catch (err) {
+    console.error(err);
+    return {
+      error: err,
+      message: "There was an error fetching the user",
     };
   }
 };

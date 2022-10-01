@@ -1,16 +1,15 @@
 import { Router } from "express";
-import { addUser, deleteUser, getUser } from "database/queries/users";
-import { generateRefreshToken, generateToken } from "utils/jwt";
-import { comparePassword } from "utils/crypto";
-import { addRefreshToken } from "database/queries/tokens";
+import { deleteUser, getUser } from "database/queries/users";
+import { addUser, getMe } from "controllers/users";
 import { refreshUser, signInUser } from "controllers/users";
+import { authenticateSuperUser, authenticateToken } from "middleware/auth";
 
 const router = Router();
 
-router.post("/add", async (req, res) => {
+router.post("/add", authenticateSuperUser, async (req, res) => {
   try {
-    const { username } = req.body;
-    const result = await addUser(username);
+    const { username, role } = req.body;
+    const result = await addUser(username, role);
     res.send(result);
   } catch (err) {
     console.error(err);
@@ -21,10 +20,44 @@ router.post("/add", async (req, res) => {
   }
 });
 
-router.get("/", async (req, res) => {
+router.get("/", authenticateSuperUser, async (req, res) => {
   try {
     const username = req.body.username || req.query.username;
     const result = await getUser(username);
+    res.send(result);
+  } catch (err) {
+    console.error(err);
+    return res.send({
+      error: err,
+      message: "There was an error fetching the user",
+    });
+  }
+});
+
+router.get("/:username", authenticateSuperUser, async (req, res) => {
+  try {
+    const username = req.params.username;
+    const result = await getUser(username);
+    res.send(result);
+  } catch (err) {
+    console.error(err);
+    return res.send({
+      error: err,
+      message: "There was an error fetching the user",
+    });
+  }
+});
+
+router.get("/me", authenticateToken, async (req, res) => {
+  try {
+    const decoded = req.body.decoded_token;
+    if (typeof decoded === "string") {
+      return res.send({
+        error: decoded,
+        message: "There was an error fetching the user",
+      });
+    }
+    const result = await getMe(decoded);
     res.send(result);
   } catch (err) {
     console.error(err);
