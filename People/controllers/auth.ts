@@ -14,7 +14,7 @@ export const refreshToken = async (key: string, refresh_token: string) => {
     }
 
     const {
-      result: { token },
+      result: { value: token },
       error,
       message,
     } = await getRefreshToken(key);

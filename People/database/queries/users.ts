@@ -18,7 +18,7 @@ export const addUser = async (username: string) => {
     }
     const randomPassword = generateRandomPassword();
     const [result] = await db.query(
-      "CREATE user SET username = $username, password = $password",
+      "CREATE users SET username = $username, password = $password",
       {
         username: username,
         password: await hashPassword(randomPassword),
@@ -53,7 +53,7 @@ export const checkUserExists = async (username: string) => {
       throw new Error("Username not provided");
     }
     const [result] = await db.query(
-      "SELECT username FROM user WHERE username = $username",
+      "SELECT username FROM users WHERE username = $username",
       {
         username: username,
       }
@@ -86,7 +86,7 @@ export const getUser = async (username: string) => {
     }
 
     const [result] = await db.query(
-      "SELECT * FROM user WHERE username = $username",
+      "SELECT * FROM users WHERE username = $username",
       {
         username: username,
       }
@@ -124,7 +124,7 @@ export const deleteUser = async (username: string) => {
     }
 
     const [result] = await db.query(
-      "DELETE FROM user WHERE username = $username",
+      "DELETE FROM users WHERE username = $username",
       {
         username: username,
       }

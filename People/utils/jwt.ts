@@ -37,8 +37,14 @@ export const generateRefreshToken = (
   });
 };
 
-export const verifyToken = (token: string) => {
-  return jwt.verify(token, JWT_SECRET);
+export const verifyToken = async (token: string) => {
+  try {
+    const verified = jwt.verify(token, JWT_SECRET);
+    return verified;
+  } catch (err) {
+    console.error(err);
+    return false;
+  }
 };
 
 export const verifyRefreshToken = (token: string) => {
