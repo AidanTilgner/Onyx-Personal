@@ -178,3 +178,27 @@ export const updateRole = async (username: string, role: string) => {
     };
   }
 };
+
+export const getUsers = async (): Promise<{
+  users?: Array<User>;
+  error?: string;
+} | null> => {
+  try {
+    const [result] = await db.query("SELECT * FROM users");
+
+    if ((result.result as any[])?.length === 0) {
+      return {
+        error: "No users found",
+      };
+    }
+
+    const users = result.result as Array<User>;
+
+    return { users };
+  } catch (err) {
+    console.error(err);
+    return {
+      error: err,
+    };
+  }
+};

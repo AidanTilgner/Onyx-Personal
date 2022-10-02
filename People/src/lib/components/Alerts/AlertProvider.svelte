@@ -43,5 +43,19 @@
     left: 24px;
     right: 24px;
     z-index: 1000;
+
+    animation-name: dropin;
+    animation-duration: 0.6s;
+    animation-timing-function: ease-in-out;
+    animation-fill-mode: forwards;
+  }
+
+  @keyframes dropin {
+    from {
+      transform: translateY(-75%);
+    }
+    to {
+      transform: translateY(0);
+    }
   }
 </style>

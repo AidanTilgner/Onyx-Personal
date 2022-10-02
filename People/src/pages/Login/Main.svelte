@@ -12,10 +12,8 @@
   };
 
   const handleSubmit = async () => {
-    console.log("Submitting form", formstate);
     const { username, password } = formstate;
     const response = await signinUser(username, password);
-    console.log("res: ", response);
     const {
       result: { access_token, refresh_token, message, error },
       error: main_error,

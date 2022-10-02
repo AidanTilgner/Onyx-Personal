@@ -56,6 +56,7 @@ export const tokenHasRole = async (
 export const initDefaultUser = async () => {
   try {
     const { DEFAULT_USERNAME } = process.env;
+    console.log("Adding default user...", DEFAULT_USERNAME);
     const { user: existing_user, error: existing_error } = await getUser(
       DEFAULT_USERNAME
     );
@@ -69,7 +70,6 @@ export const initDefaultUser = async () => {
       console.log("Default user already exists");
       return;
     }
-    console.log("Adding user...");
     const { user, error, generated_password } = await addUser(
       DEFAULT_USERNAME,
       "hyperuser"
@@ -78,7 +78,7 @@ export const initDefaultUser = async () => {
       console.error(error);
       return;
     }
-    console.log("Added user", user);
+    console.log("Added default user");
 
     writeFileSync(
       ".secrets",
