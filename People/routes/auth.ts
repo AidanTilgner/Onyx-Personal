@@ -22,8 +22,14 @@ router.post("/check", async (req, res) => {
   try {
     const token =
       req.body.token || req.headers["x-access-token"] || req.query.token;
+    if (!token) {
+      return res.send({
+        error: "No token provided",
+        message: "No token provided",
+        validated: false,
+      });
+    }
     const validated = await verifyToken(token);
-    console.log("VALIDATED in auth controller", validated);
     if (!validated) {
       return res.status(401).send({
         message: "Invalid token",

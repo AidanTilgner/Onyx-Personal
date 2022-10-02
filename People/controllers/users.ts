@@ -62,6 +62,7 @@ export const getUser = async (username: string) => {
 
 export const signInUser = async (username: string, password: string) => {
   try {
+    console.log("Signing in user", username);
     // Find user
     const { user, error } = await getDBUser(username);
 
