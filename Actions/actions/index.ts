@@ -107,8 +107,6 @@ const parseAndUseNLU = async (nlu: {
       }
     }
 
-    console.log("To send: ", toSend);
-
     return toSend;
   } catch (err) {
     console.log("Error parsing NLU:", err);

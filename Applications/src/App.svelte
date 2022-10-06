@@ -27,7 +27,7 @@
 
   let unsub;
   (async () => {
-    if (!(await checkAuth())) {
+    if (await checkAuth()) {
       navigate("/login");
     }
   })();

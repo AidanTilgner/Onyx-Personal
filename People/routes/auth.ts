@@ -23,7 +23,7 @@ router.post("/check", async (req, res) => {
     const token =
       req.body.token || req.headers["x-access-token"] || req.query.token;
     if (!token) {
-      return res.send({
+      return res.status(401).send({
         error: "No token provided",
         message: "No token provided",
         validated: false,

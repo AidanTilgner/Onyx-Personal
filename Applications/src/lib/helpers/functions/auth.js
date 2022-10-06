@@ -47,3 +47,20 @@ export const checkAuth = async () => {
 
   return true;
 };
+
+export const getLoginURL = async () => {
+  try {
+    const res = await axios.get("/api/auth/login-url");
+    return res.data.url;
+  } catch (err) {
+    console.error(err);
+    currentAlert.set({
+      title: "Error",
+      message:
+        "There was an error fetching the login url, please go to login page manually",
+      type: "danger",
+      show: true,
+    });
+    return false;
+  }
+};
