@@ -143,14 +143,14 @@ function stopRecording() {
 }
 
 async function sendAudio(blob) {
-  const formData = new FormData();
-  formData.append("audio", blob);
-  const authToken = localStorage.getItem("app_key");
+  const authToken = localStorage.getItem("access_token");
   if (!authToken) {
     alert("Please login to use this feature");
     return;
   }
 
+  const formData = new FormData();
+  formData.append("audio", blob);
   const { session_id } = JSON.parse(localStorage.getItem("session"));
 
   const pkg = {

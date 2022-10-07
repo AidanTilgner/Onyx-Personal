@@ -12,6 +12,7 @@ def packagesHandler(request):
     if request.method == "POST":
         # TODO: Add support for this being the last step in the chain
         data = request.form
+        print("Headers: ", request.headers.get("x-access-token"))
         pkg = json.loads(data["pkg"])
         current_step = pkg["steps"][str(pkg["current_step"])]
         file_name = current_step["use_file"] or current_step["use_files"][0]

@@ -1,3 +1,5 @@
+import { fetchApi } from "../fetch";
+
 const nluCommand = async (command, ...args) => {
   try {
     const [type, ...rest] = args;
@@ -21,7 +23,7 @@ const testNlu = async () => {
   try {
     // test that nlu server is running by pinging it with a request
     // set a timeout of 5 seconds which will throw an error if the server doesn't respond
-    const response = await fetch(`/api/proxy/nlu/test`, {
+    const response = await fetchApi(`/api/proxy/nlu/test`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -29,12 +31,7 @@ const testNlu = async () => {
       body: JSON.stringify({
         text: "test",
       }),
-    })
-      .then((res) => res.json())
-      .catch((err) => {
-        console.error(err);
-        return err;
-      });
+    });
     const {
       nlu: { nlu_response, responses },
       error,
@@ -52,7 +49,7 @@ const testNlu = async () => {
 const sayCommand = async (command, ...args) => {
   try {
     const text = args.join(" ");
-    const response = await fetch(`/api/proxy/nlu`, {
+    const response = await fetchApi(`/api/proxy/nlu`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -60,12 +57,7 @@ const sayCommand = async (command, ...args) => {
       body: JSON.stringify({
         text: text,
       }),
-    })
-      .then((res) => res.json())
-      .catch((err) => {
-        console.error(err);
-        return err;
-      });
+    });
     const {
       nlu: { nlu_response, responses },
       error,
