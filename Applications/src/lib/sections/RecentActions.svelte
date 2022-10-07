@@ -6,9 +6,11 @@
 
   let actions = [];
   onMount(async () => {
-    const res = await fetch("/api/proxy/recent-actions").then((res) =>
-      res.json()
-    );
+    const res = await fetch("/api/proxy/recent-actions", {
+      headers: {
+        "x-access-token": localStorage.getItem("access_token"),
+      },
+    }).then((res) => res.json());
     actions = res.actions;
   });
 </script>

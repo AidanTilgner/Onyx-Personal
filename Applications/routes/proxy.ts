@@ -33,7 +33,9 @@ router.post("/package", upload.any(), (req, res) => {
   }
 
   axios
-    .post(`${destinations[initial]}/package-hook`, form)
+    .post(`${destinations[initial]}/package-hook`, form, {
+      headers: form.getHeaders(),
+    })
     .then((response) => {
       return res.send(response.data);
     })
@@ -45,7 +47,13 @@ router.post("/package", upload.any(), (req, res) => {
 
 router.get("/actions", async (req, res) => {
   try {
-    const response = await actionServer.get("/actions");
+    const response = await actionServer.get("/actions", {
+      headers: {
+        "x-access-token":
+          (req.headers["x-access-token"] as string) ||
+          (req.headers["Authorization"] as string).split(" ")[1],
+      },
+    });
     return res.send(response.data);
   } catch (err) {
     console.error("Error: ", err);
@@ -57,7 +65,13 @@ router.get("/actions", async (req, res) => {
 
 router.get("/recent-actions", async (req, res) => {
   try {
-    const response = await actionServer.get("/actions/recent");
+    const response = await actionServer.get("/actions/recent", {
+      headers: {
+        "x-access-token":
+          (req.headers["x-access-token"] as string) ||
+          (req.headers["Authorization"] as string).split(" ")[1],
+      },
+    });
     return res.send(response.data);
   } catch (err) {
     console.error("Error: ", err);
@@ -69,7 +83,13 @@ router.get("/recent-actions", async (req, res) => {
 
 router.get("/actions/:action", async (req, res) => {
   try {
-    const response = await actionServer.get(`/actions/${req.params.action}`);
+    const response = await actionServer.get(`/actions/${req.params.action}`, {
+      headers: {
+        "x-access-token":
+          (req.headers["x-access-token"] as string) ||
+          (req.headers["Authorization"] as string).split(" ")[1],
+      },
+    });
     return res.send(response.data);
   } catch (err) {
     console.error("Error: ", err);
@@ -81,7 +101,13 @@ router.get("/actions/:action", async (req, res) => {
 
 router.post("/actions/:action", async (req, res) => {
   try {
-    const response = await actionServer.post(`/actions/${req.params.action}`);
+    const response = await actionServer.post(`/actions/${req.params.action}`, {
+      headers: {
+        "x-access-token":
+          (req.headers["x-access-token"] as string) ||
+          (req.headers["Authorization"] as string).split(" ")[1],
+      },
+    });
     return res.send(response.data);
   } catch (err) {
     console.error("Error: ", err);
@@ -94,7 +120,14 @@ router.post("/actions/:action", async (req, res) => {
 router.get("/actions/metadata/:action", async (req, res) => {
   try {
     const response = await actionServer.get(
-      `/actions/metadata/${req.params.action}`
+      `/actions/metadata/${req.params.action}`,
+      {
+        headers: {
+          "x-access-token":
+            (req.headers["x-access-token"] as string) ||
+            (req.headers["Authorization"] as string).split(" ")[1],
+        },
+      }
     );
     globalLog("Got action metadata: ", response.data);
     return res.send(response.data);
@@ -108,7 +141,13 @@ router.get("/actions/metadata/:action", async (req, res) => {
 
 router.post("/nlu", async (req, res) => {
   try {
-    const response = await interpretationServer.post("/nlu", req.body);
+    const response = await interpretationServer.post("/nlu", req.body, {
+      headers: {
+        "x-access-token":
+          (req.headers["x-access-token"] as string) ||
+          (req.headers["Authorization"] as string).split(" ")[1],
+      },
+    });
     return res.send(response.data);
   } catch (err) {
     console.error("Error: ", err);
@@ -120,6 +159,11 @@ router.post("/nlu/test", async (req, res) => {
     // test that the nlu server is running with a timeout of 5 seconds
     const response = await interpretationServer.post("/nlu", req.body, {
       timeout: 5000,
+      headers: {
+        "x-access-token":
+          (req.headers["x-access-token"] as string) ||
+          (req.headers["Authorization"] as string).split(" ")[1],
+      },
     });
     return res.send(response.data);
   } catch (err) {
