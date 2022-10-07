@@ -21,14 +21,14 @@ router.post("/check", async (req, res) => {
           console.error(err);
         }
         return {
-          data: {
-            error: err,
-            message: "There was an error authenticating",
-            validated: false,
-          },
+          error: err,
+          message: "There was an error authenticating",
+          validated: false,
         };
       });
-    const { validated, message, error } = response.data as {
+
+    console.log("response", response);
+    const { validated, message, error } = response as {
       validated: boolean;
       message: string;
       error: any;
@@ -50,9 +50,35 @@ router.post("/check", async (req, res) => {
   }
 });
 
-router.get("/login-url", (req, res) => {
-  const url = process.env.PEOPLE_SERVER_LOGIN_URL;
-  res.send({ url });
+router.post("/login", async (req, res) => {
+  try {
+    const { username, password } = req.body;
+    console.log("username", username);
+    console.log("password", password);
+    const response = await peopleServer.post(`/users/signin`, {
+      username,
+      password,
+    });
+    const { data } = response;
+    if (data.error) {
+      return res.status(401).send({
+        message: data.message,
+        error: data.error,
+      });
+    }
+    console.log("response", data);
+    res.send({
+      message: "Logged in",
+      access_token: data.access_token,
+      refresh_token: data.refresh_token,
+    });
+  } catch (err) {
+    console.error(err);
+    res.send({
+      message: "There was an error logging in",
+      error: err,
+    });
+  }
 });
 
 export default router;

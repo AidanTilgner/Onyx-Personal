@@ -1,16 +1,28 @@
 <script>
-  import { getLoginURL } from "../lib/helpers/functions/auth";
   import { onMount } from "svelte";
+  import { navigate } from "svelte-routing";
+  import { loginUser, checkAuth } from "../lib/helpers/functions/auth";
 
-  let loginURL = "";
+  const formState = {
+    username: "",
+    password: "",
+  };
 
   onMount(async () => {
-    loginURL = await getLoginURL();
-    handleNavigateToLogin();
+    const auth = await checkAuth();
+    if (auth) {
+      navigate("/home");
+    }
   });
 
-  const handleNavigateToLogin = () => {
-    window.location.href = loginURL;
+  const handleSubmit = async () => {
+    const { username, password } = formState;
+    console.log("Form submitted", username, password);
+    const loggedIn = await loginUser(username, password);
+    console.log("response", loggedIn);
+    if (loggedIn) {
+      navigate("/home");
+    }
   };
 </script>
 
@@ -21,19 +33,29 @@
         <h2>Login to Onyx</h2>
       </div>
       <div class="login-modal-body">
-        <p>
-          You are being redirected to the login page. If you are not redirected
-          automatically, click the button below.
-        </p>
-        {#if loginURL}
-          <button
-            type="button"
-            class="submit-button"
-            on:click={handleNavigateToLogin}
-          >
-            Click here to login
-          </button>
-        {/if}
+        <form on:submit|preventDefault={handleSubmit}>
+          <div class="form-group">
+            <label for="username">Username</label>
+            <input
+              type="text"
+              name="username"
+              id="username"
+              bind:value={formState.username}
+            />
+          </div>
+          <div class="form-group">
+            <label for="password">Password</label>
+            <input
+              type="password"
+              name="password"
+              id="password"
+              bind:value={formState.password}
+            />
+          </div>
+          <div class="form-group">
+            <button type="submit" class="submit-button">Login</button>
+          </div>
+        </form>
       </div>
     </div>
   </div>
@@ -77,7 +99,7 @@
     }
   }
 
-  .input-group {
+  .form-group {
     display: flex;
     flex-direction: column;
     margin-bottom: 24px;
