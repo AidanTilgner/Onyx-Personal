@@ -28,7 +28,6 @@ const handlePackage = async (pkg: NLUPackage) => {
 
     let result: any;
 
-    console.log("Using data: ", deposited);
     const res = await mappings[action](session_id, deposited);
     result = res;
     steps[current_step].data.gathered = res;

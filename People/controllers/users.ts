@@ -12,6 +12,7 @@ import {
 import {
   getUser as getDBUser,
   addUser as addDBUser,
+  getUsers as getDBUsers,
 } from "database/queries/users";
 import { AllowedRoles } from "interfaces/roles";
 import { User } from "interfaces/users";
@@ -119,7 +120,7 @@ export const refreshUser = async (username: string, refresh_token: string) => {
       return {
         error: "Invalid refresh token",
         message: "Invalid refresh token",
-        status: 401,
+        validated: false,
       };
     }
 
@@ -134,6 +135,7 @@ export const refreshUser = async (username: string, refresh_token: string) => {
       return {
         error,
         message,
+        validated: false,
       };
     }
 
@@ -141,7 +143,7 @@ export const refreshUser = async (username: string, refresh_token: string) => {
       return {
         error: "Invalid refresh token",
         message: "Invalid refresh token",
-        status: 401,
+        validated: false,
       };
     }
 
@@ -151,6 +153,7 @@ export const refreshUser = async (username: string, refresh_token: string) => {
       return {
         error: user_error,
         message: "There was an error fetching the user",
+        validated: false,
       };
     }
 
@@ -158,6 +161,7 @@ export const refreshUser = async (username: string, refresh_token: string) => {
       return {
         error: "User not found",
         message: "User not found",
+        validated: false,
       };
     }
 
@@ -167,8 +171,8 @@ export const refreshUser = async (username: string, refresh_token: string) => {
 
     return {
       message: "User authenticated successfully",
-      status: 200,
       access_token: new_access_token,
+      validated: true,
     };
   } catch (err) {
     console.error(err);
@@ -206,6 +210,29 @@ export const getMe = async (decoded: User) => {
     return {
       error: err,
       message: "There was an error fetching the user",
+    };
+  }
+};
+
+export const getUsers = async () => {
+  try {
+    const { users, error } = await getDBUsers();
+
+    if (error) {
+      return {
+        error,
+      };
+    }
+
+    return {
+      result: users,
+      message: "Users fetched successfully",
+    };
+  } catch (err) {
+    console.error(err);
+    return {
+      error: err,
+      message: "There was an error fetching the users",
     };
   }
 };

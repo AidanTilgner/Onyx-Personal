@@ -9,7 +9,6 @@ export const addRefreshToken = async (key: string, token: string) => {
         token: token,
       }
     );
-    console.log("Added token", result);
     if (!result.result) {
       return {
         error: "There was an error adding the reset token",
@@ -37,7 +36,6 @@ export const getRefreshToken = async (key: string) => {
         key: key,
       }
     );
-    console.log("Original result", result);
     const token = result.result[0] as { value: string };
 
     if (!token) {

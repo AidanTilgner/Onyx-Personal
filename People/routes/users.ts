@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { deleteUser, getUser } from "database/queries/users";
-import { addUser, getMe } from "controllers/users";
+import { addUser, getMe, getUsers } from "controllers/users";
 import { refreshUser, signInUser } from "controllers/users";
 import { authenticateSuperUser, authenticateToken } from "middleware/auth";
 
@@ -22,8 +22,7 @@ router.post("/add", authenticateSuperUser, async (req, res) => {
 
 router.get("/", authenticateSuperUser, async (req, res) => {
   try {
-    const username = req.body.username || req.query.username;
-    const result = await getUser(username);
+    const result = await getUsers();
     res.send(result);
   } catch (err) {
     console.error(err);

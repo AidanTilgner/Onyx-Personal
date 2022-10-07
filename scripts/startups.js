@@ -170,10 +170,41 @@ const startThirdPartyServer = (dev) => {
   });
 };
 
+const startPeopleServer = (dev) => {
+  const server_process = spawn(
+    `npm run ${dev ? "dev" : "start"}`,
+    {
+      cwd: path.join(process.cwd() + "/../People/"),
+      shell: true,
+    },
+    (err, stdout, stderr) => {
+      if (err) {
+        console.log("[People Server] Error starting People server: ", err);
+        console.log(stderr);
+        return;
+      }
+      console.log("[People Server] Successfully started People Server");
+      console.log(stdout);
+    }
+  );
+  server_process.stdout.on("data", (data) => {
+    console.log(`[People Server]: ${data}`);
+  });
+
+  server_process.stderr.on("data", (data) => {
+    console.log(`[People Server] Error: ${data}`);
+  });
+
+  server_process.on("close", (code) => {
+    console.log(`[People Server] child process exited with code ${code}`);
+  });
+};
+
 module.exports = {
   startActionServer,
   startApplicationsServer,
   startInterpretationServer,
   startSpeechServer,
   startThirdPartyServer,
+  startPeopleServer,
 };

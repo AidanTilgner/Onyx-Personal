@@ -1,6 +1,8 @@
 <script lang="ts">
   import { TextInput, Button } from "carbon-components-svelte";
   import { signinUser } from "@lib/helpers/backend";
+  import { dispatchAlert } from "@lib/stores/alerts";
+  import { navigate } from "svelte-routing";
 
   const formstate: {
     [key: string]: string;
@@ -10,10 +12,49 @@
   };
 
   const handleSubmit = async () => {
-    console.log("Submitting form", formstate);
     const { username, password } = formstate;
     const response = await signinUser(username, password);
-    console.log(response);
+    const {
+      result: { access_token, refresh_token, message, error },
+      error: main_error,
+    } = response;
+    if (main_error) {
+      dispatchAlert({
+        kind: "error",
+        title: "Error",
+        subtitle: main_error,
+        timeout: 5000,
+        visible: true,
+        caption: "Please try again.",
+      });
+    }
+    if (error) {
+      dispatchAlert({
+        kind: "error",
+        title: "Error",
+        subtitle: error,
+        timeout: 5000,
+        visible: true,
+        caption: "Please try again.",
+      });
+    }
+    if (access_token) {
+      localStorage.setItem("access_token", access_token);
+    }
+    if (refresh_token) {
+      localStorage.setItem("refresh_token", refresh_token);
+    }
+    if (message) {
+      dispatchAlert({
+        kind: "success",
+        title: "Success",
+        subtitle: message,
+        timeout: 5000,
+        visible: true,
+        caption: new Date().toLocaleString(),
+      });
+    }
+    navigate("/");
   };
 </script>
 

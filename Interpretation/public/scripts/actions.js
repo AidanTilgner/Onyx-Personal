@@ -114,7 +114,6 @@ const flagUnsupportedActions = () => {
   state.actionMappings.forEach((actionMapping) => {
     const { action: act, element: actionElement } = actionMapping;
     const [action, subaction = "default"] = act.split(".");
-    console.log("Testing action:", action, subaction);
     if (!actionServerActions[action]?.includes(subaction)) {
       const unsupportedElement = document.createElement("span");
       unsupportedElement.classList.add("unsupported");

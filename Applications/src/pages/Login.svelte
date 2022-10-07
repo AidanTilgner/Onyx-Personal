@@ -1,37 +1,26 @@
 <script>
-  import axios from "axios";
-  import { currentAlert } from "../lib/stores/alerts";
-  import { checkAuth } from "../lib/helpers/functions/auth";
-  import { loggedIn } from "../lib/stores/user";
+  import { onMount } from "svelte";
   import { navigate } from "svelte-routing";
+  import { loginUser, checkAuth } from "../lib/helpers/functions/auth";
 
-  let app_key = "";
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    axios
-      .post("/api/auth/check", {
-        token: app_key,
-      })
-      .then((res) => {
-        if (!res.data.authorized) {
-          currentAlert.set({
-            show: true,
-            message: "Invalid token",
-            type: "danger",
-          });
-          return;
-        }
-        localStorage.setItem("app_key", app_key);
-        window.location.href = "/";
-      })
-      .catch((err) => {
-        currentAlert.set({
-          type: "danger",
-          message: "There was an issue with attempted login",
-          show: true,
-        });
-        console.error(err);
-      });
+  const formState = {
+    username: "",
+    password: "",
+  };
+
+  onMount(async () => {
+    const auth = await checkAuth();
+    if (auth) {
+      navigate("/home");
+    }
+  });
+
+  const handleSubmit = async () => {
+    const { username, password } = formState;
+    const loggedIn = await loginUser(username, password);
+    if (loggedIn) {
+      navigate("/home");
+    }
   };
 </script>
 
@@ -42,21 +31,29 @@
         <h2>Login to Onyx</h2>
       </div>
       <div class="login-modal-body">
-        <div class="input-group">
-          <label for="app_key">App Key</label>
-          <input
-            type="text"
-            class="form-control"
-            id="app_key"
-            placeholder="Enter App Key"
-            on:change={(e) => {
-              app_key = e.target.value;
-            }}
-          />
-        </div>
-        <button type="button" class="submit-button" on:click={handleSubmit}
-          >Submit</button
-        >
+        <form on:submit|preventDefault={handleSubmit}>
+          <div class="form-group">
+            <label for="username">Username</label>
+            <input
+              type="text"
+              name="username"
+              id="username"
+              bind:value={formState.username}
+            />
+          </div>
+          <div class="form-group">
+            <label for="password">Password</label>
+            <input
+              type="password"
+              name="password"
+              id="password"
+              bind:value={formState.password}
+            />
+          </div>
+          <div class="form-group">
+            <button type="submit" class="submit-button">Login</button>
+          </div>
+        </form>
       </div>
     </div>
   </div>
@@ -100,7 +97,7 @@
     }
   }
 
-  .input-group {
+  .form-group {
     display: flex;
     flex-direction: column;
     margin-bottom: 24px;

@@ -10,3 +10,4 @@ venv/
 .env
 tmp/
 .secrets
+storage/
