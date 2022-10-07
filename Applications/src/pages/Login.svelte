@@ -17,9 +17,7 @@
 
   const handleSubmit = async () => {
     const { username, password } = formState;
-    console.log("Form submitted", username, password);
     const loggedIn = await loginUser(username, password);
-    console.log("response", loggedIn);
     if (loggedIn) {
       navigate("/home");
     }

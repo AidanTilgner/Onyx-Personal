@@ -11,13 +11,12 @@ export const checkAuth = async () => {
     });
     return false;
   }
-  console.log("Checking auth");
+
   axios
     .post("/api/auth/check", {
       token: localStorage.getItem("access_token"),
     })
     .then((res) => {
-      console.log("Auth check", res);
       if (res.data.authorized) {
         currentAlert.set({
           message: "You have been logged in successfully",

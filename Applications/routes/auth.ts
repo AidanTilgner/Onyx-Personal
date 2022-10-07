@@ -27,7 +27,6 @@ router.post("/check", async (req, res) => {
         };
       });
 
-    console.log("response", response);
     const { validated, message, error } = response as {
       validated: boolean;
       message: string;
@@ -53,8 +52,6 @@ router.post("/check", async (req, res) => {
 router.post("/login", async (req, res) => {
   try {
     const { username, password } = req.body;
-    console.log("username", username);
-    console.log("password", password);
     const response = await peopleServer.post(`/users/signin`, {
       username,
       password,
@@ -66,7 +63,7 @@ router.post("/login", async (req, res) => {
         error: data.error,
       });
     }
-    console.log("response", data);
+
     res.send({
       message: "Logged in",
       access_token: data.access_token,
