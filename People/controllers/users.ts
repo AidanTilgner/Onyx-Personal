@@ -112,9 +112,13 @@ export const signInUser = async (username: string, password: string) => {
   }
 };
 
-export const refreshUser = async (username: string, refresh_token: string) => {
+export const refreshUser = async (refresh_token: string, username: string) => {
   try {
-    const validated = verifyRefreshToken(refresh_token);
+    const validated = verifyRefreshToken(refresh_token) as
+      | {
+          username: string;
+        }
+      | false;
 
     if (!validated) {
       return {
@@ -179,6 +183,27 @@ export const refreshUser = async (username: string, refresh_token: string) => {
     return {
       error: err,
       message: "There was an error refreshing the token",
+    };
+  }
+};
+
+export const logoutUser = async (username: string) => {
+  try {
+    const { error } = await deleteRefreshToken(username);
+    if (error) {
+      return {
+        error,
+        message: "There was an error logging out the user",
+      };
+    }
+    return {
+      message: "User logged out successfully",
+    };
+  } catch (err) {
+    console.error(err);
+    return {
+      error: err,
+      message: "There was an error logging out the user",
     };
   }
 };

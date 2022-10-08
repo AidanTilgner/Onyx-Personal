@@ -2,6 +2,7 @@
   import Icon from "../../helpers/Icon/Icon.svelte";
   import { navigate } from "svelte-routing";
   import { currentPath } from "../../stores/env";
+  import { logoutUser } from "../../helpers/functions/auth";
 
   const navigateLink = (link) => {
     navigate(link);
@@ -19,7 +20,7 @@
     <div class="logo-container">
       <Icon name="onyx-logo" width="152" />
     </div>
-    <div class="nav-items">
+    <div class="nav-section">
       <div
         on:click={() => {
           navigateLink("/home");
@@ -77,6 +78,27 @@
       <p>Robots</p>
     </div> -->
     </div>
+    <div class="nav-section">
+      <div
+        on:click={() => {
+          navigateLink("/settings");
+          if (isMobile()) visible = false;
+        }}
+        class="nav-item {$currentPath === '/settings' && 'active'}"
+      >
+        <i class="material-symbols-outlined">settings</i>
+        <p>Settings</p>
+      </div>
+      <div
+        on:click={() => {
+          logoutUser();
+        }}
+        class="nav-item"
+      >
+        <i class="material-symbols-outlined">logout</i>
+        <p>Logout</p>
+      </div>
+    </div>
   </div>
 {/if}
 
@@ -127,6 +149,10 @@
     right: 0;
     bottom: 0;
     background-color: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
 
     @include tablet {
       width: 300px;
@@ -153,10 +179,19 @@
     align-items: center;
     justify-content: center;
     margin-top: 36px;
+    margin-bottom: 82px;
+  }
+  .nav-section {
+    margin-top: 36px;
+    padding: 24px 0;
+    border-top: 1px solid #eaeaea;
   }
 
-  .nav-items {
-    margin-top: 82px;
+  .nav-section:last-child {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
   }
 
   .nav-item {

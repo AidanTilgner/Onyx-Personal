@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { deleteUser, getUser } from "database/queries/users";
-import { addUser, getMe, getUsers } from "controllers/users";
+import { addUser, getMe, getUsers, logoutUser } from "controllers/users";
 import { refreshUser, signInUser } from "controllers/users";
 import { authenticateSuperUser, authenticateToken } from "middleware/auth";
 
@@ -95,10 +95,25 @@ router.post("/signin", async (req, res) => {
   }
 });
 
+router.post("/logout", async (req, res) => {
+  try {
+    const { username } = req.body;
+    const result = await logoutUser(username);
+    res.send(result);
+  } catch (err) {
+    console.error(err);
+    return res.send({
+      error: err,
+      message: "There was an error logging out the user",
+    });
+  }
+});
+
 router.post("/refresh", async (req, res) => {
   try {
-    const { username, refresh_token } = req.body;
-    const toSend = await refreshUser(username, refresh_token);
+    const { refresh_token, username } = req.body;
+    console.log("Refresh token: ", refresh_token);
+    const toSend = await refreshUser(refresh_token, username);
     res.send(toSend);
   } catch (err) {
     console.error(err);

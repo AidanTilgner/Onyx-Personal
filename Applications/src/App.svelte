@@ -21,13 +21,16 @@
   import Alert from "./lib/components/Alert/Alert.svelte";
   import Login from "./pages/Login.svelte";
   import Actions from "./pages/Actions.svelte";
+  import Settings from "./pages/Settings.svelte";
   export let url;
 
   const initialized = initSocket();
 
   let unsub;
   (async () => {
-    if (await checkAuth()) {
+    const authed = await checkAuth();
+    console.log("authed", authed);
+    if (!authed) {
       navigate("/login");
     }
   })();
@@ -72,6 +75,7 @@
           <Route path="/news" component={News} />
           <Route path="/robots" component={Robots} />
           <Route path="/actions" component={Actions} />
+          <Route path="/settings" component={Settings} />
           <Route path="*" component={Home} />
         </Router>
         <SideBar />
