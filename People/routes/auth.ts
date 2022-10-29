@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { refreshToken } from "controllers/auth";
 import { verifyToken } from "@utils/jwt";
+import { User } from "interfaces/users";
 
 const router = Router();
 
@@ -35,6 +36,9 @@ router.post("/check", async (req, res) => {
         message: "Invalid token",
         validated: false,
       });
+    }
+    if ((validated as User).password) {
+      delete (validated as User).password;
     }
     res.status(200).send({
       message: "Token is valid",

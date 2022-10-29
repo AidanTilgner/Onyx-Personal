@@ -4,6 +4,7 @@ import {
   generateToken,
   verifyRefreshToken,
 } from "@utils/jwt";
+import { getAllowedRoles } from "@utils/auth";
 import {
   addRefreshToken,
   getRefreshToken,
@@ -19,7 +20,7 @@ import { User } from "interfaces/users";
 
 export const addUser = async (username: string, role: AllowedRoles) => {
   try {
-    const { user, error } = await addDBUser(username, role);
+    const { user, generated_password, error } = await addDBUser(username, role);
     if (error) {
       return {
         error: error,
@@ -27,7 +28,10 @@ export const addUser = async (username: string, role: AllowedRoles) => {
       };
     }
     return {
-      result: user,
+      result: {
+        user: user,
+        generated_password: generated_password,
+      },
       message: "User added successfully",
     };
   } catch (err) {
@@ -64,7 +68,7 @@ export const getUser = async (username: string) => {
 export const signInUser = async (username: string, password: string) => {
   try {
     // Find user
-    const { user, error } = await getDBUser(username);
+    const { user, error } = await getDBUser(username, true);
 
     if (error) {
       return {
@@ -81,6 +85,7 @@ export const signInUser = async (username: string, password: string) => {
 
     // Compare passwords
     const { password: hashedPassword } = user;
+    console.log("Passwords: ", password, hashedPassword);
     const isPasswordCorrect = await comparePassword(password, hashedPassword);
 
     if (!isPasswordCorrect) {
@@ -212,6 +217,7 @@ export const getMe = async (decoded: User) => {
   try {
     const { username } = decoded;
     const { user, error } = await getDBUser(username);
+    const allowedRoles = await getAllowedRoles(username);
 
     if (error) {
       return {
@@ -227,7 +233,10 @@ export const getMe = async (decoded: User) => {
     }
 
     return {
-      result: user,
+      result: {
+        ...user,
+        allowed_roles: allowedRoles,
+      },
       message: "User fetched successfully",
     };
   } catch (err) {
@@ -258,6 +267,23 @@ export const getUsers = async () => {
     return {
       error: err,
       message: "There was an error fetching the users",
+    };
+  }
+};
+
+export const getUserAllowedRoles = async (username: string) => {
+  try {
+    const allowedRoles = await getAllowedRoles(username);
+
+    return {
+      result: allowedRoles,
+      message: "Allowed roles fetched successfully",
+    };
+  } catch (err) {
+    console.error(err);
+    return {
+      error: err,
+      message: "There was an error fetching the user's allowed roles",
     };
   }
 };

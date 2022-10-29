@@ -3,11 +3,12 @@
 
   const isMobile = window.innerWidth < 768;
   let expanded = isMobile ? false : true;
+  $: showItems = localStorage.getItem("access_token") ? true : false;
 </script>
 
 <div class="navbar">
   <h3 class="navbar__title">Onyx People Server</h3>
-  {#if expanded}
+  {#if expanded && showItems}
     <div class="navbar__items">
       <button
         class="navbar__item"
@@ -16,6 +17,16 @@
         }}
       >
         Household
+      </button>
+      <button
+        class="navbar__item logout"
+        on:click={() => {
+          localStorage.removeItem("access_token");
+          localStorage.removeItem("refresh_token");
+          window.location.reload();
+        }}
+      >
+        Logout
       </button>
     </div>
   {/if}
@@ -109,6 +120,15 @@
         background-color: #000;
         color: #fff;
       }
+    }
+  }
+
+  .logout {
+    color: #f00;
+    border-color: #f00;
+    &:hover {
+      background-color: #f00;
+      color: #fff;
     }
   }
 </style>

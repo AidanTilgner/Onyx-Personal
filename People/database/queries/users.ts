@@ -81,7 +81,8 @@ export const checkUserExists = async (username: string): Promise<boolean> => {
 };
 
 export const getUser = async (
-  username: string
+  username: string,
+  withPassword?: boolean
 ): Promise<{ user?: User; error?: string } | null> => {
   try {
     if (!username) {
@@ -104,6 +105,9 @@ export const getUser = async (
     }
 
     const user = result.result[0] as User;
+    if (!withPassword) {
+      delete user.password;
+    }
 
     return { user };
   } catch (err) {
@@ -199,6 +203,41 @@ export const getUsers = async (): Promise<{
     console.error(err);
     return {
       error: err,
+    };
+  }
+};
+
+export const disableUser = async (
+  username: string
+): Promise<{
+  result?: any;
+  error?: string;
+  message?: string;
+}> => {
+  try {
+    if (!username) {
+      return {
+        error: "Username is required",
+        message: "Username is required",
+      };
+    }
+
+    const [result] = await db.query(
+      "UPDATE users SET disabled = 1 WHERE username = $username",
+      {
+        username: username,
+      }
+    );
+
+    return {
+      result: result.result,
+      message: "User disabled successfully",
+    };
+  } catch (err) {
+    console.error(err);
+    return {
+      error: err,
+      message: "There was an error disabling the user",
     };
   }
 };

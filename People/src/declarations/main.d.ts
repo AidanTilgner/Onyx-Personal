@@ -17,3 +17,17 @@ export interface Alert {
   visible: boolean;
   timeout?: number;
 }
+
+export interface User {
+  username: string;
+  password: string;
+  role: string;
+}
+
+export interface Role {
+  name: string;
+  permissions: string[];
+  rank: number;
+}
+
+export type AllowedRoles = "hyperuser" | "superuser" | "user";

@@ -3,6 +3,7 @@
   import { signinUser } from "@lib/helpers/backend";
   import { dispatchAlert } from "@lib/stores/alerts";
   import { navigate } from "svelte-routing";
+  import { onMount } from "svelte";
 
   const formstate: {
     [key: string]: string;
@@ -14,6 +15,7 @@
   const handleSubmit = async () => {
     const { username, password } = formstate;
     const response = await signinUser(username, password);
+    console.log("response", response);
     const {
       result: { access_token, refresh_token, message, error },
       error: main_error,
@@ -27,6 +29,7 @@
         visible: true,
         caption: "Please try again.",
       });
+      return;
     }
     if (error) {
       dispatchAlert({
@@ -37,6 +40,7 @@
         visible: true,
         caption: "Please try again.",
       });
+      return;
     }
     if (access_token) {
       localStorage.setItem("access_token", access_token);
@@ -54,8 +58,16 @@
         caption: new Date().toLocaleString(),
       });
     }
-    navigate("/");
+    window.location.reload();
   };
+
+  onMount(() => {
+    const access_token = localStorage.getItem("access_token");
+    const refresh_token = localStorage.getItem("refresh_token");
+    if (access_token && refresh_token) {
+      navigate("/");
+    }
+  });
 </script>
 
 <main class="login-container">
