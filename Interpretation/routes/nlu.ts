@@ -15,7 +15,7 @@ const generateRandomSessionId = () => {
 };
 
 router.post("/", async (req, res) => {
-  const { text, language } = req.body;
+  const { text, language = "en" } = req.body;
   const session_id =
     req.body.session_id || req.query.session_id || generateRandomSessionId();
   const nlu = await unstable_getNLUData(session_id, text, language);

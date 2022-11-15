@@ -86,7 +86,7 @@ router.delete("/example", (req, res) => {
 router.get("/actions/supported", async (req, res) => {
   try {
     const actions = await actionServer
-      .get(`${process.env.ACTION_SERVER_HOST}/actions`)
+      .get(`/actions`)
       .then((res) => {
         return res.data.actions;
       })
@@ -96,6 +96,7 @@ router.get("/actions/supported", async (req, res) => {
           error: "There was an error getting the supported actions",
         });
       });
+
     return res.send({
       actions: actions,
       message: "Successfully retrieved supported actions",
